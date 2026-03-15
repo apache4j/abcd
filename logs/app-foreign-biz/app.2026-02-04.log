@@ -1,0 +1,6 @@
+2026-02-04 10:32:09.371 [SpringApplicationShutdownHook][TID: N/A][trace:] INFO  o.s.b.w.e.undertow.UndertowWebServer - Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-04 10:32:09.389 [SpringApplicationShutdownHook][TID: N/A][trace:] INFO  o.s.b.w.e.undertow.UndertowWebServer - Graceful shutdown complete
+2026-02-04 10:32:09.394 [SpringApplicationShutdownHook][TID: N/A][trace:] INFO  io.undertow - stopping server: Undertow - 2.3.3.Final
+2026-02-04 10:32:09.415 [SpringApplicationShutdownHook][TID: N/A][trace:] INFO  io.undertow.servlet - Destroying Spring FrameworkServlet 'dispatcherServlet'
+2026-02-04 10:32:09.548 [SpringApplicationShutdownHook][TID: N/A][trace:] INFO  c.a.c.n.r.NacosServiceRegistry - De-registering from Nacos Server now...
+2026-02-04 10:32:09.555 [SpringApplicationShutdownHook][TID: N/A][trace:] INFO  c.a.c.n.r.NacosServiceRegistry - De-registration finished.

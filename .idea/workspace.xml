@@ -1,0 +1,1127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4f1fe572-5a69-4acb-90bb-11d870cdeed1" name="Changes" comment="mail">
+      <change afterPath="$PROJECT_DIR$/system-business-service/mvn打包NoDeploy.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/websocket-service/websocket-biz/src/main/java/com/cloud/baowang/websocket/service/impl/WebSocketServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/websocket-service/websocket-biz/src/main/java/com/cloud/baowang/websocket/service/impl/WebSocketServiceImpl.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Enum" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <favorite-branches>
+      <branch-storage>
+        <map>
+          <entry type="LOCAL">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$/app-foreign" source="hotfix-20250918" />
+                <branch-info repo="$PROJECT_DIR$/wallet-service" source="hotfix-20250918" />
+                <branch-info repo="$PROJECT_DIR$/baowang-common" source="hotfix-20250918" />
+                <branch-info repo="$PROJECT_DIR$/site-foreign" source="hotfix-20250918" />
+                <branch-info repo="$PROJECT_DIR$/user-service" source="hotfix-20250918" />
+                <branch-info repo="$PROJECT_DIR$/system-business-service" source="hotfix-20250918" />
+                <branch-info repo="$PROJECT_DIR$/job-center" source="hotfix-20250918" />
+                <branch-info repo="$PROJECT_DIR$/agent-service" source="hotfix-20250918" />
+                <branch-info repo="$PROJECT_DIR$/play-service" source="hotfix-20250918" />
+                <branch-info repo="$PROJECT_DIR$/agent-foreign" source="hotfix-20250918" />
+                <branch-info repo="$PROJECT_DIR$/websocket-service" source="hotfix-20250918" />
+                <branch-info repo="$PROJECT_DIR$/play-wallet-api" source="hotfix-20250918" />
+                <branch-info repo="$PROJECT_DIR$/gateway" source="hotfix-20250918" />
+                <branch-info repo="$PROJECT_DIR$/admin-foreign" source="hotfix-20250918" />
+                <branch-info repo="$PROJECT_DIR$/business-foreign" source="hotfix-20250918" />
+                <branch-info repo="$PROJECT_DIR$/pay-service" source="hotfix-20250918" />
+                <branch-info repo="$PROJECT_DIR$/report-service" source="hotfix-20250918" />
+                <branch-info repo="$PROJECT_DIR$/essync-service" source="hotfix-20250918" />
+                <branch-info repo="$PROJECT_DIR$/activity-service" source="hotfix-20250918" />
+                <branch-info repo="$PROJECT_DIR$/admin-foreign" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/activity-service" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/parent-pom" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/agent-service" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/baowang-common" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/app-foreign" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/commonsql" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/data-transfer" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/business-foreign" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/pay-service" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/agent-foreign" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/essync-service" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/websocket-service" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/wallet-service" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/system-business-service" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/job-center" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/user-service" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/report-service" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/play-wallet-api" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/site-foreign" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/gateway" source="dev-20251020" />
+                <branch-info repo="$PROJECT_DIR$/play-service" source="dev-20251020" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </favorite-branches>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/activity-service" value="main" />
+        <entry key="$PROJECT_DIR$/agent-service" value="dev-20260201" />
+        <entry key="$PROJECT_DIR$/pay-service" value="main" />
+      </map>
+    </option>
+    <option name="RECENT_COMMON_BRANCH" value="sit" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/system-business-service" />
+    <option name="ROOT_SYNC" value="SYNC" />
+  </component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="customMavenHome" value="$PROJECT_DIR$/../Documents/Apache/apache-maven-3.6.0" />
+        <option name="mavenHomeTypeForPersistence" value="CUSTOM" />
+        <option name="userSettingsFile" value="$PROJECT_DIR$/../Documents/Apache/apache-maven-3.6.0/conf/settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="32xGHvYF7BjOlFDKt280JdequAk" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.AESDBUtil.executor": "Run",
+    "Application.AESDecrypt.executor": "Run",
+    "Application.BukaSenderService.executor": "Run",
+    "Application.Card.executor": "Run",
+    "Application.DBAceLtOrderParseUtil.executor": "Run",
+    "Application.DBAceltGameApiImpl.executor": "Run",
+    "Application.DBAceltGamePullBetTask.executor": "Run",
+    "Application.DBAceltServiceImpl.executor": "Run",
+    "Application.DBChessServiceImpl.executor": "Run",
+    "Application.DBEVGGameApiImpl.executor": "Run",
+    "Application.DBEVGServiceImpl.executor": "Run",
+    "Application.DBFishingServiceImpl.executor": "Run",
+    "Application.DBSHController.executor": "Run",
+    "Application.DBSHGameApiImpl.executor": "Run",
+    "Application.DBSHOrderInfoUtil.executor": "Run",
+    "Application.DBSHServiceImpl.executor": "Run",
+    "Application.DBScratchLotteryServiceImpl.executor": "Run",
+    "Application.DG2GameApiImpl.executor": "Run",
+    "Application.DG2ServiceImpl.executor": "Run",
+    "Application.IpAddressUtils.executor": "Run",
+    "Application.JdbGamePullBetTask.executor": "Run",
+    "Application.OrderInfoLabel$OrderInfoLabelEnum.executor": "Run",
+    "Application.SexyServiceImpl.executor": "Run",
+    "Application.TimeZoneUtils.executor": "Run",
+    "Application.UserVenueRebateTaskService.executor": "Run",
+    "Application.VenueUserAccountConfig.executor": "Run",
+    "Application.WintoEVGServiceImpl.executor": "Run",
+    "Application.WintoEvgServiceImpl.executor": "Run",
+    "Maven.activity-api [clean].executor": "Run",
+    "Maven.activity-api [install].executor": "Run",
+    "Maven.activity-service [clean].executor": "Run",
+    "Maven.activity-service [install].executor": "Run",
+    "Maven.agent-biz [clean].executor": "Run",
+    "Maven.agent-biz [install].executor": "Run",
+    "Maven.app-foreign [clean].executor": "Run",
+    "Maven.app-foreign [install].executor": "Run",
+    "Maven.baowang-common [clean].executor": "Run",
+    "Maven.baowang-common [compile].executor": "Run",
+    "Maven.baowang-common [install].executor": "Run",
+    "Maven.common-auth [clean].executor": "Run",
+    "Maven.common-auth [install].executor": "Run",
+    "Maven.common-core [clean].executor": "Run",
+    "Maven.common-core [install].executor": "Run",
+    "Maven.common-kafka [clean].executor": "Run",
+    "Maven.common-kafka [install].executor": "Run",
+    "Maven.common-log [clean].executor": "Run",
+    "Maven.common-log [install].executor": "Run",
+    "Maven.common-test [clean].executor": "Run",
+    "Maven.common-test [install].executor": "Run",
+    "Maven.common-test [package].executor": "Run",
+    "Maven.data-transfer [clean].executor": "Run",
+    "Maven.data-transfer [install].executor": "Run",
+    "Maven.data-transfer [package].executor": "Run",
+    "Maven.data-transfer [test].executor": "Run",
+    "Maven.essync-service [clean].executor": "Run",
+    "Maven.essync-service [install].executor": "Run",
+    "Maven.gateway [clean].executor": "Run",
+    "Maven.gateway [install].executor": "Run",
+    "Maven.parent-pom [clean].executor": "Run",
+    "Maven.parent-pom [install].executor": "Run",
+    "Maven.parent-pom [validate].executor": "Run",
+    "Maven.play-biz [clean].executor": "Run",
+    "Maven.play-biz [package].executor": "Run",
+    "Maven.play-service [clean].executor": "Run",
+    "Maven.play-service [install].executor": "Run",
+    "Maven.play-wallet-api [install].executor": "Run",
+    "Maven.report-biz [clean].executor": "Run",
+    "Maven.report-biz [install].executor": "Run",
+    "Maven.report-service [clean].executor": "Run",
+    "Maven.report-service [install].executor": "Run",
+    "Maven.system-business-api [clean].executor": "Run",
+    "Maven.system-business-api [install].executor": "Run",
+    "Maven.system-business-service [clean].executor": "Run",
+    "Maven.system-business-service [install].executor": "Run",
+    "Maven.user-biz [clean].executor": "Run",
+    "Maven.user-biz [install].executor": "Run",
+    "Maven.user-service [clean].executor": "Run",
+    "Maven.user-service [install].executor": "Run",
+    "Maven.websocket-service [clean].executor": "Run",
+    "Maven.websocket-service [install].executor": "Run",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "Spring Boot.ActivityApplication.executor": "Run",
+    "Spring Boot.AdminCenterApplication.executor": "Debug",
+    "Spring Boot.AgentApplication.executor": "Debug",
+    "Spring Boot.AgentForeignApplication.executor": "Run",
+    "Spring Boot.AppForeignApplication.executor": "Debug",
+    "Spring Boot.BusinessForeignApplication.executor": "Run",
+    "Spring Boot.EsSyncServiceApplication.executor": "Run",
+    "Spring Boot.GatewayApplication.executor": "Debug",
+    "Spring Boot.JobServerApplication.executor": "Run",
+    "Spring Boot.PayServiceRunner.executor": "Run",
+    "Spring Boot.PlayApplication.executor": "Debug",
+    "Spring Boot.PlayWalletApiApplication.executor": "Debug",
+    "Spring Boot.ReportApplication.executor": "Debug",
+    "Spring Boot.SiteCenterApplication.executor": "Run",
+    "Spring Boot.SystemBusinessApplication.executor": "Debug",
+    "Spring Boot.UserApplication.executor": "Debug",
+    "Spring Boot.WalletApplication.executor": "Debug",
+    "Spring Boot.WebsocketApplication.executor": "Run",
+    "git-widget-placeholder": "sit",
+    "jdk.selected.JAVA_MODULE": "17",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/mac/baowang/system-business-service",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.74367815",
+    "run.configurations.included.in.services": "true",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="ReactorSettings">
+    <option name="notificationShown" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/system-business-service" />
+      <recent name="$PROJECT_DIR$/agent-service/agent-biz/src/main/resources/mapper" />
+      <recent name="$PROJECT_DIR$/agent-service/agent-api/src/main/java/com/cloud/baowang/agent/api/vo/agent/commission" />
+      <recent name="$PROJECT_DIR$/user-service/user-biz/src/main/resources/mapper" />
+      <recent name="$PROJECT_DIR$/play-service/play-api/src/main/java/com/cloud/baowang/play/api/vo/pt2/vo/rps" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/agent-service/agent-biz/src/main/resources/mapper" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.cloud.baowang.agent.api.vo.commission.front" />
+      <recent name="com.cloud.baowang.agent.api.vo.commission" />
+      <recent name="com.cloud.baowang.agent.repositories" />
+      <recent name="com.cloud.baowang.system.api.vo.commission" />
+      <recent name="com.cloud.baowang.report.api.vo" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="KtorApplicationConfigurationType" />
+        <option value="MicronautRunConfigurationType" />
+        <option value="QuarkusRunConfigurationType" />
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
+  </component>
+  <component name="RunManager" selected="Spring Boot.AgentApplication">
+    <configuration name="BukaSenderService" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.cloud.baowang.system.service.verify.vendor.service.BukaSenderService" />
+      <module name="system-business-biz" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.cloud.baowang.system.service.verify.vendor.service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DBScratchLotteryServiceImpl" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.cloud.baowang.play.game.db.scratch.DBScratchLotteryServiceImpl" />
+      <module name="play-biz" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.cloud.baowang.play.game.db.scratch.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="IpAddressUtils" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.cloud.baowang.common.core.utils.IpAddressUtils" />
+      <module name="common-core" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.cloud.baowang.common.core.utils.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SexyServiceImpl" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.cloud.baowang.play.game.sexy.SexyServiceImpl" />
+      <module name="play-biz" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.cloud.baowang.play.game.sexy.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TimeZoneUtils" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.cloud.baowang.common.core.utils.TimeZoneUtils" />
+      <module name="common-core" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.cloud.baowang.common.core.utils.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="wallet-api" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AccountApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="account-biz" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.cloud.baowang.account.AccountApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ActivityApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="activity-biz" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.cloud.baowang.activity.ActivityApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AdminCenterApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="ACTIVE_PROFILES" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl = org.apache.ibatis.logging.stdout.StdOutImpl" />
+      <module name="admin-foreign-biz" />
+      <option name="PROGRAM_PARAMETERS" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.cloud.baowang.admin.AdminCenterApplication" />
+      <option name="VM_PARAMETERS" value="-Dfile.encoding=UTF-8 -Dspring.output.ansi.enabled=always" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AgentApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="ACTIVE_PROFILES" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl = org.apache.ibatis.logging.stdout.StdOutImpl" />
+      <module name="agent-biz" />
+      <option name="PROGRAM_PARAMETERS" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.cloud.baowang.agent.AgentApplication" />
+      <option name="VM_PARAMETERS" value="-Dfile.encoding=UTF-8 -Dspring.output.ansi.enabled=always" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AgentForeignApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="agent-foreign-biz" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.cloud.baowang.agent.AgentForeignApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AppForeignApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="ACTIVE_PROFILES" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl = org.apache.ibatis.logging.stdout.StdOutImpl" />
+      <module name="app-foreign-biz" />
+      <option name="PROGRAM_PARAMETERS" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.cloud.baowang.user.AppForeignApplication" />
+      <option name="VM_PARAMETERS" value="-Dfile.encoding=UTF-8 -Dspring.output.ansi.enabled=always" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="BusinessForeignApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="business-foreign-biz" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.cloud.baowang.site.BusinessForeignApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="EsSyncServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="essync-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.cloud.baowang.es.sync.EsSyncServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GatewayApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="ACTIVE_PROFILES" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl = org.apache.ibatis.logging.stdout.StdOutImpl" />
+      <option name="ALTERNATIVE_JRE_PATH" value="17" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <module name="gateway" />
+      <option name="PROGRAM_PARAMETERS" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl " />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.cloud.baowang.common.gateway.GatewayApplication" />
+      <option name="VM_PARAMETERS" value="-Dfile.encoding=UTF-8 -Dspring.output.ansi.enabled=always" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="JobServerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="job-server" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.cloud.baowang.JobServerApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="PayServiceRunner" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="pay-biz" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.cloud.baowang.PayServiceRunner" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="PlayApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="ACTIVE_PROFILES" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl = org.apache.ibatis.logging.stdout.StdOutImpl" />
+      <module name="play-biz" />
+      <option name="PROGRAM_PARAMETERS" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl " />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.cloud.baowang.play.PlayApplication" />
+      <option name="VM_PARAMETERS" value="-Dfile.encoding=UTF-8 -Dspring.output.ansi.enabled=always" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="PlayWalletApiApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="ACTIVE_PROFILES" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl = org.apache.ibatis.logging.stdout.StdOutImpl" />
+      <module name="play-wallet-api" />
+      <option name="PROGRAM_PARAMETERS" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.cloud.baowang.play.wallet.PlayWalletApiApplication" />
+      <option name="VM_PARAMETERS" value="-Dfile.encoding=UTF-8 -Dspring.output.ansi.enabled=always" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ReportApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="ACTIVE_PROFILES" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl = org.apache.ibatis.logging.stdout.StdOutImpl" />
+      <module name="report-biz" />
+      <option name="PROGRAM_PARAMETERS" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl " />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.cloud.baowang.report.ReportApplication" />
+      <option name="VM_PARAMETERS" value="-Dfile.encoding=UTF-8 -Dspring.output.ansi.enabled=always" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SiteCenterApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="ACTIVE_PROFILES" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl = org.apache.ibatis.logging.stdout.StdOutImpl" />
+      <module name="site-foreign-biz" />
+      <option name="PROGRAM_PARAMETERS" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl " />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.cloud.baowang.site.SiteCenterApplication" />
+      <option name="VM_PARAMETERS" value="-Dfile.encoding=UTF-8 -Dspring.output.ansi.enabled=always" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SystemBusinessApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="ACTIVE_PROFILES" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl = org.apache.ibatis.logging.stdout.StdOutImpl" />
+      <module name="system-business-biz" />
+      <option name="PROGRAM_PARAMETERS" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.cloud.baowang.system.SystemBusinessApplication" />
+      <option name="VM_PARAMETERS" value="-Dfile.encoding=UTF-8 -Dspring.output.ansi.enabled=always" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="ACTIVE_PROFILES" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl = org.apache.ibatis.logging.stdout.StdOutImpl" />
+      <module name="user-biz" />
+      <option name="PROGRAM_PARAMETERS" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.cloud.baowang.user.UserApplication" />
+      <option name="VM_PARAMETERS" value="-Dfile.encoding=UTF-8 -Dspring.output.ansi.enabled=always" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="WalletApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="ACTIVE_PROFILES" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl = org.apache.ibatis.logging.stdout.StdOutImpl" />
+      <module name="wallet-biz" />
+      <option name="PROGRAM_PARAMETERS" value="--spring.profiles.active=feng --log_dir=./logs --mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.cloud.baowang.wallet.WalletApplication" />
+      <option name="VM_PARAMETERS" value="-Dfile.encoding=UTF-8 -Dspring.output.ansi.enabled=always" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="WebsocketApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="websocket-biz" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.cloud.baowang.websocket.WebsocketApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Application.IpAddressUtils" />
+      <item itemvalue="Application.BukaSenderService" />
+      <item itemvalue="Application.DBScratchLotteryServiceImpl" />
+      <item itemvalue="Application.SexyServiceImpl" />
+      <item itemvalue="Application.TimeZoneUtils" />
+      <item itemvalue="Spring Boot.AccountApplication" />
+      <item itemvalue="Spring Boot.ActivityApplication" />
+      <item itemvalue="Spring Boot.AdminCenterApplication" />
+      <item itemvalue="Spring Boot.AgentApplication" />
+      <item itemvalue="Spring Boot.AgentForeignApplication" />
+      <item itemvalue="Spring Boot.AppForeignApplication" />
+      <item itemvalue="Spring Boot.BusinessForeignApplication" />
+      <item itemvalue="Spring Boot.EsSyncServiceApplication" />
+      <item itemvalue="Spring Boot.GatewayApplication" />
+      <item itemvalue="Spring Boot.JobServerApplication" />
+      <item itemvalue="Spring Boot.PayServiceRunner" />
+      <item itemvalue="Spring Boot.PlayApplication" />
+      <item itemvalue="Spring Boot.PlayWalletApiApplication" />
+      <item itemvalue="Spring Boot.ReportApplication" />
+      <item itemvalue="Spring Boot.SiteCenterApplication" />
+      <item itemvalue="Spring Boot.SystemBusinessApplication" />
+      <item itemvalue="Spring Boot.UserApplication" />
+      <item itemvalue="Spring Boot.WalletApplication" />
+      <item itemvalue="Spring Boot.WebsocketApplication" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.TimeZoneUtils" />
+        <item itemvalue="Application.SexyServiceImpl" />
+        <item itemvalue="Application.DBScratchLotteryServiceImpl" />
+        <item itemvalue="Application.BukaSenderService" />
+        <item itemvalue="Application.IpAddressUtils" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23339.11" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23339.11" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="4f1fe572-5a69-4acb-90bb-11d870cdeed1" name="Changes" comment="" />
+      <created>1758354725754</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1758354725754</updated>
+      <workItem from="1758354726817" duration="15822000" />
+      <workItem from="1758512404104" duration="2198000" />
+      <workItem from="1758514749810" duration="9219000" />
+      <workItem from="1758527593717" duration="1100000" />
+      <workItem from="1758528708288" duration="5270000" />
+      <workItem from="1758535466575" duration="79106000" />
+      <workItem from="1758792383503" duration="26450000" />
+      <workItem from="1758874416818" duration="162000" />
+      <workItem from="1758874593960" duration="50000" />
+      <workItem from="1758875352618" duration="1015000" />
+      <workItem from="1758876373371" duration="2000" />
+      <workItem from="1758876661091" duration="108956000" />
+      <workItem from="1759285531345" duration="17000" />
+      <workItem from="1759285584819" duration="54946000" />
+      <workItem from="1759399921327" duration="58399000" />
+      <workItem from="1759889015259" duration="114124000" />
+      <workItem from="1760323794633" duration="4405000" />
+      <workItem from="1760340682729" duration="2211000" />
+      <workItem from="1760343166513" duration="100114000" />
+      <workItem from="1760773221696" duration="30370000" />
+      <workItem from="1761099449027" duration="94233000" />
+      <workItem from="1761375293770" duration="87894000" />
+      <workItem from="1761798928252" duration="7890000" />
+      <workItem from="1761815141608" duration="65803000" />
+      <workItem from="1762244012148" duration="7000" />
+      <workItem from="1762244145199" duration="4000" />
+      <workItem from="1762244193285" duration="15000" />
+      <workItem from="1762411493551" duration="5881000" />
+      <workItem from="1762515032517" duration="2508000" />
+      <workItem from="1763025615911" duration="7759000" />
+      <workItem from="1765009371634" duration="10620000" />
+      <workItem from="1766304602372" duration="124000" />
+      <workItem from="1766830744528" duration="2244000" />
+      <workItem from="1768019915800" duration="5166000" />
+      <workItem from="1768451209917" duration="3970000" />
+      <workItem from="1768531006684" duration="577000" />
+      <workItem from="1768531626044" duration="82000" />
+      <workItem from="1768531714074" duration="755000" />
+      <workItem from="1768532493154" duration="9545000" />
+      <workItem from="1768631722839" duration="404000" />
+      <workItem from="1768632874158" duration="188000" />
+      <workItem from="1768633066432" duration="10818000" />
+      <workItem from="1768890895786" duration="11311000" />
+      <workItem from="1768963052706" duration="1457000" />
+      <workItem from="1768964665485" duration="72168000" />
+      <workItem from="1769658290502" duration="47000" />
+      <workItem from="1769675462204" duration="12167000" />
+      <workItem from="1769745928518" duration="47000" />
+      <workItem from="1769746061351" duration="25784000" />
+      <workItem from="1769849952115" duration="59441000" />
+      <workItem from="1770188306065" duration="83389000" />
+      <workItem from="1771984286418" duration="954000" />
+      <workItem from="1772261060470" duration="11317000" />
+      <workItem from="1772445654511" duration="5586000" />
+      <workItem from="1772674134833" duration="1231000" />
+      <workItem from="1772702435961" duration="598000" />
+      <workItem from="1772764554140" duration="598000" />
+      <workItem from="1772849517253" duration="598000" />
+      <workItem from="1773019874652" duration="598000" />
+      <workItem from="1773545850906" duration="19000" />
+    </task>
+    <task id="LOCAL-00196" summary="winto电子">
+      <option name="closed" value="true" />
+      <created>1761532034790</created>
+      <option name="number" value="00196" />
+      <option name="presentableId" value="LOCAL-00196" />
+      <option name="project" value="LOCAL" />
+      <updated>1761532034790</updated>
+    </task>
+    <task id="LOCAL-00197" summary="拉单优化">
+      <option name="closed" value="true" />
+      <created>1761535193770</created>
+      <option name="number" value="00197" />
+      <option name="presentableId" value="LOCAL-00197" />
+      <option name="project" value="LOCAL" />
+      <updated>1761535193770</updated>
+    </task>
+    <task id="LOCAL-00198" summary="pt2">
+      <option name="closed" value="true" />
+      <created>1761538510152</created>
+      <option name="number" value="00198" />
+      <option name="presentableId" value="LOCAL-00198" />
+      <option name="project" value="LOCAL" />
+      <updated>1761538510152</updated>
+    </task>
+    <task id="LOCAL-00199" summary="db系列">
+      <option name="closed" value="true" />
+      <created>1761547975617</created>
+      <option name="number" value="00199" />
+      <option name="presentableId" value="LOCAL-00199" />
+      <option name="project" value="LOCAL" />
+      <updated>1761547975617</updated>
+    </task>
+    <task id="LOCAL-00200" summary="winto电子">
+      <option name="closed" value="true" />
+      <created>1761549973136</created>
+      <option name="number" value="00200" />
+      <option name="presentableId" value="LOCAL-00200" />
+      <option name="project" value="LOCAL" />
+      <updated>1761549973136</updated>
+    </task>
+    <task id="LOCAL-00201" summary="db电竞">
+      <option name="closed" value="true" />
+      <created>1761558484955</created>
+      <option name="number" value="00201" />
+      <option name="presentableId" value="LOCAL-00201" />
+      <option name="project" value="LOCAL" />
+      <updated>1761558484955</updated>
+    </task>
+    <task id="LOCAL-00202" summary="db电竞">
+      <option name="closed" value="true" />
+      <created>1761620197987</created>
+      <option name="number" value="00202" />
+      <option name="presentableId" value="LOCAL-00202" />
+      <option name="project" value="LOCAL" />
+      <updated>1761620197987</updated>
+    </task>
+    <task id="LOCAL-00203" summary="游戏模块">
+      <option name="closed" value="true" />
+      <created>1761622247062</created>
+      <option name="number" value="00203" />
+      <option name="presentableId" value="LOCAL-00203" />
+      <option name="project" value="LOCAL" />
+      <updated>1761622247062</updated>
+    </task>
+    <task id="LOCAL-00204" summary="db">
+      <option name="closed" value="true" />
+      <created>1761644900972</created>
+      <option name="number" value="00204" />
+      <option name="presentableId" value="LOCAL-00204" />
+      <option name="project" value="LOCAL" />
+      <updated>1761644900972</updated>
+    </task>
+    <task id="LOCAL-00205" summary="db,winto,dg2,sexy">
+      <option name="closed" value="true" />
+      <created>1761792819177</created>
+      <option name="number" value="00205" />
+      <option name="presentableId" value="LOCAL-00205" />
+      <option name="project" value="LOCAL" />
+      <updated>1761792819177</updated>
+    </task>
+    <task id="LOCAL-00206" summary="db体育拉单">
+      <option name="closed" value="true" />
+      <created>1761806646133</created>
+      <option name="number" value="00206" />
+      <option name="presentableId" value="LOCAL-00206" />
+      <option name="project" value="LOCAL" />
+      <updated>1761806646133</updated>
+    </task>
+    <task id="LOCAL-00207" summary="db体育拉单">
+      <option name="closed" value="true" />
+      <created>1761807740509</created>
+      <option name="number" value="00207" />
+      <option name="presentableId" value="LOCAL-00207" />
+      <option name="project" value="LOCAL" />
+      <updated>1761807740509</updated>
+    </task>
+    <task id="LOCAL-00208" summary="注单解析">
+      <option name="closed" value="true" />
+      <created>1761814304863</created>
+      <option name="number" value="00208" />
+      <option name="presentableId" value="LOCAL-00208" />
+      <option name="project" value="LOCAL" />
+      <updated>1761814304863</updated>
+    </task>
+    <task id="LOCAL-00209" summary="弹窗">
+      <option name="closed" value="true" />
+      <created>1761815869933</created>
+      <option name="number" value="00209" />
+      <option name="presentableId" value="LOCAL-00209" />
+      <option name="project" value="LOCAL" />
+      <updated>1761815869933</updated>
+    </task>
+    <task id="LOCAL-00210" summary="媒体号配置">
+      <option name="closed" value="true" />
+      <created>1761820399019</created>
+      <option name="number" value="00210" />
+      <option name="presentableId" value="LOCAL-00210" />
+      <option name="project" value="LOCAL" />
+      <updated>1761820399019</updated>
+    </task>
+    <task id="LOCAL-00211" summary="弹窗">
+      <option name="closed" value="true" />
+      <created>1761900843213</created>
+      <option name="number" value="00211" />
+      <option name="presentableId" value="LOCAL-00211" />
+      <option name="project" value="LOCAL" />
+      <updated>1761900843213</updated>
+    </task>
+    <task id="LOCAL-00212" summary="弹窗">
+      <option name="closed" value="true" />
+      <created>1761901791159</created>
+      <option name="number" value="00212" />
+      <option name="presentableId" value="LOCAL-00212" />
+      <option name="project" value="LOCAL" />
+      <updated>1761901791159</updated>
+    </task>
+    <task id="LOCAL-00213" summary="弹窗">
+      <option name="closed" value="true" />
+      <created>1761902010882</created>
+      <option name="number" value="00213" />
+      <option name="presentableId" value="LOCAL-00213" />
+      <option name="project" value="LOCAL" />
+      <updated>1761902010882</updated>
+    </task>
+    <task id="LOCAL-00214" summary="弹窗">
+      <option name="closed" value="true" />
+      <created>1761902048186</created>
+      <option name="number" value="00214" />
+      <option name="presentableId" value="LOCAL-00214" />
+      <option name="project" value="LOCAL" />
+      <updated>1761902048186</updated>
+    </task>
+    <task id="LOCAL-00215" summary="弹窗">
+      <option name="closed" value="true" />
+      <created>1761903953886</created>
+      <option name="number" value="00215" />
+      <option name="presentableId" value="LOCAL-00215" />
+      <option name="project" value="LOCAL" />
+      <updated>1761903953886</updated>
+    </task>
+    <task id="LOCAL-00216" summary="代理新增修改">
+      <option name="closed" value="true" />
+      <created>1769248060058</created>
+      <option name="number" value="00216" />
+      <option name="presentableId" value="LOCAL-00216" />
+      <option name="project" value="LOCAL" />
+      <updated>1769248060059</updated>
+    </task>
+    <task id="LOCAL-00217" summary="nacos">
+      <option name="closed" value="true" />
+      <created>1769739011549</created>
+      <option name="number" value="00217" />
+      <option name="presentableId" value="LOCAL-00217" />
+      <option name="project" value="LOCAL" />
+      <updated>1769739011550</updated>
+    </task>
+    <task id="LOCAL-00218" summary="发版修复">
+      <option name="closed" value="true" />
+      <created>1769740864067</created>
+      <option name="number" value="00218" />
+      <option name="presentableId" value="LOCAL-00218" />
+      <option name="project" value="LOCAL" />
+      <updated>1769740864067</updated>
+    </task>
+    <task id="LOCAL-00219" summary="发版修复">
+      <option name="closed" value="true" />
+      <created>1769741662527</created>
+      <option name="number" value="00219" />
+      <option name="presentableId" value="LOCAL-00219" />
+      <option name="project" value="LOCAL" />
+      <updated>1769741662527</updated>
+    </task>
+    <task id="LOCAL-00220" summary="发版修复3">
+      <option name="closed" value="true" />
+      <created>1769743752889</created>
+      <option name="number" value="00220" />
+      <option name="presentableId" value="LOCAL-00220" />
+      <option name="project" value="LOCAL" />
+      <updated>1769743752889</updated>
+    </task>
+    <task id="LOCAL-00221" summary="发版修复4">
+      <option name="closed" value="true" />
+      <created>1769747389308</created>
+      <option name="number" value="00221" />
+      <option name="presentableId" value="LOCAL-00221" />
+      <option name="project" value="LOCAL" />
+      <updated>1769747389308</updated>
+    </task>
+    <task id="LOCAL-00222" summary="发版修复5">
+      <option name="closed" value="true" />
+      <created>1769761175571</created>
+      <option name="number" value="00222" />
+      <option name="presentableId" value="LOCAL-00222" />
+      <option name="project" value="LOCAL" />
+      <updated>1769761175571</updated>
+    </task>
+    <task id="LOCAL-00223" summary="发版修复6">
+      <option name="closed" value="true" />
+      <created>1769764773221</created>
+      <option name="number" value="00223" />
+      <option name="presentableId" value="LOCAL-00223" />
+      <option name="project" value="LOCAL" />
+      <updated>1769764773221</updated>
+    </task>
+    <task id="LOCAL-00224" summary="发版修复7">
+      <option name="closed" value="true" />
+      <created>1769770570511</created>
+      <option name="number" value="00224" />
+      <option name="presentableId" value="LOCAL-00224" />
+      <option name="project" value="LOCAL" />
+      <updated>1769770570511</updated>
+    </task>
+    <task id="LOCAL-00225" summary="发版修复7">
+      <option name="closed" value="true" />
+      <created>1769771294774</created>
+      <option name="number" value="00225" />
+      <option name="presentableId" value="LOCAL-00225" />
+      <option name="project" value="LOCAL" />
+      <updated>1769771294774</updated>
+    </task>
+    <task id="LOCAL-00226" summary="新增代理修改">
+      <option name="closed" value="true" />
+      <created>1769854247851</created>
+      <option name="number" value="00226" />
+      <option name="presentableId" value="LOCAL-00226" />
+      <option name="project" value="LOCAL" />
+      <updated>1769854247851</updated>
+    </task>
+    <task id="LOCAL-00227" summary="ip报错修改">
+      <option name="closed" value="true" />
+      <created>1769856482924</created>
+      <option name="number" value="00227" />
+      <option name="presentableId" value="LOCAL-00227" />
+      <option name="project" value="LOCAL" />
+      <updated>1769856482924</updated>
+    </task>
+    <task id="LOCAL-00228" summary="活动模版报错修改">
+      <option name="closed" value="true" />
+      <created>1769857410535</created>
+      <option name="number" value="00228" />
+      <option name="presentableId" value="LOCAL-00228" />
+      <option name="project" value="LOCAL" />
+      <updated>1769857410535</updated>
+    </task>
+    <task id="LOCAL-00229" summary="活动模版报错修改">
+      <option name="closed" value="true" />
+      <created>1769997849704</created>
+      <option name="number" value="00229" />
+      <option name="presentableId" value="LOCAL-00229" />
+      <option name="project" value="LOCAL" />
+      <updated>1769997849704</updated>
+    </task>
+    <task id="LOCAL-00230" summary="vip段位报错修改">
+      <option name="closed" value="true" />
+      <created>1769999858108</created>
+      <option name="number" value="00230" />
+      <option name="presentableId" value="LOCAL-00230" />
+      <option name="project" value="LOCAL" />
+      <updated>1769999858108</updated>
+    </task>
+    <task id="LOCAL-00231" summary="黑名单校验">
+      <option name="closed" value="true" />
+      <created>1770016901792</created>
+      <option name="number" value="00231" />
+      <option name="presentableId" value="LOCAL-00231" />
+      <option name="project" value="LOCAL" />
+      <updated>1770016901792</updated>
+    </task>
+    <task id="LOCAL-00232" summary="vip段位报错">
+      <option name="closed" value="true" />
+      <created>1770020073114</created>
+      <option name="number" value="00232" />
+      <option name="presentableId" value="LOCAL-00232" />
+      <option name="project" value="LOCAL" />
+      <updated>1770020073114</updated>
+    </task>
+    <task id="LOCAL-00233" summary="一级分类日志">
+      <option name="closed" value="true" />
+      <created>1770021525762</created>
+      <option name="number" value="00233" />
+      <option name="presentableId" value="LOCAL-00233" />
+      <option name="project" value="LOCAL" />
+      <updated>1770021525762</updated>
+    </task>
+    <task id="LOCAL-00234" summary="一级分类日志">
+      <option name="closed" value="true" />
+      <created>1770024615714</created>
+      <option name="number" value="00234" />
+      <option name="presentableId" value="LOCAL-00234" />
+      <option name="project" value="LOCAL" />
+      <updated>1770024615714</updated>
+    </task>
+    <task id="LOCAL-00235" summary="日志">
+      <option name="closed" value="true" />
+      <created>1770085039726</created>
+      <option name="number" value="00235" />
+      <option name="presentableId" value="LOCAL-00235" />
+      <option name="project" value="LOCAL" />
+      <updated>1770085039726</updated>
+    </task>
+    <task id="LOCAL-00236" summary="代理">
+      <option name="closed" value="true" />
+      <created>1770100644316</created>
+      <option name="number" value="00236" />
+      <option name="presentableId" value="LOCAL-00236" />
+      <option name="project" value="LOCAL" />
+      <updated>1770100644316</updated>
+    </task>
+    <task id="LOCAL-00237" summary="代理新增">
+      <option name="closed" value="true" />
+      <created>1770105418765</created>
+      <option name="number" value="00237" />
+      <option name="presentableId" value="LOCAL-00237" />
+      <option name="project" value="LOCAL" />
+      <updated>1770105418765</updated>
+    </task>
+    <task id="LOCAL-00238" summary="代理">
+      <option name="closed" value="true" />
+      <created>1770106803890</created>
+      <option name="number" value="00238" />
+      <option name="presentableId" value="LOCAL-00238" />
+      <option name="project" value="LOCAL" />
+      <updated>1770106803890</updated>
+    </task>
+    <task id="LOCAL-00239" summary="代理佣金计算">
+      <option name="closed" value="true" />
+      <created>1770288538687</created>
+      <option name="number" value="00239" />
+      <option name="presentableId" value="LOCAL-00239" />
+      <option name="project" value="LOCAL" />
+      <updated>1770288538687</updated>
+    </task>
+    <task id="LOCAL-00240" summary="佣金报表">
+      <option name="closed" value="true" />
+      <created>1770362923406</created>
+      <option name="number" value="00240" />
+      <option name="presentableId" value="LOCAL-00240" />
+      <option name="project" value="LOCAL" />
+      <updated>1770362923406</updated>
+    </task>
+    <task id="LOCAL-00241" summary="热门游戏">
+      <option name="closed" value="true" />
+      <created>1770366370271</created>
+      <option name="number" value="00241" />
+      <option name="presentableId" value="LOCAL-00241" />
+      <option name="project" value="LOCAL" />
+      <updated>1770366370271</updated>
+    </task>
+    <task id="LOCAL-00242" summary="佣金审核详情">
+      <option name="closed" value="true" />
+      <created>1770375052798</created>
+      <option name="number" value="00242" />
+      <option name="presentableId" value="LOCAL-00242" />
+      <option name="project" value="LOCAL" />
+      <updated>1770375052798</updated>
+    </task>
+    <task id="LOCAL-00243" summary="佣金">
+      <option name="closed" value="true" />
+      <created>1770452883998</created>
+      <option name="number" value="00243" />
+      <option name="presentableId" value="LOCAL-00243" />
+      <option name="project" value="LOCAL" />
+      <updated>1770452883998</updated>
+    </task>
+    <task id="LOCAL-00244" summary="mail">
+      <option name="closed" value="true" />
+      <created>1770457384738</created>
+      <option name="number" value="00244" />
+      <option name="presentableId" value="LOCAL-00244" />
+      <option name="project" value="LOCAL" />
+      <updated>1770457384738</updated>
+    </task>
+    <option name="localTasksCounter" value="245" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ID_ORDER">
+      <list>
+        <option value="Default.Root" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="Default.Subject" />
+        <option value="GitHub.CommitStatus" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="dev-20260201" />
+                </option>
+              </RecentGroup>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="origin/hotfix-20251021" />
+                </option>
+              </RecentGroup>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="sit" />
+                </option>
+              </RecentGroup>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="dev-20251020" />
+                </option>
+              </RecentGroup>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="origin/pro" />
+                </option>
+              </RecentGroup>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="origin/dev-jianguo" />
+                </option>
+              </RecentGroup>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="hotfix-20250918" />
+                </option>
+              </RecentGroup>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="dev-20260201" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$" />
+    </ignored-roots>
+    <MESSAGE value="弹窗" />
+    <MESSAGE value="代理新增修改" />
+    <MESSAGE value="nacos" />
+    <MESSAGE value="发版修复" />
+    <MESSAGE value="发版修复3" />
+    <MESSAGE value="发版修复4" />
+    <MESSAGE value="发版修复5" />
+    <MESSAGE value="发版修复6" />
+    <MESSAGE value="发版修复7" />
+    <MESSAGE value="新增代理修改" />
+    <MESSAGE value="ip报错修改" />
+    <MESSAGE value="活动模版报错修改" />
+    <MESSAGE value="vip段位报错修改" />
+    <MESSAGE value="黑名单校验" />
+    <MESSAGE value="vip段位报错" />
+    <MESSAGE value="一级分类日志" />
+    <MESSAGE value="日志" />
+    <MESSAGE value="代理新增" />
+    <MESSAGE value="代理" />
+    <MESSAGE value="代理佣金计算" />
+    <MESSAGE value="佣金报表" />
+    <MESSAGE value="热门游戏" />
+    <MESSAGE value="佣金审核详情" />
+    <MESSAGE value="佣金" />
+    <MESSAGE value="mail" />
+    <option name="LAST_COMMIT_MESSAGE" value="mail" />
+  </component>
+</project>

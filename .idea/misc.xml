@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/gateway/pom.xml" />
+        <option value="$PROJECT_DIR$/job-center/pom.xml" />
+        <option value="$PROJECT_DIR$/app-foreign/pom.xml" />
+        <option value="$PROJECT_DIR$/pay-service/pom.xml" />
+        <option value="$PROJECT_DIR$/play-service/pom.xml" />
+        <option value="$PROJECT_DIR$/site-foreign/pom.xml" />
+        <option value="$PROJECT_DIR$/user-service/pom.xml" />
+        <option value="$PROJECT_DIR$/admin-foreign/pom.xml" />
+        <option value="$PROJECT_DIR$/agent-foreign/pom.xml" />
+        <option value="$PROJECT_DIR$/agent-service/pom.xml" />
+        <option value="$PROJECT_DIR$/baowang-common/pom.xml" />
+        <option value="$PROJECT_DIR$/essync-service/pom.xml" />
+        <option value="$PROJECT_DIR$/report-service/pom.xml" />
+        <option value="$PROJECT_DIR$/wallet-service/pom.xml" />
+        <option value="$PROJECT_DIR$/play-wallet-api/pom.xml" />
+        <option value="$PROJECT_DIR$/activity-service/pom.xml" />
+        <option value="$PROJECT_DIR$/business-foreign/pom.xml" />
+        <option value="$PROJECT_DIR$/websocket-service/pom.xml" />
+        <option value="$PROJECT_DIR$/system-business-service/pom.xml" />
+        <option value="$PROJECT_DIR$/parent-pom/pom.xml" />
+        <option value="$PROJECT_DIR$/data-transfer/pom.xml" />
+        <option value="$PROJECT_DIR$/account-service/pom.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_23" project-jdk-name="17" project-jdk-type="JavaSDK" />
+</project>

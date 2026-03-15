@@ -1,0 +1,4 @@
+2026-02-04 10:03:04.516 [SpringApplicationShutdownHook][trace:] INFO  o.s.b.w.e.netty.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-04 10:03:04.561 [netty-shutdown][trace:] INFO  o.s.b.w.e.netty.GracefulShutdown - Graceful shutdown complete
+2026-02-04 10:03:04.581 [SpringApplicationShutdownHook][trace:] INFO  c.a.c.n.r.NacosServiceRegistry - De-registering from Nacos Server now...
+2026-02-04 10:03:04.593 [SpringApplicationShutdownHook][trace:] INFO  c.a.c.n.r.NacosServiceRegistry - De-registration finished.

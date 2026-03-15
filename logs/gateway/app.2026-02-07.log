@@ -1,0 +1,454 @@
+2026-02-07 10:25:39.865 [File Watcher][trace:] INFO  o.s.b.d.a.LocalDevToolsAutoConfiguration$RestartingClassPathChangeChangedEventListener - Restarting due to 2 class path changes (0 additions, 2 deletions, 0 modifications)
+2026-02-07 10:25:39.959 [Thread-15][trace:] INFO  o.s.b.w.e.netty.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-07 10:25:39.970 [netty-shutdown][trace:] INFO  o.s.b.w.e.netty.GracefulShutdown - Graceful shutdown complete
+2026-02-07 10:25:39.994 [Thread-15][trace:] INFO  c.a.c.n.r.NacosServiceRegistry - De-registering from Nacos Server now...
+2026-02-07 10:25:40.028 [Thread-15][trace:] INFO  c.a.c.n.r.NacosServiceRegistry - De-registration finished.
+2026-02-07 10:25:43.601 [restartedMain][trace:] WARN  c.a.c.n.c.NacosPropertySourceBuilder - Ignore the empty nacos configuration and get it based on dataId[gateway] & group[feng]
+2026-02-07 10:25:43.786 [restartedMain][trace:] WARN  c.a.c.n.c.NacosPropertySourceBuilder - Ignore the empty nacos configuration and get it based on dataId[gateway-feng.yml] & group[feng]
+2026-02-07 10:25:43.786 [restartedMain][trace:] INFO  o.s.c.b.c.PropertySourceBootstrapConfiguration - Located property source: [BootstrapPropertySource {name='bootstrapProperties-gateway-feng.yml,feng'}, BootstrapPropertySource {name='bootstrapProperties-gateway.yml,feng'}, BootstrapPropertySource {name='bootstrapProperties-gateway,feng'}, BootstrapPropertySource {name='bootstrapProperties-common-config.yml,feng'}]
+2026-02-07 10:25:43.805 [restartedMain][trace:] INFO  c.c.b.c.gateway.GatewayApplication - The following 1 profile is active: "feng"
+2026-02-07 10:25:44.281 [restartedMain][trace:] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-02-07 10:25:44.281 [restartedMain][trace:] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-02-07 10:25:44.284 [restartedMain][trace:] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 3 ms. Found 0 Redis repository interfaces.
+2026-02-07 10:25:44.368 [restartedMain][trace:] INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=c33fcfb0-de0c-31f3-9ad2-59ea2628e0f2
+2026-02-07 10:25:44.388 [restartedMain][trace:] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration' of type [org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2026-02-07 10:25:44.389 [restartedMain][trace:] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration$ReactorDeferringLoadBalancerFilterConfig' of type [org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration$ReactorDeferringLoadBalancerFilterConfig] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2026-02-07 10:25:44.389 [restartedMain][trace:] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'reactorDeferringLoadBalancerExchangeFilterFunction' of type [org.springframework.cloud.client.loadbalancer.reactive.DeferringLoadBalancerExchangeFilterFunction] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2026-02-07 10:25:45.599 [restartedMain][trace:] INFO  org.redisson.Version - Redisson 3.18.1
+2026-02-07 10:25:45.656 [restartedMain][trace:] INFO  o.r.cluster.ClusterConnectionManager - Redis cluster nodes configuration got from 192.168.29.52/192.168.29.52:7001:
+eaa6e306c2f73064e3ed6981c7de08fb588d668b 192.168.29.52:7004@17004 slave c556b585d1b49937a928158a7942ef5dd00d9ec1 0 1770434744000 3 connected
+c556b585d1b49937a928158a7942ef5dd00d9ec1 192.168.29.52:7003@17003 master - 0 1770434744768 3 connected 10923-16383
+35de5cab71bf4e7e2b9b64610966d3d9088cf7a2 192.168.29.52:7002@17002 master - 0 1770434744000 2 connected 5461-10922
+ded2b7f828bb9358197917d20bc81f1d6fc82568 192.168.29.52:7001@17001 myself,master - 0 0 1 connected 0-5460
+6b3429b6c882cacf61bb9a45d5a2e0a451cf137e 192.168.29.52:7006@17006 slave 35de5cab71bf4e7e2b9b64610966d3d9088cf7a2 0 1770434743741 2 connected
+df947aa0c748eb3be4bd9ab25fae5896b3d582c8 192.168.29.52:7005@17005 slave ded2b7f828bb9358197917d20bc81f1d6fc82568 0 1770434744000 1 connected
+
+2026-02-07 10:25:45.681 [redisson-netty-9-10][trace:] INFO  o.r.c.pool.MasterConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7001
+2026-02-07 10:25:45.691 [redisson-netty-9-12][trace:] INFO  o.r.c.p.MasterPubSubConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7001
+2026-02-07 10:25:45.758 [redisson-netty-9-14][trace:] INFO  o.r.c.pool.MasterConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7002
+2026-02-07 10:25:45.765 [redisson-netty-9-19][trace:] INFO  o.r.c.p.MasterPubSubConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7002
+2026-02-07 10:25:45.768 [redisson-netty-9-21][trace:] INFO  o.r.c.pool.SlaveConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7005
+2026-02-07 10:25:45.769 [redisson-netty-9-22][trace:] INFO  o.r.c.p.MasterPubSubConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7003
+2026-02-07 10:25:45.769 [redisson-netty-9-2][trace:] INFO  o.r.cluster.ClusterConnectionManager - slaves: [redis://192.168.29.52:7005] added for slot ranges: [[0-5460]]
+2026-02-07 10:25:45.770 [redisson-netty-9-2][trace:] INFO  o.r.cluster.ClusterConnectionManager - master: redis://192.168.29.52:7001 added for slot ranges: [[0-5460]]
+2026-02-07 10:25:45.770 [redisson-netty-9-2][trace:] INFO  o.r.c.pool.PubSubConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7005
+2026-02-07 10:25:45.771 [redisson-netty-9-23][trace:] INFO  o.r.c.pool.SlaveConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7006
+2026-02-07 10:25:45.772 [redisson-netty-9-3][trace:] INFO  o.r.c.pool.MasterConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7003
+2026-02-07 10:25:45.774 [redisson-netty-9-5][trace:] INFO  o.r.cluster.ClusterConnectionManager - slaves: [redis://192.168.29.52:7006] added for slot ranges: [[5461-10922]]
+2026-02-07 10:25:45.774 [redisson-netty-9-5][trace:] INFO  o.r.cluster.ClusterConnectionManager - master: redis://192.168.29.52:7002 added for slot ranges: [[5461-10922]]
+2026-02-07 10:25:45.774 [redisson-netty-9-5][trace:] INFO  o.r.c.pool.PubSubConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7006
+2026-02-07 10:25:45.775 [redisson-netty-9-6][trace:] INFO  o.r.c.pool.SlaveConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7004
+2026-02-07 10:25:45.778 [redisson-netty-9-26][trace:] INFO  o.r.cluster.ClusterConnectionManager - slaves: [redis://192.168.29.52:7004] added for slot ranges: [[10923-16383]]
+2026-02-07 10:25:45.779 [redisson-netty-9-26][trace:] INFO  o.r.cluster.ClusterConnectionManager - master: redis://192.168.29.52:7003 added for slot ranges: [[10923-16383]]
+2026-02-07 10:25:45.779 [redisson-netty-9-26][trace:] INFO  o.r.c.pool.PubSubConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7004
+2026-02-07 10:25:46.076 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [After]
+2026-02-07 10:25:46.076 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Before]
+2026-02-07 10:25:46.076 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Between]
+2026-02-07 10:25:46.076 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Cookie]
+2026-02-07 10:25:46.076 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Header]
+2026-02-07 10:25:46.076 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Host]
+2026-02-07 10:25:46.076 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Method]
+2026-02-07 10:25:46.076 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Path]
+2026-02-07 10:25:46.076 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Query]
+2026-02-07 10:25:46.076 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [ReadBody]
+2026-02-07 10:25:46.076 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [RemoteAddr]
+2026-02-07 10:25:46.076 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2026-02-07 10:25:46.076 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Weight]
+2026-02-07 10:25:46.076 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2026-02-07 10:25:46.091 [restartedMain][trace:] INFO  c.a.c.s.g.s.SentinelSCGAutoConfiguration - [Sentinel SpringCloudGateway] register SentinelGatewayFilter with order: -2147483648
+2026-02-07 10:25:46.285 [restartedMain][trace:] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 20 endpoint(s) beneath base path '/actuator'
+2026-02-07 10:25:46.336 [restartedMain][trace:] INFO  c.a.c.s.g.s.SentinelSCGAutoConfiguration - [Sentinel SpringCloudGateway] register SentinelGatewayBlockExceptionHandler
+2026-02-07 10:25:47.474 [restartedMain][trace:] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2026-02-07 10:25:47.674 [restartedMain][trace:] INFO  o.s.b.w.e.netty.NettyWebServer - Netty started on port 7000
+2026-02-07 10:25:48.077 [restartedMain][trace:] INFO  c.a.c.n.r.NacosServiceRegistry - nacos registry, feng gateway 192.168.62.93:7000 register finished
+2026-02-07 10:25:48.145 [restartedMain][trace:] INFO  c.c.b.c.gateway.GatewayApplication - Started GatewayApplication in 5.73 seconds (process running for 69080.629)
+2026-02-07 10:25:48.154 [restartedMain][trace:] INFO  c.a.c.n.r.NacosContextRefresher - [Nacos Config] Listening config: dataId=gateway, group=feng
+2026-02-07 10:25:48.158 [restartedMain][trace:] INFO  c.a.c.n.r.NacosContextRefresher - [Nacos Config] Listening config: dataId=gateway-feng.yml, group=feng
+2026-02-07 10:25:48.158 [restartedMain][trace:] INFO  c.a.c.n.r.NacosContextRefresher - [Nacos Config] Listening config: dataId=gateway.yml, group=feng
+2026-02-07 10:25:48.158 [restartedMain][trace:] INFO  c.a.c.n.r.NacosContextRefresher - [Nacos Config] Listening config: dataId=common-config.yml, group=feng
+2026-02-07 10:25:48.159 [restartedMain][trace:] INFO  o.s.b.d.a.ConditionEvaluationDeltaLoggingListener - Condition evaluation unchanged
+2026-02-07 10:25:49.202 [File Watcher][trace:] INFO  o.s.b.d.a.LocalDevToolsAutoConfiguration$RestartingClassPathChangeChangedEventListener - Restarting due to 2 class path changes (2 additions, 0 deletions, 0 modifications)
+2026-02-07 10:25:49.217 [Thread-32][trace:] INFO  o.s.b.w.e.netty.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-07 10:25:49.228 [netty-shutdown][trace:] INFO  o.s.b.w.e.netty.GracefulShutdown - Graceful shutdown complete
+2026-02-07 10:25:49.244 [Thread-32][trace:] INFO  c.a.c.n.r.NacosServiceRegistry - De-registering from Nacos Server now...
+2026-02-07 10:25:49.258 [Thread-32][trace:] INFO  c.a.c.n.r.NacosServiceRegistry - De-registration finished.
+2026-02-07 10:25:51.752 [restartedMain][trace:] WARN  c.a.c.n.c.NacosPropertySourceBuilder - Ignore the empty nacos configuration and get it based on dataId[gateway] & group[feng]
+2026-02-07 10:25:51.758 [restartedMain][trace:] WARN  c.a.c.n.c.NacosPropertySourceBuilder - Ignore the empty nacos configuration and get it based on dataId[gateway-feng.yml] & group[feng]
+2026-02-07 10:25:51.759 [restartedMain][trace:] INFO  o.s.c.b.c.PropertySourceBootstrapConfiguration - Located property source: [BootstrapPropertySource {name='bootstrapProperties-gateway-feng.yml,feng'}, BootstrapPropertySource {name='bootstrapProperties-gateway.yml,feng'}, BootstrapPropertySource {name='bootstrapProperties-gateway,feng'}, BootstrapPropertySource {name='bootstrapProperties-common-config.yml,feng'}]
+2026-02-07 10:25:51.769 [restartedMain][trace:] INFO  c.c.b.c.gateway.GatewayApplication - The following 1 profile is active: "feng"
+2026-02-07 10:25:52.011 [restartedMain][trace:] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-02-07 10:25:52.011 [restartedMain][trace:] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-02-07 10:25:52.014 [restartedMain][trace:] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 3 ms. Found 0 Redis repository interfaces.
+2026-02-07 10:25:52.047 [restartedMain][trace:] INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=c33fcfb0-de0c-31f3-9ad2-59ea2628e0f2
+2026-02-07 10:25:52.061 [restartedMain][trace:] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration' of type [org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2026-02-07 10:25:52.062 [restartedMain][trace:] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration$ReactorDeferringLoadBalancerFilterConfig' of type [org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration$ReactorDeferringLoadBalancerFilterConfig] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2026-02-07 10:25:52.062 [restartedMain][trace:] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'reactorDeferringLoadBalancerExchangeFilterFunction' of type [org.springframework.cloud.client.loadbalancer.reactive.DeferringLoadBalancerExchangeFilterFunction] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2026-02-07 10:25:52.203 [restartedMain][trace:] INFO  org.redisson.Version - Redisson 3.18.1
+2026-02-07 10:25:52.301 [restartedMain][trace:] INFO  o.r.cluster.ClusterConnectionManager - Redis cluster nodes configuration got from 192.168.29.52/192.168.29.52:7001:
+eaa6e306c2f73064e3ed6981c7de08fb588d668b 192.168.29.52:7004@17004 slave c556b585d1b49937a928158a7942ef5dd00d9ec1 0 1770434751000 3 connected
+c556b585d1b49937a928158a7942ef5dd00d9ec1 192.168.29.52:7003@17003 master - 0 1770434751861 3 connected 10923-16383
+35de5cab71bf4e7e2b9b64610966d3d9088cf7a2 192.168.29.52:7002@17002 master - 0 1770434751559 2 connected 5461-10922
+ded2b7f828bb9358197917d20bc81f1d6fc82568 192.168.29.52:7001@17001 myself,master - 0 0 1 connected 0-5460
+6b3429b6c882cacf61bb9a45d5a2e0a451cf137e 192.168.29.52:7006@17006 slave 35de5cab71bf4e7e2b9b64610966d3d9088cf7a2 0 1770434751000 2 connected
+df947aa0c748eb3be4bd9ab25fae5896b3d582c8 192.168.29.52:7005@17005 slave ded2b7f828bb9358197917d20bc81f1d6fc82568 0 1770434751356 1 connected
+
+2026-02-07 10:25:52.465 [redisson-netty-15-11][trace:] INFO  o.r.c.pool.MasterConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7001
+2026-02-07 10:25:52.533 [redisson-netty-15-13][trace:] INFO  o.r.c.pool.MasterConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7002
+2026-02-07 10:25:52.578 [redisson-netty-15-12][trace:] INFO  o.r.c.p.MasterPubSubConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7001
+2026-02-07 10:25:52.636 [redisson-netty-15-1][trace:] INFO  o.r.c.pool.MasterConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7003
+2026-02-07 10:25:52.640 [redisson-netty-15-21][trace:] INFO  o.r.c.pool.SlaveConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7005
+2026-02-07 10:25:52.641 [redisson-netty-15-17][trace:] INFO  o.r.c.p.MasterPubSubConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7002
+2026-02-07 10:25:52.643 [redisson-netty-15-22][trace:] INFO  o.r.cluster.ClusterConnectionManager - slaves: [redis://192.168.29.52:7005] added for slot ranges: [[0-5460]]
+2026-02-07 10:25:52.643 [redisson-netty-15-22][trace:] INFO  o.r.cluster.ClusterConnectionManager - master: redis://192.168.29.52:7001 added for slot ranges: [[0-5460]]
+2026-02-07 10:25:52.643 [redisson-netty-15-22][trace:] INFO  o.r.c.pool.PubSubConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7005
+2026-02-07 10:25:52.645 [redisson-netty-15-23][trace:] INFO  o.r.c.pool.SlaveConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7006
+2026-02-07 10:25:52.645 [redisson-netty-15-24][trace:] INFO  o.r.cluster.ClusterConnectionManager - slaves: [redis://192.168.29.52:7006] added for slot ranges: [[5461-10922]]
+2026-02-07 10:25:52.645 [redisson-netty-15-24][trace:] INFO  o.r.cluster.ClusterConnectionManager - master: redis://192.168.29.52:7002 added for slot ranges: [[5461-10922]]
+2026-02-07 10:25:52.645 [redisson-netty-15-24][trace:] INFO  o.r.c.pool.PubSubConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7006
+2026-02-07 10:25:52.645 [redisson-netty-15-3][trace:] INFO  o.r.c.p.MasterPubSubConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7003
+2026-02-07 10:25:52.648 [redisson-netty-15-6][trace:] INFO  o.r.c.pool.SlaveConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7004
+2026-02-07 10:25:52.649 [redisson-netty-15-26][trace:] INFO  o.r.cluster.ClusterConnectionManager - slaves: [redis://192.168.29.52:7004] added for slot ranges: [[10923-16383]]
+2026-02-07 10:25:52.649 [redisson-netty-15-26][trace:] INFO  o.r.cluster.ClusterConnectionManager - master: redis://192.168.29.52:7003 added for slot ranges: [[10923-16383]]
+2026-02-07 10:25:52.649 [redisson-netty-15-26][trace:] INFO  o.r.c.pool.PubSubConnectionPool - 1 connections initialized for 192.168.29.52/192.168.29.52:7004
+2026-02-07 10:25:53.058 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [After]
+2026-02-07 10:25:53.060 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Before]
+2026-02-07 10:25:53.060 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Between]
+2026-02-07 10:25:53.060 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Cookie]
+2026-02-07 10:25:53.060 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Header]
+2026-02-07 10:25:53.060 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Host]
+2026-02-07 10:25:53.061 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Method]
+2026-02-07 10:25:53.061 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Path]
+2026-02-07 10:25:53.061 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Query]
+2026-02-07 10:25:53.061 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [ReadBody]
+2026-02-07 10:25:53.061 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [RemoteAddr]
+2026-02-07 10:25:53.061 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2026-02-07 10:25:53.061 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Weight]
+2026-02-07 10:25:53.061 [restartedMain][trace:] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2026-02-07 10:25:53.101 [restartedMain][trace:] INFO  c.a.c.s.g.s.SentinelSCGAutoConfiguration - [Sentinel SpringCloudGateway] register SentinelGatewayFilter with order: -2147483648
+2026-02-07 10:25:53.325 [restartedMain][trace:] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 20 endpoint(s) beneath base path '/actuator'
+2026-02-07 10:25:53.349 [restartedMain][trace:] INFO  c.a.c.s.g.s.SentinelSCGAutoConfiguration - [Sentinel SpringCloudGateway] register SentinelGatewayBlockExceptionHandler
+2026-02-07 10:25:53.430 [restartedMain][trace:] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2026-02-07 10:25:53.552 [restartedMain][trace:] INFO  o.s.b.w.e.netty.NettyWebServer - Netty started on port 7000
+2026-02-07 10:25:53.930 [restartedMain][trace:] INFO  c.a.c.n.r.NacosServiceRegistry - nacos registry, feng gateway 192.168.62.93:7000 register finished
+2026-02-07 10:25:53.979 [restartedMain][trace:] INFO  c.c.b.c.gateway.GatewayApplication - Started GatewayApplication in 2.323 seconds (process running for 69086.463)
+2026-02-07 10:25:53.981 [restartedMain][trace:] INFO  c.a.c.n.r.NacosContextRefresher - [Nacos Config] Listening config: dataId=gateway, group=feng
+2026-02-07 10:25:53.981 [restartedMain][trace:] INFO  c.a.c.n.r.NacosContextRefresher - [Nacos Config] Listening config: dataId=gateway-feng.yml, group=feng
+2026-02-07 10:25:53.981 [restartedMain][trace:] INFO  c.a.c.n.r.NacosContextRefresher - [Nacos Config] Listening config: dataId=gateway.yml, group=feng
+2026-02-07 10:25:53.981 [restartedMain][trace:] INFO  c.a.c.n.r.NacosContextRefresher - [Nacos Config] Listening config: dataId=common-config.yml, group=feng
+2026-02-07 10:25:53.982 [restartedMain][trace:] INFO  o.s.b.d.a.ConditionEvaluationDeltaLoggingListener - Condition evaluation unchanged
+2026-02-07 10:33:42.909 [reactor-http-kqueue-3][trace:] INFO  c.c.b.c.c.u.snowFlake.MachineUtils - SnowFlake Mac Val:4A4D5E7614DC4A4D5E7614DC1A4A53319C64184A531382B4
+2026-02-07 10:33:42.914 [reactor-http-kqueue-3][trace:] INFO  c.c.b.c.c.u.snowFlake.MachineUtils - SnowFlake Default DataCenterId:29,maxDatacenterId:31
+2026-02-07 10:33:47.990 [reactor-http-kqueue-3][trace:] INFO  c.c.b.c.c.u.snowFlake.MachineUtils - SnowFlake genWorkerId workId:10,maxWorkerId:31 
+2026-02-07 10:33:48.028 [reactor-http-kqueue-3][trace:] INFO  c.c.b.c.c.u.s.SnowflakeIdWorker - 默认节点 datacenterId:29,workerId:10,
+2026-02-07 10:33:48.045 [reactor-http-kqueue-3][trace:482354808351268864] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 10:33:48.230 [reactor-http-kqueue-3][trace:482354808351268864] WARN  c.c.b.common.auth.util.AdminAuthUtil - 中控后台 jwt 解密发生异常, 异常token:jIHyzXCwbsAw9QaN+kaL3cjUsXRtNoUzkGZK3/9UzTWeoWcPOUIBTI5QmMZg0lvGw7+Npm0eF70c/XNeN7Q82NvLeoD8PwvCXyTNCq4H3gNcIVmJpoGqfsb+FBFmllKXuqSymve3DnYDm0MOiDSwu8Hwia/EKaC+18o+tp2mK7GYog7zDY1ERPlswKDjBn6TEKdZQCNjyzL20TtLT3TPrc/7kLnfXLVoE39mao6KU+2EamNbJjDIa+3tWQS42D2ikjBduP4YgMqlHPSpnK1HQX+dpBq5CxSnGKROzKNH8wQpZ+tZYX1xO1OnliHfBXbBvzLhzCscmidGLjD04EVu1XiGsKy2z08OsCjmPc6RnRsnvyGcw1VpSudJHNKrkvKzLpjKDrdcbrgu6hPk2t8jAVvOad/cg4EKy2Y32pJ6jSAeQrWwe9ud7447kvJoF7jjnCyDvhOX/e3EKOGmggkSpA==
+2026-02-07 10:33:48.283 [reactor-http-kqueue-3][trace:482354808351268864] ERROR c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 处理发生异常:
+com.cloud.baowang.common.core.exceptions.BaowangDefaultException: PROMPT_10007
+	at com.cloud.baowang.common.auth.util.AdminAuthUtil.adminAuth(AdminAuthUtil.java:52)
+	at com.cloud.baowang.common.gateway.filter.UserAdminApiFilter.filter(UserAdminApiFilter.java:66)
+	at com.cloud.baowang.common.gateway.filter.BaoWangGlobalFilter.lambda$filter$3(BaoWangGlobalFilter.java:144)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at com.cloud.baowang.common.gateway.filter.BaoWangGlobalFilter.filter(BaoWangGlobalFilter.java:144)
+	at org.springframework.cloud.gateway.handler.FilteringWebHandler$GatewayFilterAdapter.filter(FilteringWebHandler.java:137)
+	at org.springframework.cloud.gateway.filter.OrderedGatewayFilter.filter(OrderedGatewayFilter.java:44)
+	at org.springframework.cloud.gateway.handler.FilteringWebHandler$DefaultGatewayFilterChain.lambda$filter$0(FilteringWebHandler.java:117)
+	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:44)
+	at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:64)
+	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:52)
+	at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:64)
+	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:52)
+	at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:64)
+	at com.alibaba.csp.sentinel.adapter.reactor.MonoSentinelOperator.subscribe(MonoSentinelOperator.java:40)
+	at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:64)
+	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:52)
+	at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:64)
+	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:52)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4444)
+	at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.subscribeNext(MonoIgnoreThen.java:263)
+	at reactor.core.publisher.MonoIgnoreThen.subscribe(MonoIgnoreThen.java:51)
+	at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:64)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onNext(MonoFlatMap.java:165)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onNext(FluxOnAssembly.java:539)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onNext(FluxOnErrorResume.java:79)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onNext(FluxOnAssembly.java:539)
+	at reactor.core.publisher.FluxSwitchIfEmpty$SwitchIfEmptySubscriber.onNext(FluxSwitchIfEmpty.java:74)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onNext(FluxOnAssembly.java:539)
+	at reactor.core.publisher.MonoNext$NextSubscriber.onNext(MonoNext.java:82)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onNext(FluxOnAssembly.java:539)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.innerNext(FluxConcatMapNoPrefetch.java:258)
+	at reactor.core.publisher.FluxConcatMap$ConcatMapInner.onNext(FluxConcatMap.java:863)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onNext(FluxOnAssembly.java:539)
+	at reactor.core.publisher.FluxMapFuseable$MapFuseableSubscriber.onNext(FluxMapFuseable.java:129)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onNext(FluxOnAssembly.java:539)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onNext(FluxOnAssembly.java:539)
+	at reactor.core.publisher.FluxSwitchIfEmpty$SwitchIfEmptySubscriber.onNext(FluxSwitchIfEmpty.java:74)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onNext(FluxOnAssembly.java:539)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onNext(MonoFlatMap.java:158)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onNext(FluxOnAssembly.java:539)
+	at reactor.core.publisher.FluxMapFuseable$MapFuseableSubscriber.onNext(FluxMapFuseable.java:129)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onNext(FluxOnAssembly.java:539)
+	at reactor.core.publisher.MonoNext$NextSubscriber.onNext(MonoNext.java:82)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onNext(FluxOnAssembly.java:539)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.innerNext(FluxConcatMapNoPrefetch.java:258)
+	at reactor.core.publisher.FluxConcatMap$ConcatMapInner.onNext(FluxConcatMap.java:863)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onNext(FluxOnAssembly.java:539)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onNext(FluxOnErrorResume.java:79)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onNext(FluxOnAssembly.java:539)
+	at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onNext(MonoPeekTerminal.java:180)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onNext(FluxOnAssembly.java:539)
+	at reactor.core.publisher.MonoFilterWhen$MonoFilterWhenMain.onNext(MonoFilterWhen.java:136)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onNext(FluxOnAssembly.java:539)
+	at reactor.core.publisher.Operators$ScalarSubscription.request(Operators.java:2545)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.request(FluxOnAssembly.java:649)
+	at reactor.core.publisher.MonoFilterWhen$MonoFilterWhenMain.request(MonoFilterWhen.java:182)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.request(FluxOnAssembly.java:649)
+	at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.request(MonoPeekTerminal.java:139)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.request(FluxOnAssembly.java:649)
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.set(Operators.java:2341)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onSubscribe(FluxOnErrorResume.java:74)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onSubscribe(FluxOnAssembly.java:633)
+	at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onSubscribe(MonoPeekTerminal.java:152)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onSubscribe(FluxOnAssembly.java:633)
+	at reactor.core.publisher.MonoFilterWhen$MonoFilterWhenMain.onSubscribe(MonoFilterWhen.java:100)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onSubscribe(FluxOnAssembly.java:633)
+	at reactor.core.publisher.MonoJust.subscribe(MonoJust.java:55)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4444)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.onNext(FluxConcatMapNoPrefetch.java:206)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onNext(FluxOnAssembly.java:539)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onNext(FluxOnAssembly.java:539)
+	at reactor.core.publisher.FluxDematerialize$DematerializeSubscriber.onNext(FluxDematerialize.java:98)
+	at reactor.core.publisher.FluxDematerialize$DematerializeSubscriber.onNext(FluxDematerialize.java:44)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onNext(FluxOnAssembly.java:539)
+	at reactor.core.publisher.FluxIterable$IterableSubscription.slowPath(FluxIterable.java:335)
+	at reactor.core.publisher.FluxIterable$IterableSubscription.request(FluxIterable.java:294)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.request(FluxOnAssembly.java:649)
+	at reactor.core.publisher.FluxDematerialize$DematerializeSubscriber.request(FluxDematerialize.java:127)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.request(FluxOnAssembly.java:649)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.request(FluxOnAssembly.java:649)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.innerComplete(FluxConcatMapNoPrefetch.java:274)
+	at reactor.core.publisher.FluxConcatMap$ConcatMapInner.onComplete(FluxConcatMap.java:887)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onComplete(FluxOnAssembly.java:549)
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.onComplete(Operators.java:2205)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onComplete(FluxOnAssembly.java:549)
+	at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onComplete(MonoPeekTerminal.java:299)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onComplete(FluxOnAssembly.java:549)
+	at reactor.core.publisher.MonoFilterWhen$MonoFilterWhenMain.onNext(MonoFilterWhen.java:141)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onNext(FluxOnAssembly.java:539)
+	at reactor.core.publisher.Operators$ScalarSubscription.request(Operators.java:2545)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.request(FluxOnAssembly.java:649)
+	at reactor.core.publisher.MonoFilterWhen$MonoFilterWhenMain.request(MonoFilterWhen.java:182)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.request(FluxOnAssembly.java:649)
+	at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.request(MonoPeekTerminal.java:139)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.request(FluxOnAssembly.java:649)
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.request(Operators.java:2305)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.request(FluxOnAssembly.java:649)
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.request(Operators.java:2305)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.request(FluxConcatMapNoPrefetch.java:338)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.request(FluxOnAssembly.java:649)
+	at reactor.core.publisher.MonoNext$NextSubscriber.request(MonoNext.java:108)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.request(FluxOnAssembly.java:649)
+	at reactor.core.publisher.FluxMapFuseable$MapFuseableSubscriber.request(FluxMapFuseable.java:171)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.request(FluxOnAssembly.java:649)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.request(MonoFlatMap.java:194)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.request(FluxOnAssembly.java:649)
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.request(Operators.java:2305)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.request(FluxOnAssembly.java:649)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.request(FluxOnAssembly.java:649)
+	at reactor.core.publisher.FluxMapFuseable$MapFuseableSubscriber.request(FluxMapFuseable.java:171)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.request(FluxOnAssembly.java:649)
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.request(Operators.java:2305)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.request(FluxConcatMapNoPrefetch.java:338)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.request(FluxOnAssembly.java:649)
+	at reactor.core.publisher.MonoNext$NextSubscriber.request(MonoNext.java:108)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.request(FluxOnAssembly.java:649)
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.set(Operators.java:2341)
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.onSubscribe(Operators.java:2215)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onSubscribe(FluxOnAssembly.java:633)
+	at reactor.core.publisher.MonoNext$NextSubscriber.onSubscribe(MonoNext.java:70)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onSubscribe(FluxOnAssembly.java:633)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.onSubscribe(FluxConcatMapNoPrefetch.java:164)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onSubscribe(FluxOnAssembly.java:633)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:201)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:83)
+	at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:64)
+	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:52)
+	at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:64)
+	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:52)
+	at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:64)
+	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:52)
+	at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:64)
+	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:52)
+	at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:64)
+	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:52)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4444)
+	at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.subscribeNext(MonoIgnoreThen.java:263)
+	at reactor.core.publisher.MonoIgnoreThen.subscribe(MonoIgnoreThen.java:51)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4444)
+	at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.subscribeNext(MonoIgnoreThen.java:263)
+	at reactor.core.publisher.MonoIgnoreThen.subscribe(MonoIgnoreThen.java:51)
+	at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:64)
+	at reactor.core.publisher.MonoDeferContextual.subscribe(MonoDeferContextual.java:55)
+	at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:64)
+	at reactor.netty.http.server.HttpServer$HttpServerHandle.onStateChange(HttpServer.java:1006)
+	at reactor.netty.ReactorNetty$CompositeConnectionObserver.onStateChange(ReactorNetty.java:710)
+	at reactor.netty.transport.ServerTransport$ChildObserver.onStateChange(ServerTransport.java:477)
+	at reactor.netty.http.server.HttpServerOperations.onInboundNext(HttpServerOperations.java:593)
+	at reactor.netty.channel.ChannelOperationsHandler.channelRead(ChannelOperationsHandler.java:113)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:444)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+	at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+	at reactor.netty.http.server.HttpTrafficHandler.channelRead(HttpTrafficHandler.java:223)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:442)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+	at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+	at io.netty.channel.CombinedChannelDuplexHandler$DelegatingChannelHandlerContext.fireChannelRead(CombinedChannelDuplexHandler.java:436)
+	at io.netty.handler.codec.ByteToMessageDecoder.fireChannelRead(ByteToMessageDecoder.java:346)
+	at io.netty.handler.codec.ByteToMessageDecoder.fireChannelRead(ByteToMessageDecoder.java:333)
+	at io.netty.handler.codec.ByteToMessageDecoder.callDecode(ByteToMessageDecoder.java:454)
+	at io.netty.handler.codec.ByteToMessageDecoder.channelRead(ByteToMessageDecoder.java:290)
+	at io.netty.channel.CombinedChannelDuplexHandler.channelRead(CombinedChannelDuplexHandler.java:251)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:442)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+	at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+	at io.netty.channel.DefaultChannelPipeline$HeadContext.channelRead(DefaultChannelPipeline.java:1410)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:440)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+	at io.netty.channel.DefaultChannelPipeline.fireChannelRead(DefaultChannelPipeline.java:919)
+	at io.netty.channel.kqueue.AbstractKQueueStreamChannel$KQueueStreamUnsafe.readReady(AbstractKQueueStreamChannel.java:544)
+	at io.netty.channel.kqueue.AbstractKQueueChannel$AbstractKQueueUnsafe.readReady(AbstractKQueueChannel.java:387)
+	at io.netty.channel.kqueue.KQueueEventLoop.processReady(KQueueEventLoop.java:213)
+	at io.netty.channel.kqueue.KQueueEventLoop.run(KQueueEventLoop.java:291)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+2026-02-07 10:33:48.290 [reactor-http-kqueue-3][trace:482354808351268864] WARN  c.c.b.c.g.filter.BaoWangGlobalFilter - [鉴权异常处理]请求路径:/admin-center/report-userInfo-statement/api/rebate, PROMPT_10007
+2026-02-07 10:35:14.622 [reactor-http-kqueue-3][trace:482355171548635136] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/business_admin_login/api/login,routeId:admin-foreign-biz
+2026-02-07 10:35:14.625 [reactor-http-kqueue-3][trace:482355171548635136] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/business_admin_login/api/login
+2026-02-07 10:35:14.627 [reactor-http-kqueue-3][trace:482355171548635136] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 10:35:14.628 [reactor-http-kqueue-3][trace:482355171548635136] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 10:35:22.602 [reactor-http-kqueue-3][trace:482355171548635136] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/business_admin_login/api/login, 耗时: 7973ms
+2026-02-07 10:35:42.268 [reactor-http-kqueue-3][trace:482355287500169216] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 10:35:42.544 [reactor-http-kqueue-3][trace:482355287500169216] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 10:35:42.544 [reactor-http-kqueue-3][trace:482355287500169216] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 10:35:42.544 [reactor-http-kqueue-3][trace:482355287500169216] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 10:35:54.061 [reactor-http-kqueue-3][trace:482355287500169216] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 11793ms
+2026-02-07 10:39:55.734 [reactor-http-kqueue-7][trace:482356350605238272] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 10:39:55.743 [reactor-http-kqueue-7][trace:482356350605238272] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 10:39:55.743 [reactor-http-kqueue-7][trace:482356350605238272] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 10:39:55.743 [reactor-http-kqueue-7][trace:482356350605238272] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 10:39:58.124 [reactor-http-kqueue-7][trace:482356350605238272] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 2393ms
+2026-02-07 10:42:49.707 [reactor-http-kqueue-2][trace:482357080309276672] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 10:42:49.731 [reactor-http-kqueue-2][trace:482357080309276672] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 10:42:49.731 [reactor-http-kqueue-2][trace:482357080309276672] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 10:42:49.731 [reactor-http-kqueue-2][trace:482357080309276672] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 10:42:50.264 [reactor-http-kqueue-2][trace:482357080309276672] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 559ms
+2026-02-07 10:56:51.717 [reactor-http-kqueue-5][trace:482360611955187712] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 10:56:51.745 [reactor-http-kqueue-5][trace:482360611955187712] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 10:56:51.745 [reactor-http-kqueue-5][trace:482360611955187712] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 10:56:51.745 [reactor-http-kqueue-5][trace:482360611955187712] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 10:57:32.882 [reactor-http-kqueue-5][trace:482360611955187712] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 41166ms
+2026-02-07 10:57:38.547 [reactor-http-kqueue-5][trace:482360808374444032] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 10:57:38.556 [reactor-http-kqueue-5][trace:482360808374444032] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 10:57:38.556 [reactor-http-kqueue-5][trace:482360808374444032] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 10:57:38.557 [reactor-http-kqueue-5][trace:482360808374444032] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 10:57:50.885 [reactor-http-kqueue-5][trace:482360808374444032] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 12338ms
+2026-02-07 11:11:51.422 [reactor-http-kqueue-8][trace:482364385591468032] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 11:11:51.428 [reactor-http-kqueue-8][trace:482364385591468032] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 11:11:51.428 [reactor-http-kqueue-8][trace:482364385591468032] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 11:11:51.428 [reactor-http-kqueue-8][trace:482364385591468032] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 11:11:58.273 [reactor-http-kqueue-8][trace:482364385591468032] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 6851ms
+2026-02-07 11:18:35.069 [reactor-http-kqueue-3][trace:482366078609694720] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 11:18:35.110 [reactor-http-kqueue-3][trace:482366078609694720] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 11:18:35.110 [reactor-http-kqueue-3][trace:482366078609694720] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 11:18:35.110 [reactor-http-kqueue-3][trace:482366078609694720] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 11:18:41.145 [reactor-http-kqueue-3][trace:482366078609694720] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 6073ms
+2026-02-07 11:25:18.799 [reactor-http-kqueue-6][trace:482367771976048640] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 11:25:18.813 [reactor-http-kqueue-6][trace:482367771976048640] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 11:25:18.813 [reactor-http-kqueue-6][trace:482367771976048640] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 11:25:18.813 [reactor-http-kqueue-6][trace:482367771976048640] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 11:25:22.622 [reactor-http-kqueue-6][trace:482367771976048640] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 3823ms
+2026-02-07 11:27:03.007 [reactor-http-kqueue-1][trace:482368209056079872] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 11:27:03.069 [reactor-http-kqueue-1][trace:482368209056079872] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 11:27:03.069 [reactor-http-kqueue-1][trace:482368209056079872] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 11:27:03.069 [reactor-http-kqueue-1][trace:482368209056079872] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 11:27:12.971 [reactor-http-kqueue-1][trace:482368209056079872] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 9964ms
+2026-02-07 13:22:08.406 [reactor-http-kqueue-4][trace:482397172402921472] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 13:22:08.433 [reactor-http-kqueue-4][trace:482397172402921472] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 13:22:08.433 [reactor-http-kqueue-4][trace:482397172402921472] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 13:22:08.433 [reactor-http-kqueue-4][trace:482397172402921472] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 13:22:18.767 [reactor-http-kqueue-4][trace:482397172402921472] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 10361ms
+2026-02-07 13:28:33.720 [reactor-http-kqueue-7][trace:482398788522778624] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 13:28:33.728 [reactor-http-kqueue-7][trace:482398788522778624] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 13:28:33.729 [reactor-http-kqueue-7][trace:482398788522778624] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 13:28:33.729 [reactor-http-kqueue-7][trace:482398788522778624] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 13:28:44.059 [reactor-http-kqueue-7][trace:482398788522778624] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 10340ms
+2026-02-07 13:32:36.276 [reactor-http-kqueue-2][trace:482399805876379648] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 13:32:36.290 [reactor-http-kqueue-2][trace:482399805876379648] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 13:32:36.290 [reactor-http-kqueue-2][trace:482399805876379648] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 13:32:36.290 [reactor-http-kqueue-2][trace:482399805876379648] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 13:32:53.047 [reactor-http-kqueue-2][trace:482399805876379648] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 16771ms
+2026-02-07 13:34:02.364 [reactor-http-kqueue-5][trace:482400166955622400] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 13:34:02.389 [reactor-http-kqueue-5][trace:482400166955622400] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 13:34:02.390 [reactor-http-kqueue-5][trace:482400166955622400] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 13:34:02.390 [reactor-http-kqueue-5][trace:482400166955622400] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 13:34:46.262 [reactor-http-kqueue-5][trace:482400166955622400] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 43898ms
+2026-02-07 13:35:05.153 [reactor-http-kqueue-8][trace:482400430311776256] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 13:35:05.160 [reactor-http-kqueue-8][trace:482400430311776256] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 13:35:05.160 [reactor-http-kqueue-8][trace:482400430311776256] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 13:35:05.160 [reactor-http-kqueue-8][trace:482400430311776256] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 13:36:05.649 [parallel-5][trace:482400430311776256] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 60496ms
+2026-02-07 13:47:33.704 [reactor-http-kqueue-2][trace:482403569941258240] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 13:47:33.786 [reactor-http-kqueue-2][trace:482403569941258240] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 13:47:33.786 [reactor-http-kqueue-2][trace:482403569941258240] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 13:47:33.787 [reactor-http-kqueue-2][trace:482403569941258240] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 13:47:41.759 [reactor-http-kqueue-2][trace:482403569941258240] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 8059ms
+2026-02-07 13:54:39.313 [reactor-http-kqueue-5][trace:482405355099955200] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 13:54:39.326 [reactor-http-kqueue-5][trace:482405355099955200] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 13:54:39.326 [reactor-http-kqueue-5][trace:482405355099955200] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 13:54:39.326 [reactor-http-kqueue-5][trace:482405355099955200] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 13:55:40.338 [parallel-2][trace:482405355099955200] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 61024ms
+2026-02-07 14:05:46.916 [reactor-http-kqueue-8][trace:482408155133419520] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 14:05:46.937 [reactor-http-kqueue-8][trace:482408155133419520] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 14:05:46.937 [reactor-http-kqueue-8][trace:482408155133419520] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 14:05:46.938 [reactor-http-kqueue-8][trace:482408155133419520] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 14:05:59.195 [reactor-http-kqueue-8][trace:482408155133419520] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 12302ms
+2026-02-07 14:06:47.843 [reactor-http-kqueue-3][trace:482408410763665408] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 14:06:47.880 [reactor-http-kqueue-3][trace:482408410763665408] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 14:06:47.881 [reactor-http-kqueue-3][trace:482408410763665408] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 14:06:47.882 [reactor-http-kqueue-3][trace:482408410763665408] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 14:07:47.967 [parallel-7][trace:482408410763665408] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 60127ms
+2026-02-07 14:13:56.414 [reactor-http-kqueue-5][trace:482410208329113600] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 14:13:56.447 [reactor-http-kqueue-5][trace:482410208329113600] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 14:13:56.447 [reactor-http-kqueue-5][trace:482410208329113600] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 14:13:56.448 [reactor-http-kqueue-5][trace:482410208329113600] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 14:14:05.516 [reactor-http-kqueue-5][trace:482410208329113600] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 9102ms
+2026-02-07 14:25:11.259 [reactor-http-kqueue-8][trace:482413038838390784] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 14:25:11.281 [reactor-http-kqueue-8][trace:482413038838390784] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 14:25:11.281 [reactor-http-kqueue-8][trace:482413038838390784] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 14:25:11.281 [reactor-http-kqueue-8][trace:482413038838390784] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 14:25:26.805 [reactor-http-kqueue-8][trace:482413038838390784] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 15546ms
+2026-02-07 14:31:21.739 [reactor-http-kqueue-3][trace:482414592735748096] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 14:31:21.829 [reactor-http-kqueue-3][trace:482414592735748096] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 14:31:21.829 [reactor-http-kqueue-3][trace:482414592735748096] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 14:31:21.829 [reactor-http-kqueue-3][trace:482414592735748096] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 14:31:35.427 [reactor-http-kqueue-3][trace:482414592735748096] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 13689ms
+2026-02-07 14:34:32.091 [reactor-http-kqueue-6][trace:482415391129903104] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 14:34:32.151 [reactor-http-kqueue-6][trace:482415391129903104] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 14:34:32.152 [reactor-http-kqueue-6][trace:482415391129903104] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 14:34:32.153 [reactor-http-kqueue-6][trace:482415391129903104] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 14:34:47.646 [reactor-http-kqueue-6][trace:482415391129903104] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 15555ms
+2026-02-07 14:45:31.642 [reactor-http-kqueue-1][trace:482418157491494912] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 14:45:31.699 [reactor-http-kqueue-1][trace:482418157491494912] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 14:45:31.700 [reactor-http-kqueue-1][trace:482418157491494912] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 14:45:31.700 [reactor-http-kqueue-1][trace:482418157491494912] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 14:46:31.772 [parallel-5][trace:482418157491494912] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 60130ms
+2026-02-07 15:16:07.784 [reactor-http-kqueue-4][trace:482425858820841472] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - gateway entrance path:/admin-center/report-userInfo-statement/api/rebate,routeId:admin-foreign-biz
+2026-02-07 15:16:07.814 [reactor-http-kqueue-4][trace:482425858820841472] INFO  c.c.b.c.g.f.basic.HeadBasicFilter - url:/admin-center/report-userInfo-statement/api/rebate
+2026-02-07 15:16:07.815 [reactor-http-kqueue-4][trace:482425858820841472] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头 HEADER_X_FORWARDED_FOR ipAddress : null
+2026-02-07 15:16:07.815 [reactor-http-kqueue-4][trace:482425858820841472] INFO  c.c.b.c.gateway.util.GatewayIpUtils - gateway请求头,解析ip结果:127.0.0.1
+2026-02-07 15:16:23.781 [reactor-http-kqueue-4][trace:482425858820841472] INFO  c.c.b.c.g.filter.BaoWangGlobalFilter - [Gateway] 请求路径: /admin-center/report-userInfo-statement/api/rebate, 耗时: 15999ms
+2026-02-07 15:26:25.123 [SpringApplicationShutdownHook][trace:] INFO  o.s.b.w.e.netty.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-07 15:26:25.741 [netty-shutdown][trace:] INFO  o.s.b.w.e.netty.GracefulShutdown - Graceful shutdown complete
+2026-02-07 15:26:26.056 [SpringApplicationShutdownHook][trace:] INFO  c.a.c.n.r.NacosServiceRegistry - De-registering from Nacos Server now...
+2026-02-07 15:26:26.291 [SpringApplicationShutdownHook][trace:] INFO  c.a.c.n.r.NacosServiceRegistry - De-registration finished.

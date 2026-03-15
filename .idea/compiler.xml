@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="agent-biz" />
+        <module name="websocket-api" />
+        <module name="admin-foreign-biz" />
+        <module name="wallet-api" />
+        <module name="pay-api" />
+        <module name="common-redis" />
+        <module name="report-api" />
+        <module name="job-server" />
+        <module name="essync-service" />
+        <module name="pay-biz" />
+        <module name="play-biz" />
+        <module name="user-api" />
+        <module name="activity-biz" />
+        <module name="business-foreign-biz" />
+        <module name="agent-api" />
+        <module name="websocket-biz" />
+        <module name="site-foreign-biz" />
+        <module name="job-core" />
+        <module name="play-wallet-api" />
+        <module name="user-biz" />
+        <module name="activity-api" />
+        <module name="common-feign" />
+        <module name="system-business-biz" />
+        <module name="play-api" />
+        <module name="common-log" />
+        <module name="system-business-api" />
+        <module name="data-transfer (2)" />
+        <module name="common-mybatis" />
+        <module name="common-sentinel" />
+        <module name="agent-foreign-biz" />
+        <module name="common-excel" />
+        <module name="job-api" />
+        <module name="account-api" />
+        <module name="common-kafka" />
+        <module name="report-biz" />
+        <module name="common-auth" />
+        <module name="common-push" />
+        <module name="app-foreign-biz" />
+        <module name="wallet-biz" />
+        <module name="account-biz" />
+        <module name="gateway" />
+        <module name="common-core" />
+        <module name="common-es" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="bom" target="17" />
+      <module name="data-transfer" target="17" />
+      <module name="data-transfer (1)" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="account-api" options="-parameters" />
+      <module name="account-biz" options="-parameters" />
+      <module name="activity-api" options="-parameters" />
+      <module name="activity-biz" options="-parameters" />
+      <module name="admin-foreign-biz" options="-parameters" />
+      <module name="agent-api" options="-parameters" />
+      <module name="agent-biz" options="-parameters" />
+      <module name="agent-foreign-biz" options="-parameters" />
+      <module name="app-foreign-biz" options="-parameters" />
+      <module name="business-foreign-biz" options="-parameters" />
+      <module name="common-auth" options="-parameters" />
+      <module name="common-core" options="-parameters" />
+      <module name="common-es" options="-parameters" />
+      <module name="common-excel" options="-parameters" />
+      <module name="common-feign" options="-parameters" />
+      <module name="common-kafka" options="-parameters" />
+      <module name="common-log" options="-parameters" />
+      <module name="common-mybatis" options="-parameters" />
+      <module name="common-push" options="-parameters" />
+      <module name="common-redis" options="-parameters" />
+      <module name="common-sentinel" options="-parameters" />
+      <module name="data-transfer" options="-parameters" />
+      <module name="data-transfer (1)" options="-parameters" />
+      <module name="data-transfer (2)" options="-parameters" />
+      <module name="essync-service" options="-parameters" />
+      <module name="gateway" options="-parameters" />
+      <module name="job-api" options="-parameters" />
+      <module name="job-core" options="-parameters" />
+      <module name="job-server" options="-parameters" />
+      <module name="pay-api" options="-parameters" />
+      <module name="pay-biz" options="-parameters" />
+      <module name="play-api" options="-parameters" />
+      <module name="play-biz" options="-parameters" />
+      <module name="play-wallet-api" options="-parameters" />
+      <module name="report-api" options="-parameters" />
+      <module name="report-biz" options="-parameters" />
+      <module name="site-foreign-biz" options="-parameters" />
+      <module name="system-business-api" options="-parameters" />
+      <module name="system-business-biz" options="-parameters" />
+      <module name="user-api" options="-parameters" />
+      <module name="user-biz" options="-parameters" />
+      <module name="wallet-api" options="-parameters" />
+      <module name="wallet-biz" options="-parameters" />
+      <module name="websocket-api" options="-parameters" />
+      <module name="websocket-biz" options="-parameters" />
+    </option>
+  </component>
+</project>
