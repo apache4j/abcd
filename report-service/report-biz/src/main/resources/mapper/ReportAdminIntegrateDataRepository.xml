@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.report.repositories.ReportAdminIntegrateDataRepository">
+
+
+    <!-- 查询分页数据 -->
+    <select id="getIntegrateTempData" resultType="com.cloud.baowang.report.api.vo.user.complex.AdminIntegrateDataTempRspVO">
+
+        SELECT
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(date/1000),
+        @@session.time_zone,#{vo.timeZoneDb}),'%Y-%m-%d') as staticDate,
+        site_code,
+        currency as currencyCode,
+
+        <!-- 注册人数统计-->
+        IFNULL(SUM(member_registration_count), 0) AS registerTotal,
+        IFNULL(SUM(member_registration_count_backed), 0) AS registerBacked,
+        IFNULL(SUM(member_registration_count_pc), 0) AS registerPc,
+        IFNULL(SUM(member_registration_count_android_app), 0) AS registerAndroidAPP,
+        IFNULL(SUM(member_registration_count_android_h5), 0) AS registerAndroidH5,
+        IFNULL(SUM(member_registration_count_ios_app), 0) AS registerIosAPP,
+        IFNULL(SUM(member_registration_count_ios_h5), 0) AS registerIosH5,
+
+        <!-- 登录人数统计-->
+        IFNULL(SUM(member_login_count), 0) AS loginTotal,
+        IFNULL(SUM(member_login_count_backed), 0) AS loginBacked,
+        IFNULL(SUM(member_login_count_pc), 0) AS loginPc,
+        IFNULL(SUM(member_login_count_android_app), 0) AS loginAndroidAPP,
+        IFNULL(SUM(member_login_count_android_h5), 0) AS loginAndroidH5,
+        IFNULL(SUM(member_login_count_ios_app), 0) AS loginIosAPP,
+        IFNULL(SUM(member_login_count_ios_h5), 0) AS loginIosH5,
+
+        <!-- 会员存款统计-->
+        IFNULL(SUM(total_member_deposit), 0) AS totalDeposit,
+        IFNULL(SUM(total_member_deposit_people_number), 0) AS depositPeopleNums,
+        IFNULL(SUM(total_member_deposit_times), 0) AS depositNums,
+
+        <!-- 会员提现统计-->
+        IFNULL(SUM(total_member_withdrawal), 0) AS totalWithdraw,
+        IFNULL(SUM(total_member_withdrawal_people_number), 0) AS withdrawPeopleNums,
+        IFNULL(SUM(total_member_withdrawal_times), 0) AS withdrawNums,
+        IFNULL(SUM(total_member_withdrawal_big_people_number), 0) AS largeWithdrawPeopleNums,
+        IFNULL(SUM(total_member_withdrawal_big_times), 0) AS largeWithdrawNums,
+        IFNULL(SUM(member_deposit_withdrawal_difference), 0) AS memberAccessDifference,
+
+        <!-- 会员首存统计-->
+        IFNULL(SUM(first_member_deposit_amount), 0) AS firstDepositAmount,
+        IFNULL(SUM(first_member_deposit_people_number), 0) AS firstDepositPeopleNums,
+
+        <!-- 会员投注统计-->
+        IFNULL(SUM(member_betting_amount), 0) AS betAmount,
+        IFNULL(SUM(member_betting_valid_amount), 0) AS effectiveBetAmount,
+        IFNULL(SUM(member_betting_people_number), 0) AS bettorNums,
+        IFNULL(SUM(member_betting_number), 0) AS bettingOrderAmount,
+        IFNULL(SUM(member_profit_loss), 0) AS memberWinOrLose,
+
+        <!--会员VIP福利统计 -->
+        IFNULL(SUM(member_vip_benefits_amount), 0) AS vipWelfareAmount,
+        IFNULL(SUM(member_vip_benefits_people_number), 0) AS vipWelfarePeopleNums,
+
+        <!--会员优惠活动统计 -->
+        IFNULL(SUM(member_activity_discounts_amount), 0) AS promotionAmount,
+        IFNULL(SUM(member_activity_discounts_people_number), 0) AS promotionPeopleNums,
+
+        IFNULL(SUM(used_discounts), 0) AS usedPromotion,
+
+        <!--会员调整统计 -->
+        IFNULL(SUM(member_adjustments_amount), 0) AS totalAdjust,
+        IFNULL(SUM(member_adjustments_add_amount), 0) AS addAmount,
+        IFNULL(SUM(member_adjustments_add_people_number), 0) AS addAmountPeopleNum,
+        IFNULL(SUM(member_adjustments_reduce_amount), 0) AS reduceAmount,
+        IFNULL(SUM(member_adjustments_reduce_people_number), 0) AS reduceAmountPeopleNums,
+
+        <!-- 上下分 -->
+        IFNULL(SUM(platform_total_adjust), 0) AS platformTotalAdjust,
+        IFNULL(SUM(platform_add_amount), 0) AS platformAddAmount,
+        IFNULL(SUM(platform_add_people_num), 0) AS platformAddPeopleNum,
+        IFNULL(SUM(platform_reduce_amount), 0) AS platformReduceAmount,
+        IFNULL(SUM(platform_reduce_people_nums), 0) AS platformReducePeopleNums,
+
+        <!-- 打赏 -->
+        IFNULL(SUM(tips_amount), 0) AS tipsAmount,
+
+        <!-- 风控调整 -->
+        IFNULL(SUM(risk_amount), 0) AS riskAmount,
+        IFNULL(SUM(risk_add_amount), 0) AS riskAddAmount,
+        IFNULL(SUM(risk_add_people_num), 0) AS riskAddPeopleNum,
+        IFNULL(SUM(risk_reduce_amount), 0) AS riskReduceAmount,
+        IFNULL(SUM(risk_reduce_people_num), 0) AS riskReducePeopleNum,
+
+
+
+
+        <!--代理注册人数统计 -->
+        IFNULL(SUM(agent_registration_count), 0) AS agentRegisterTotal,
+        IFNULL(SUM(agent_registration_count_backed), 0) AS agentRegisterBacked,
+        IFNULL(SUM(agent_registration_count_pc), 0) AS agentRegisterPc,
+        IFNULL(SUM(agent_registration_count_android_app), 0) AS agentRegisterAndroidAPP,
+        IFNULL(SUM(agent_registration_count_android_h5), 0) AS agentRegisterAndroidH5,
+        IFNULL(SUM(agent_registration_count_ios_app), 0) AS agentRegisterIosAPP,
+        IFNULL(SUM(agent_registration_count_ios_h5), 0) AS agentRegisterIosH5,
+
+
+        <!--代存金额统计 -->
+        IFNULL(SUM(stored_members_limit), 0) AS agentCredit,
+        IFNULL(SUM(stored_members_limit_people_number), 0) AS agentCreditPeopleNums,
+        IFNULL(SUM(stored_members_limit_times), 0) AS agentCreditTimes
+
+        FROM
+        report_membership_stats
+        WHERE 1=1
+
+        <if test="vo.siteCode == null and vo.currencyCode == null and vo.beginTime == null and vo.endTime == null">
+            AND DATE(FROM_UNIXTIME(date / 1000)) >= CURDATE() - INTERVAL 7 DAY
+        </if>
+
+
+        <if test="vo.siteCode != null">
+            AND site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.currencyCode != null">
+            AND currency = #{vo.currencyCode}
+        </if>
+        <if test="vo.beginTime!=null">
+            AND date &gt;= #{vo.beginTime}
+        </if>
+        <if test="vo.endTime!=null">
+            AND date &lt;= #{vo.endTime}
+        </if>
+            GROUP BY
+            staticDate,
+            currency
+
+
+        ORDER BY
+        staticDate desc,currency asc
+
+
+    </select>
+
+    <select id="getIntegrateTempAdminData" resultType="com.cloud.baowang.report.api.vo.user.complex.AdminIntegrateDataTempRspVO">
+
+        SELECT
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(date / 1000), @@session.time_zone,#{vo.timeZoneDb}), '%Y-%m-%d') as staticDate,
+        site_code,
+        currency as currencyCode,
+
+        <!-- 注册人数统计-->
+        IFNULL(SUM(member_registration_count), 0) AS registerTotal,
+        IFNULL(SUM(member_registration_count_backed), 0) AS registerBacked,
+        IFNULL(SUM(member_registration_count_pc), 0) AS registerPc,
+        IFNULL(SUM(member_registration_count_android_app), 0) AS registerAndroidAPP,
+        IFNULL(SUM(member_registration_count_android_h5), 0) AS registerAndroidH5,
+        IFNULL(SUM(member_registration_count_ios_app), 0) AS registerIosAPP,
+        IFNULL(SUM(member_registration_count_ios_h5), 0) AS registerIosH5,
+
+        <!-- 登录人数统计-->
+        IFNULL(SUM(member_login_count), 0) AS loginTotal,
+        IFNULL(SUM(member_login_count_backed), 0) AS loginBacked,
+        IFNULL(SUM(member_login_count_pc), 0) AS loginPc,
+        IFNULL(SUM(member_login_count_android_app), 0) AS loginAndroidAPP,
+        IFNULL(SUM(member_login_count_android_h5), 0) AS loginAndroidH5,
+        IFNULL(SUM(member_login_count_ios_app), 0) AS loginIosAPP,
+        IFNULL(SUM(member_login_count_ios_h5), 0) AS loginIosH5,
+
+        <!-- 会员存款统计-->
+        IFNULL(SUM(total_member_deposit), 0) AS totalDeposit,
+        IFNULL(SUM(total_member_deposit_people_number), 0) AS depositPeopleNums,
+        IFNULL(SUM(total_member_deposit_times), 0) AS depositNums,
+
+        <!-- 会员提现统计-->
+        IFNULL(SUM(total_member_withdrawal), 0) AS totalWithdraw,
+        IFNULL(SUM(total_member_withdrawal_people_number), 0) AS withdrawPeopleNums,
+        IFNULL(SUM(total_member_withdrawal_times), 0) AS withdrawNums,
+        IFNULL(SUM(total_member_withdrawal_big_people_number), 0) AS largeWithdrawPeopleNums,
+        IFNULL(SUM(total_member_withdrawal_big_times), 0) AS largeWithdrawNums,
+        IFNULL(SUM(member_deposit_withdrawal_difference), 0) AS memberAccessDifference,
+
+        <!-- 会员首存统计-->
+        IFNULL(SUM(first_member_deposit_amount), 0) AS firstDepositAmount,
+        IFNULL(SUM(first_member_deposit_people_number), 0) AS firstDepositPeopleNums,
+
+        <!-- 会员投注统计-->
+        IFNULL(SUM(member_betting_amount), 0) AS betAmount,
+        IFNULL(SUM(member_betting_valid_amount), 0) AS effectiveBetAmount,
+        <!-- IFNULL(SUM(member_betting_people_number), 0) AS bettorNums, -->
+        IFNULL(SUM(member_betting_number), 0) AS bettingOrderAmount,
+        IFNULL(SUM(member_profit_loss), 0) AS memberWinOrLose,
+
+        <!--会员VIP福利统计 -->
+        IFNULL(SUM(member_vip_benefits_amount), 0) AS vipWelfareAmount,
+        IFNULL(SUM(member_vip_benefits_people_number), 0) AS vipWelfarePeopleNums,
+
+        <!--会员优惠活动统计 -->
+        IFNULL(SUM(member_activity_discounts_amount), 0) AS promotionAmount,
+        IFNULL(SUM(member_activity_discounts_people_number), 0) AS promotionPeopleNums,
+
+        IFNULL(SUM(used_discounts), 0) AS usedPromotion,
+
+        <!--会员调整统计 -->
+        IFNULL(SUM(member_adjustments_amount), 0) AS totalAdjust,
+        IFNULL(SUM(member_adjustments_add_amount), 0) AS addAmount,
+        IFNULL(SUM(member_adjustments_add_people_number), 0) AS addAmountPeopleNum,
+        IFNULL(SUM(member_adjustments_reduce_amount), 0) AS reduceAmount,
+        IFNULL(SUM(member_adjustments_reduce_people_number), 0) AS reduceAmountPeopleNums,
+
+        <!-- 上下分 -->
+        IFNULL(SUM(platform_total_adjust), 0) AS platformTotalAdjust,
+        IFNULL(SUM(platform_add_amount), 0) AS platformAddAmount,
+        IFNULL(SUM(platform_add_people_num), 0) AS platformAddPeopleNum,
+        IFNULL(SUM(platform_reduce_amount), 0) AS platformReduceAmount,
+        IFNULL(SUM(platform_reduce_people_nums), 0) AS platformReducePeopleNums,
+
+        <!-- 打赏 -->
+        IFNULL(SUM(tips_amount), 0) AS tipsAmount,
+
+        <!-- 风控调整 -->
+        IFNULL(SUM(risk_amount), 0) AS riskAmount,
+        IFNULL(SUM(risk_add_amount), 0) AS riskAddAmount,
+        IFNULL(SUM(risk_add_people_num), 0) AS riskAddPeopleNum,
+        IFNULL(SUM(risk_reduce_amount), 0) AS riskReduceAmount,
+        IFNULL(SUM(risk_reduce_people_num), 0) AS riskReducePeopleNum,
+
+        <!--代理注册人数统计 -->
+        IFNULL(SUM(agent_registration_count), 0) AS agentRegisterTotal,
+        IFNULL(SUM(agent_registration_count_backed), 0) AS agentRegisterBacked,
+        IFNULL(SUM(agent_registration_count_pc), 0) AS agentRegisterPc,
+        IFNULL(SUM(agent_registration_count_android_app), 0) AS agentRegisterAndroidAPP,
+        IFNULL(SUM(agent_registration_count_android_h5), 0) AS agentRegisterAndroidH5,
+        IFNULL(SUM(agent_registration_count_ios_app), 0) AS agentRegisterIosAPP,
+        IFNULL(SUM(agent_registration_count_ios_h5), 0) AS agentRegisterIosH5,
+
+
+        <!--代存金额统计 -->
+        IFNULL(SUM(stored_members_limit), 0) AS agentCredit,
+        IFNULL(SUM(stored_members_limit_people_number), 0) AS agentCreditPeopleNums,
+        IFNULL(SUM(stored_members_limit_times), 0) AS agentCreditTimes
+
+        FROM
+        report_membership_stats
+        WHERE 1=1
+
+        <if test="vo.siteCode == null and vo.currencyCode == null and vo.beginTime == null and vo.endTime == null">
+            AND DATE(FROM_UNIXTIME(date / 1000)) >= CURDATE() - INTERVAL 7 DAY
+        </if>
+
+
+        <if test="vo.siteCode != null">
+            AND site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.currencyCode != null">
+            AND currency = #{vo.currencyCode}
+        </if>
+        <if test="vo.beginTime!=null">
+            AND date &gt;= #{vo.beginTime}
+        </if>
+        <if test="vo.endTime!=null">
+            AND date &lt;= #{vo.endTime}
+        </if>
+
+        <if test="vo.siteCode == null">
+            GROUP BY
+            staticDate,
+            site_code,
+            currency
+        </if>
+        <if test="vo.siteCode != null">
+            GROUP BY
+            staticDate,
+            currency
+        </if>
+
+        ORDER BY staticDate DESC, site_code ASC, currency ASC
+
+
+    </select>
+    <!-- 统计所有数据 -->
+    <select id="statisticIntegrateAllTempData" resultType="com.cloud.baowang.report.api.vo.user.complex.AdminIntegrateDataTempRspVO">
+        SELECT
+        site_code,
+        currency as currencyCode,
+        <!-- 注册人数统计-->
+        IFNULL(SUM(member_registration_count), 0) AS registerTotal,
+        IFNULL(SUM(member_registration_count_backed), 0) AS registerBacked,
+        IFNULL(SUM(member_registration_count_pc), 0) AS registerPc,
+        IFNULL(SUM(member_registration_count_android_app), 0) AS registerAndroidAPP,
+        IFNULL(SUM(member_registration_count_android_h5), 0) AS registerAndroidH5,
+        IFNULL(SUM(member_registration_count_ios_app), 0) AS registerIosAPP,
+        IFNULL(SUM(member_registration_count_ios_h5), 0) AS registerIosH5,
+
+        <!-- 登录人数统计-->
+        IFNULL(SUM(member_login_count), 0) AS loginTotal,
+        IFNULL(SUM(member_login_count_backed), 0) AS loginBacked,
+        IFNULL(SUM(member_login_count_pc), 0) AS loginPc,
+        IFNULL(SUM(member_login_count_android_app), 0) AS loginAndroidAPP,
+        IFNULL(SUM(member_login_count_android_h5), 0) AS loginAndroidH5,
+        IFNULL(SUM(member_login_count_ios_app), 0) AS loginIosAPP,
+        IFNULL(SUM(member_login_count_ios_h5), 0) AS loginIosH5,
+
+        <!-- 会员存款统计-->
+        IFNULL(SUM(total_member_deposit), 0) AS totalDeposit,
+        IFNULL(SUM(total_member_deposit_people_number), 0) AS depositPeopleNums,
+        IFNULL(SUM(total_member_deposit_times), 0) AS depositNums,
+
+        <!-- 会员提现统计-->
+        IFNULL(SUM(total_member_withdrawal), 0) AS totalWithdraw,
+        IFNULL(SUM(total_member_withdrawal_people_number), 0) AS withdrawPeopleNums,
+        IFNULL(SUM(total_member_withdrawal_times), 0) AS withdrawNums,
+        IFNULL(SUM(total_member_withdrawal_big_people_number), 0) AS largeWithdrawPeopleNums,
+        IFNULL(SUM(total_member_withdrawal_big_times), 0) AS largeWithdrawNums,
+        IFNULL(SUM(member_deposit_withdrawal_difference), 0) AS memberAccessDifference,
+
+        <!-- 会员首存统计-->
+        IFNULL(SUM(first_member_deposit_amount), 0) AS firstDepositAmount,
+        IFNULL(SUM(first_member_deposit_people_number), 0) AS firstDepositPeopleNums,
+
+        <!-- 会员投注统计-->
+        IFNULL(SUM(member_betting_amount), 0) AS betAmount,
+        IFNULL(SUM(member_betting_valid_amount), 0) AS effectiveBetAmount,
+        <!-- IFNULL(SUM(member_betting_people_number), 0) AS bettorNums, -->
+        IFNULL(SUM(member_betting_number), 0) AS bettingOrderAmount,
+        IFNULL(SUM(member_profit_loss), 0) AS memberWinOrLose,
+
+        <!--会员VIP福利统计 -->
+        IFNULL(SUM(member_vip_benefits_amount), 0) AS vipWelfareAmount,
+        IFNULL(SUM(member_vip_benefits_people_number), 0) AS vipWelfarePeopleNums,
+
+        <!--会员优惠活动统计 -->
+        IFNULL(SUM(member_activity_discounts_amount), 0) AS promotionAmount,
+        IFNULL(SUM(member_activity_discounts_people_number), 0) AS promotionPeopleNums,
+        IFNULL(SUM(used_discounts), 0) AS usedPromotion,
+
+        <!--会员调整统计 -->
+        IFNULL(SUM(member_adjustments_amount), 0) AS totalAdjust,
+        IFNULL(SUM(member_adjustments_add_amount), 0) AS addAmount,
+        IFNULL(SUM(member_adjustments_add_people_number), 0) AS addAmountPeopleNum,
+        IFNULL(SUM(member_adjustments_reduce_amount), 0) AS reduceAmount,
+        IFNULL(SUM(member_adjustments_reduce_people_number), 0) AS reduceAmountPeopleNums,
+
+        <!-- 上下分 -->
+        IFNULL(SUM(platform_total_adjust), 0) AS platformTotalAdjust,
+        IFNULL(SUM(platform_add_amount), 0) AS platformAddAmount,
+        IFNULL(SUM(platform_add_people_num), 0) AS platformAddPeopleNum,
+        IFNULL(SUM(platform_reduce_amount), 0) AS platformReduceAmount,
+        IFNULL(SUM(platform_reduce_people_nums), 0) AS platformReducePeopleNums,
+
+        <!-- 打赏 -->
+        IFNULL(SUM(tips_amount), 0) AS tipsAmount,
+
+        <!-- 风控调整 -->
+        IFNULL(SUM(risk_amount), 0) AS riskAmount,
+        IFNULL(SUM(risk_add_amount), 0) AS riskAddAmount,
+        IFNULL(SUM(risk_add_people_num), 0) AS riskAddPeopleNum,
+        IFNULL(SUM(risk_reduce_amount), 0) AS riskReduceAmount,
+        IFNULL(SUM(risk_reduce_people_num), 0) AS riskReducePeopleNum,
+
+        <!--代理注册人数统计 -->
+        IFNULL(SUM(agent_registration_count), 0) AS agentRegisterTotal,
+        IFNULL(SUM(agent_registration_count_backed), 0) AS agentRegisterBacked,
+        IFNULL(SUM(agent_registration_count_pc), 0) AS agentRegisterPc,
+        IFNULL(SUM(agent_registration_count_android_app), 0) AS agentRegisterAndroidAPP,
+        IFNULL(SUM(agent_registration_count_android_h5), 0) AS agentRegisterAndroidH5,
+        IFNULL(SUM(agent_registration_count_ios_app), 0) AS agentRegisterIosAPP,
+        IFNULL(SUM(agent_registration_count_ios_h5), 0) AS agentRegisterIosH5,
+
+        IFNULL(SUM(stored_members_limit), 0) AS agentCredit,
+        IFNULL(SUM(stored_members_limit_people_number), 0) AS agentCreditPeopleNums,
+        IFNULL(SUM(stored_members_limit_times), 0) AS agentCreditTimes
+
+        FROM
+        report_membership_stats
+        WHERE 1=1
+
+        <if test="vo.siteCode == null and vo.currencyCode == null and vo.beginTime == null and vo.endTime == null">
+            AND DATE(FROM_UNIXTIME(date / 1000)) >= CURDATE() - INTERVAL 7 DAY
+        </if>
+
+        <if test="vo.siteCode != null">
+            AND site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.currencyCode != null">
+            AND currency = #{vo.currencyCode}
+        </if>
+        <if test="vo.beginTime!=null">
+            AND date &gt;= #{vo.beginTime}
+        </if>
+        <if test="vo.endTime!=null">
+            AND date &lt;= #{vo.endTime}
+        </if>
+            group by site_code,currency
+    </select>
+
+    <select id="getBettorNum" resultType="com.cloud.baowang.report.api.vo.user.complex.AdminIntegrateDataTempRspVO">
+        select CONCAT(site_code,main_currency,DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(day_hour_millis / 1000), @@session.time_zone,#{timeZoneDb}), '%Y-%m-%d'))  as siteCode, count(DISTINCT u.user_id) as bettorNums
+        from report_user_win_lose u where u.valid_bet_amount > 0 and u.day_hour_millis BETWEEN #{beginTime} and #{endTime}
+        <if test="currencyList != null and currencyList.size() > 0">
+            and u.main_currency in
+            <foreach collection="currencyList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="siteCodeList != null and siteCodeList.size() > 0">
+            and u.site_code in
+            <foreach collection="siteCodeList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        group by CONCAT(site_code,main_currency,DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(day_hour_millis / 1000), @@session.time_zone,#{timeZoneDb}), '%Y-%m-%d'))
+    </select>
+
+    <select id="getTotalBettorNum" resultType="com.cloud.baowang.report.api.vo.user.complex.AdminIntegrateDataTempRspVO">
+        select CONCAT(site_code,main_currency)  as siteCode, count(DISTINCT u.user_id) as bettorNums
+        from report_user_win_lose u where u.valid_bet_amount > 0 and u.day_hour_millis BETWEEN #{beginTime} and #{endTime}
+        <if test="currencyList != null and currencyList.size() > 0">
+            and u.main_currency in
+            <foreach collection="currencyList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="siteCodeList != null and siteCodeList.size() > 0">
+            and u.site_code in
+            <foreach collection="siteCodeList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        group by CONCAT(site_code,main_currency)
+    </select>
+
+</mapper>

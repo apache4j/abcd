@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.system.repositories.site.AreaSiteManageRepository">
+
+
+    <select id="selectByLanguage" resultType="com.cloud.baowang.system.api.vo.site.area.AreaSiteLangVO">
+        SELECT
+            t1.area_code as areaCode,
+            t1.country_code as countryCode,
+            t1.max_length as maxLength,
+            t1.min_length as minLength,
+            t2.country_name as countryName,
+            t1.icon as icon
+        FROM
+            `area_site_manage` t1,
+            area_country_name t2
+        WHERE
+            t1.area_code = t2.area_code
+          AND t1.site_code = #{siteCode}
+          AND t1.status = #{status}
+          AND t2.`language` = #{language}
+    </select>
+</mapper>

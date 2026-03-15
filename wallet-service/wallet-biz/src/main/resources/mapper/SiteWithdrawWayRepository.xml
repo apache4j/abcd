@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.wallet.repositories.SiteWithdrawWayRepository">
+
+    <select id="queryWithdrawAuthorizePage"
+            resultType="com.cloud.baowang.wallet.api.vo.withdraw.WithdrawAuthorizeResVO">
+        SELECT
+        a.id AS withdrawWayId,
+        a.withdraw_way_i18 AS withdrawWayName,
+        a.withdraw_type_id AS withdrawType,
+
+        (SELECT withdraw_type_i18 FROM system_withdraw_type WHERE id = a.withdraw_type_id) AS withdrawTypeName,
+        IFNULL(t1.way_fee, a.way_fee) AS withdrawFee,
+        IFNULL(t1.fee_type, a.fee_type) AS feeType,
+        IFNULL(t1.way_fee_fixed_amount, a.way_fee_fixed_amount) AS wayFeeFixedAmount,
+
+        a.way_icon AS wayIcon,
+        a.memo AS memo,
+        a.status AS status,
+
+        CASE
+        WHEN t1.created_time IS NOT NULL THEN t1.created_time
+        ELSE a.updated_time
+        END AS operatorTime,
+
+        CASE
+        WHEN t1.creator IS NOT NULL THEN t1.creator
+        ELSE a.updater
+        END AS operator,
+
+        CASE
+        WHEN a.id = t1.withdraw_id THEN 1
+        ELSE 0
+        END AS chooseFlag
+
+        FROM (
+        SELECT
+        t.id,
+        t.withdraw_way,
+        t.withdraw_way_i18,
+        t.withdraw_type_id,
+        t.way_fee_fixed_amount,
+        t.fee_type,
+        t.way_icon,
+        t.way_fee,
+        t.memo,
+        t.status,
+        t.sort_order,
+        t.updated_time,
+        t.updater,
+        t.withdraw_type_code,
+        COUNT(swc.id) AS channelTotal
+
+        FROM system_withdraw_way t
+        JOIN system_withdraw_type t2 ON t.withdraw_type_id = t2.id
+        LEFT JOIN system_withdraw_channel swc ON swc.withdraw_way_id = t.id
+        WHERE t.currency_code = #{vo.currency}
+        <if test="vo.withdrawTypeId != '' and vo.withdrawTypeId != null">
+            AND t2.id = #{vo.withdrawTypeId}
+        </if>
+        <if test="vo.withdrawWayId != '' and vo.withdrawWayId != null">
+            AND t.id = #{vo.withdrawWayId}
+        </if>
+        <if test="vo.status != null and vo.status != ''">
+            AND t.status = #{vo.status}
+        </if>
+        GROUP BY t.id, t.withdraw_way, t.withdraw_way_i18, t.withdraw_type_id, t.way_icon, t.way_fee, t.memo, t.status,
+        t.sort_order, t.updated_time, t.updater
+        ) a
+
+        LEFT JOIN site_withdraw_way t1
+        ON a.id = t1.withdraw_id AND t1.site_code = #{vo.siteCode}
+        WHERE
+        ( a.channelTotal > 0 or a.withdraw_type_code = 'manual_withdraw')
+        ORDER BY chooseFlag DESC, a.status DESC, a.sort_order DESC
+    </select>
+    <select id="queryBySite" resultType="com.cloud.baowang.wallet.api.vo.withdraw.SiteWithdrawWayResVO">
+        SELECT
+        a.id AS withdrawId,
+        a.id AS payMethodId,
+        a.withdraw_way_i18 AS withdrawWayI18
+        FROM
+        system_withdraw_way a
+    </select>
+    <select id="queryBySiteAndTypeCode"
+            resultType="com.cloud.baowang.wallet.api.vo.withdraw.SiteWithdrawWayResVO">
+        select a.id AS payMethodId,
+        a.way_fee AS wayFee,
+        a.withdraw_id AS withdrawId,
+        b.withdraw_way AS withdrawWayCode,
+        b.withdraw_way_i18 AS withdrawWayI18
+        from site_withdraw_way a
+        inner join system_withdraw_way b on a.site_code = #{siteCode} and a.withdraw_id = b.id
+        where a.status = 1 and b.withdraw_type_code = #{typeCode}
+    </select>
+    <select id="queryWithdrawListBySite" resultType="com.cloud.baowang.wallet.api.vo.withdraw.SiteWithdrawWayResVO">
+        select a.id AS payMethodId,
+        a.way_fee AS wayFee,
+        a.withdraw_id AS withdrawId,
+        b.withdraw_way AS withdrawWayCode,
+        b.withdraw_way_i18 AS withdrawWayI18,
+        b.withdraw_type_code AS withdrawTypeCode
+        from site_withdraw_way a
+        inner join system_withdraw_way b on a.site_code = #{siteCode} and a.withdraw_id = b.id
+        where a.status = 1
+    </select>
+    <select id="queryListBySiteAndCurrencyCode"
+            resultType="com.cloud.baowang.wallet.api.vo.withdraw.SiteWithdrawWayResVO">
+        select
+        sw.withdraw_id as withdrawId,
+        sysw.withdraw_way_i18
+        from
+        site_withdraw_way sw
+        join system_withdraw_way sysw on
+        sw.withdraw_id = sysw.id
+        where sw.site_code = #{siteCode} and sysw.currency_code =#{currencyCode}
+    </select>
+
+    <select id="selectWithdrawPage"
+            resultType="com.cloud.baowang.wallet.api.vo.withdraw.SiteWithdrawWayResponseVO">
+        SELECT
+        a.id AS id,
+        b.currency_code AS currencyCode,
+        a.withdraw_id AS withdrawWayId,
+        b.withdraw_way_i18 AS withdrawWayI18,
+        b.withdraw_type_code AS withdrawTypeCode,
+        b.way_icon AS wayIcon,
+        a.fee_type AS feeType,
+        a.way_fee AS wayFee,
+        a.way_fee_fixed_amount AS wayFeeFixedAmount,
+        a.status AS status,
+        a.sort_order AS sortOrder,
+        a.creator AS creator,
+        a.created_time AS createdTime,
+        a.updater AS updater,
+        a.updated_time AS updatedTime,
+        c.withdraw_type_i18 AS withdrawTypeI18
+        FROM
+        site_withdraw_way a
+        LEFT JOIN system_withdraw_way b ON b.id = a.withdraw_id
+        LEFT JOIN system_withdraw_type c ON c.id = b.withdraw_type_id
+        WHERE
+        a.site_code = #{vo.siteCode}
+        <if test="vo.withdrawTypeId != null and vo.withdrawTypeId != ''">
+            AND c.id = #{vo.withdrawTypeId}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode != ''">
+            AND b.currency_code = #{vo.currencyCode}
+        </if>
+        <if test="vo.withdrawWay != null and vo.withdrawWay != ''">
+            AND b.withdraw_way LIKE CONCAT('%', #{vo.withdrawWay}, '%')
+        </if>
+        <if test="vo.status != null ">
+            AND a.status = #{vo.status}
+        </if>
+        <if test="vo.feeType != null ">
+            AND a.fee_type = #{vo.feeType}
+        </if>
+        ORDER BY a.updated_time DESC
+
+    </select>
+
+    <select id="selectBySort" resultType="com.cloud.baowang.wallet.api.vo.withdraw.SiteWithdrawWayResponseVO">
+        SELECT
+        a.id AS id,
+        b.currency_code AS currencyCode,
+        a.withdraw_id AS withdrawWayId,
+        b.withdraw_way_i18 AS withdrawWayI18,
+        b.withdraw_type_code AS withdrawTypeCode,
+        b.way_icon AS wayIcon,
+        a.fee_type AS feeType,
+        a.way_fee AS wayFee,
+        a.way_fee_fixed_amount AS wayFeeFixedAmount,
+        a.status AS status,
+        a.sort_order AS sortOrder,
+        a.creator AS creator,
+        a.created_time AS createdTime,
+        a.updater AS updater,
+        a.updated_time AS updatedTime,
+        c.withdraw_type_i18 AS withdrawTypeI18
+        FROM
+        site_withdraw_way a
+        LEFT JOIN system_withdraw_way b ON b.id = a.withdraw_id
+        LEFT JOIN system_withdraw_type c ON c.id = b.withdraw_type_id
+        WHERE
+        a.site_code = #{vo.siteCode}
+        <if test="vo.withdrawTypeId != null and vo.withdrawTypeId != ''">
+            AND c.id = #{vo.withdrawTypeId}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode != ''">
+            AND b.currency_code = #{vo.currencyCode}
+        </if>
+        <if test="vo.withdrawWay != null and vo.withdrawWay != ''">
+            AND b.withdraw_way LIKE CONCAT('%', #{vo.withdrawWay}, '%')
+        </if>
+        <if test="vo.status != null">
+            AND a.status = #{vo.status}
+        </if>
+        <if test="vo.feeType != null ">
+            AND a.fee_type = #{vo.feeType}
+        </if>
+        ORDER BY a.sort_order ASC
+    </select>
+    <select id="selectFrontWayList" resultType="com.cloud.baowang.wallet.po.SystemWithdrawWayPO">
+        SELECT
+        b.id AS id,
+        b.currency_code AS currencyCode,
+        b.withdraw_type_id AS withdrawTypeId,
+        b.withdraw_type_code AS withdrawTypeCode,
+        b.withdraw_way AS withdrawWay,
+        b.withdraw_way_i18 AS withdrawWayI18,
+        b.network_type AS networkType,
+        b.fee_type AS feeType,
+        b.way_fee AS wayFee,
+        b.way_fee_fixed_amount AS wayFeeFixedAmount,
+        b.quick_amount AS quickAmount,
+        b.way_icon AS wayIcon,
+        b.memo AS memo,
+        b.recommend_flag AS recommendFlag
+        FROM
+        site_withdraw_way a
+        LEFT JOIN system_withdraw_way b ON b.id = a.withdraw_id
+        LEFT JOIN system_withdraw_type c ON c.id = b.withdraw_type_id
+        WHERE
+        a.site_code = #{vo.siteCode}
+        AND a.status = 1
+        AND b.status = 1
+        <if test="vo.mainCurrency != null and vo.mainCurrency != ''">
+            AND b.currency_code = #{vo.mainCurrency}
+        </if>
+        ORDER BY b.recommend_flag DESC, a.sort_order ASC
+    </select>
+
+
+
+    <select id="getWithdrawWayBySiteCodeList" resultType="com.cloud.baowang.wallet.api.vo.recharge.SiteWithdrawWayResChangeVO">
+        SELECT
+        site.withdraw_id withdrawId,
+        site.site_code siteCode,
+        site.way_fee wayFee,
+        site.way_fee_fixed_amount wayFeeFixedAmount,
+        way.currency_code currencyCode,
+        m.message as withdrawWayName
+        FROM
+        site_withdraw_way site
+        left join system_withdraw_way way on way.id = site.withdraw_id
+        left join i18n_message m on way.withdraw_way_i18 = m.message_key  and m.`language` ='zh-CN'
+        WHERE
+        site.site_code = #{siteCode}
+    </select>
+    <select id="getWithdrawCollectInfoList" resultType="java.lang.String">
+        SELECT
+        b.collect_info
+        FROM
+        site_withdraw_way a
+        LEFT JOIN system_withdraw_way b ON b.id = a.withdraw_id
+        WHERE
+        a.site_code = #{siteCode}
+        AND a.status = 1
+        AND b.status = 1
+        AND b.withdraw_type_code = #{withdrawTypeCode}
+        AND b.currency_code = #{currencyCode}
+    </select>
+</mapper>

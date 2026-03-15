@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentRegisterRecordRepository">
+    <select id="queryAgentRegisterRecord" resultType="com.cloud.baowang.agent.api.vo.agentRegister.AgentRegisterRecordVO">
+        select
+            register_time as registerTime,
+            agent_type as agentType,
+            agent_account as agentAccount,
+            register_ip as registerIp,
+            registrant as registrant,
+            register_ip_control_id as registerIpControlId,
+            ip_attribution as ipAttribution,
+            register_device as registerDevice,
+            device_control_id as deviceControlId,
+            device_number as deviceNumber
+            from agent_register_info
+        where 1 = 1
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            AND site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.agentType != null and vo.agentType != ''">
+            AND agent_type = #{vo.agentType}
+        </if>
+        <if test="vo.agentAccount != null and vo.agentAccount != ''">
+            AND agent_account = #{vo.agentAccount}
+        </if>
+        <if test="vo.registerIp != null and vo.registerIp != ''">
+            AND register_ip = #{vo.registerIp}
+        </if>
+        <if test="vo.ipAttribution != null and vo.ipAttribution != ''">
+            AND ip_attribution = #{vo.ipAttribution}
+        </if>
+        <if test="vo.registerDevice != null and vo.registerDevice != ''">
+            AND register_device = #{vo.registerDevice}
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND register_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND register_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+
+        <choose>
+            <when test="vo.orderField == 'registerTime' and vo.orderType == 'asc'">
+                ORDER BY registerTime asc
+            </when>
+            <when test="vo.orderField == 'registerTime' and vo.orderType == 'desc'">
+                ORDER BY registerTime desc
+            </when>
+
+            <otherwise>
+                order by register_time desc , register_ip desc
+            </otherwise>
+        </choose>
+    </select>
+</mapper>

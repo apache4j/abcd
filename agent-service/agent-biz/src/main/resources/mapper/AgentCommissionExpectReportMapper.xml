@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentCommissionExpectReportRepository">
+    <select id="getLatestCommissionExpectReport" resultType="com.cloud.baowang.agent.po.commission.AgentCommissionExpectReportPO">
+        select * from agent_commission_expect_report
+                where agent_id = #{agentId}
+            order by created_time desc
+            limit 1
+    </select>
+
+</mapper>

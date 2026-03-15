@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.user.repositories.UserVIPFlowRecordRepository">
+
+    <select id = "selectLastOne" resultType="com.cloud.baowang.user.po.UserVIPFlowRecordPO">
+        SELECT user_id as userId,
+                user_account as userAccount,
+                vip_grade_code as vipGradeCode,
+               status as status,
+               valid_exe as validExe,
+               valid_sum_exe as validSumExe,
+               last_vip_time as lastVipTime
+        FROM user_vip_flow_record WHERE created_time >=
+        ( SELECT created_time FROM user_vip_flow_record WHERE user_id = #{userId}
+        AND `status` != '' ORDER BY created_time DESC LIMIT 1 )
+        and user_id = #{userId}
+        ORDER BY created_time DESC LIMIT 1
+    </select>
+</mapper>

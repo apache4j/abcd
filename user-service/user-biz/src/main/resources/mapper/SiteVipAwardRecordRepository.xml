@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.user.repositories.SiteVipAwardRecordRepository">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.cloud.baowang.user.po.SiteVipAwardRecordPO">
+        <id column="id" property="id" />
+        <result column="site_code" property="siteCode" />
+        <result column="order_id" property="orderId" />
+        <result column="award_type" property="awardType" />
+        <result column="award_amount" property="awardAmount" />
+        <result column="agent_id" property="agentId" />
+        <result column="agent_account" property="agentAccount" />
+        <result column="receive_type" property="receiveType" />
+        <result column="receive_status" property="receiveStatus" />
+        <result column="user_id" property="userId" />
+        <result column="user_account" property="userAccount" />
+        <result column="vip_grade_code" property="vipGradeCode" />
+        <result column="account_type" property="accountType" />
+        <result column="record_start_time" property="recordStartTime" />
+        <result column="record_end_time" property="recordEndTime" />
+        <result column="receive_time" property="receiveTime" />
+        <result column="expired_time" property="expiredTime" />
+        <result column="creator" property="creator" />
+        <result column="created_time" property="createdTime" />
+        <result column="updater" property="updater" />
+        <result column="updated_time" property="updatedTime" />
+    </resultMap>
+
+</mapper>

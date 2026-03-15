@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentCoinRecordRepository">
+    <select id="listAgentCustomerCoinRecord"
+            resultType="com.cloud.baowang.agent.api.vo.agentCoin.AgentCustomerCoinRecordVO">
+        SELECT
+        a.order_no AS orderNo,
+        a.coin_from AS coinFrom,
+        a.coin_amount AS coinAmount,
+        a.coin_to AS coinTo,
+        a.created_time as coinTime,
+        a.wallet_type AS walletType,
+        a.agent_account AS agentAccount,
+        a.balance_type AS balanceType,
+        a.business_coin_type AS businessCoinType,
+        a.coin_type AS coinType,
+        a.remark AS remark,
+        "1" AS status,
+        b.deposit_withdraw_address AS depositWithdrawAddress,
+        IF(a.business_coin_type = '2',c.agent_account,'') AS transferOutAccount,
+        IF(a.business_coin_type = '2',c.transfer_account,'') AS transferInAccount,
+        b.deposit_withdraw_type_code AS depositWithdrawTypeCode
+        FROM
+        agent_coin_record a
+        LEFT JOIN agent_deposit_withdrawal b on b.order_no = a.order_no
+        LEFT JOIN agent_transfer_record c on c.order_no = a.order_no
+        where balance_type in ('1','2')
+        <if test="vo.agentId != null and vo.agentId != ''">
+            AND a.agent_id = #{vo.agentId}
+        </if>
+        <if test="vo.walletType != null and vo.walletType != ''">
+            AND a.wallet_type = #{vo.walletType}
+        </if>
+        <if test = "vo.coinTypeList != null and vo.coinTypeList.size > 0">
+            AND a.coin_type in
+            <foreach collection="vo.coinTypeList" item="value" open="(" separator="," close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND a.created_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND a.created_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        order by a.created_time desc
+
+
+    </select>
+    <select id="getCoinRecordDetail"
+            resultType="com.cloud.baowang.agent.api.vo.agentCoin.AgentCustomerCoinRecordDetailVO">
+
+        SELECT
+            a.order_no AS orderNo,
+            a.coin_amount AS coinAmount,
+            a.coin_to AS coinToAmount,
+            a.created_time as coinTime,
+            a.wallet_type AS walletType,
+            a.agent_account AS agentAccount,
+            a.balance_type AS balanceType,
+            a.business_coin_type AS businessCoinType,
+            a.coin_type AS coinType,
+            a.remark AS remark,
+            "1" AS status,
+            b.deposit_withdraw_address AS depositWithdrawAddress,
+            c.agent_account AS transferOutAccount,
+            c.transfer_account AS transferInAccount
+        FROM
+            agent_coin_record a
+            LEFT JOIN agent_deposit_withdrawal b on b.order_no = a.order_no
+            LEFT JOIN agent_transfer_record c on c.order_no = a.order_no
+        WHERE a.order_no = #{vo.orderNo}
+        <if test="vo.walletType != null and vo.walletType != ''">
+            AND a.wallet_type = #{vo.walletType}
+        </if>
+        <if test="vo.balanceType != null and vo.balanceType != ''">
+            AND a.balance_type = #{vo.balanceType}
+        </if>
+    </select>
+
+    <select id="sumAllAgentCoinRecord" resultType="com.cloud.baowang.agent.api.vo.agentCoin.AgentCoinRecordVO">
+        SELECT
+        sum(coin_from) AS coinFrom,
+        sum(coin_amount) AS coinAmount,
+        sum(coin_to) AS coinTo
+        FROM
+        agent_coin_record
+        ${ew.customSqlSegment}
+    </select>
+
+
+</mapper>

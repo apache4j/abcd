@@ -1,0 +1,136 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.cloud.baowang</groupId>
+        <artifactId>system-business-service</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>system-business-biz</artifactId>
+    <packaging>jar</packaging>
+
+    <name>system-business-biz</name>
+
+    <properties>
+        <maven.deploy.skip>false</maven.deploy.skip>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+
+        <!-- Config 配置中心相关 -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+        <!--    system-business-api    -->
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>system-business-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>common-mybatis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>common-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>common-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>common-kafka</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>user-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>wallet-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>play-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>agent-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mailersend</groupId>
+            <artifactId>java-sdk</artifactId>
+            <version>1.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>common-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>job-api</artifactId>
+            <version>${revision}</version>
+            <scope>compile</scope>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.cloud.baowang</groupId>-->
+<!--            <artifactId>common-test</artifactId>-->
+<!--            <version>${revision}</version>-->
+<!--            <type>pom</type>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
+
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>data-transfer</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>activity-api</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.maxmind.geoip2</groupId>
+            <artifactId>geoip2</artifactId>
+            <version>2.15.0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

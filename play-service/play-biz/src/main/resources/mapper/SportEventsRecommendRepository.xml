@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.play.repositories.SportEventsRecommendRepository">
+
+    <select id="querySportRecommendPage" resultType="com.cloud.baowang.play.api.vo.venue.SportRecommendVO">
+
+        SELECT
+        ev_info.id,
+        ev_info.league_id,
+        ev_info.league_name,
+        ev_info.events_id,
+        ev_info.events_code,
+        ev_info.team_name,
+        ev_info.sport_name,
+        ev_info.sport_type,
+        s_info.created_time as updated_time,
+        ev_info.start_time as start_time,
+        ev_info.end_time as end_time,
+        s_info.creator as updater ,
+        CASE WHEN s_info.id IS NULL THEN 0 ELSE 1 END AS pinStatus,
+        s_info.created_time AS sortTime
+        from sport_events_recommend ev_info
+        LEFT JOIN site_sport_events_recommend s_info ON ev_info.id = s_info.sport_recommend_id AND s_info.site_code = #{siteCode}
+
+        <!-- 只查询出赛事未结束的 所以查出 结束时间 <= 系统时间 -->
+        where ev_info.end_time >= #{vo.endTime}
+
+        <if test="vo.sportType != null">
+            AND ev_info.sport_type = #{vo.sportType}
+        </if>
+
+        <if test="vo.leagueName != null and vo.leagueName != ''">
+            AND ev_info.league_name LIKE CONCAT('%', #{vo.leagueName}, '%')
+        </if>
+
+        <if test="vo.eventsId != null and vo.eventsId != ''">
+            AND ev_info.events_id = #{vo.eventsId}
+        </if>
+
+        <if test="vo.teamName != null and vo.teamName != ''">
+            AND ev_info.team_name LIKE CONCAT('%', #{vo.teamName}, '%')
+        </if>
+
+        <if test="vo.status == 0">
+            <!-- 未开赛 -->
+            AND ev_info.start_time &gt;= #{vo.endTime}
+        </if>
+
+        <if test="vo.status == 1">
+            <!-- 已开赛 -->
+            AND ev_info.start_time &lt;= #{vo.endTime}
+        </if>
+
+
+        <!-- s_info.id 不为 null 的排在前面，并按 s_info.sort_time 升序排序；
+             s_info.id 为 null 的排在后面，并按 ev_info.start_time 升序排序;
+            -->
+        ORDER BY
+        CASE WHEN s_info.id IS NULL THEN 1 ELSE 0 END,          -- 非空排前，空排后
+        CASE
+        WHEN s_info.id IS NULL THEN ev_info.start_time
+        ELSE s_info.created_time
+        END ASC
+
+
+    </select>
+</mapper>

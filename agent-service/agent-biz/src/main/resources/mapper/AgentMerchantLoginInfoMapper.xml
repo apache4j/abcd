@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentMerchantLoginInfoRepository">
+
+    <select id="getCountByLoginType" resultType="java.lang.Long">
+        select count(id) from agent_merchant_login_info where site_code = #{siteCode}
+        <if test="loginType != null">
+            and login_type = #{loginType}
+        </if>
+    </select>
+</mapper>

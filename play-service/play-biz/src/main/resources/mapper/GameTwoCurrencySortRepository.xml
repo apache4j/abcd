@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.play.repositories.GameTwoCurrencySortRepository">
+
+    <select id="getMaxGameOneHomeSort" resultType="java.lang.Integer">
+
+        SELECT IFNULL(max(game_one_home_sort),0) gameOneHomeSort FROM game_two_currency_sort where site_code = #{siteCode} and currency_code = #{currencyCode}
+                                                                                               and game_one_id = #{gameOneId};
+
+    </select>
+
+    <select id="getMaxGameOneHotSort" resultType="java.lang.Integer">
+        SELECT IFNULL(max(game_one_hot_sort), 0) gameOneHomeSort
+        FROM game_two_currency_sort
+        where site_code = #{siteCode}
+          and currency_code = #{currencyCode}
+          and game_one_id = #{gameOneId};
+    </select>
+</mapper>

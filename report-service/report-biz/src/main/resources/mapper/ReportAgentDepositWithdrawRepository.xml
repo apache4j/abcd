@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.report.repositories.ReportAgentDepositWithdrawRepository">
+
+
+    <select id="selectTotal" resultType="com.cloud.baowang.report.po.ReportAgentDepositWithdrawPO">
+        SELECT
+        sum( `total_deposit_amount` ) AS total_deposit_amount,
+        sum( `total_deposit_num` ) AS total_deposit_num,
+        sum( `total_withdraw_amount` ) AS total_withdraw_amount,
+        sum( `total_withdraw_num` ) AS total_withdraw_num,
+        sum( `diff_deposit_withdraw` ) AS diff_deposit_withdraw,
+        sum( `agent_subordinates_amount` ) AS agent_subordinates_amount,
+        sum( `agent_subordinates_user` ) AS agent_subordinates_user,
+        sum( `agent_subordinates_count` ) AS agent_subordinates_count,
+        sum( `agent_transfer_amount` ) AS agent_transfer_amount,
+        sum( `agent_transfer_user` ) AS agent_transfer_user,
+        sum( `agent_transfer_count` ) AS agent_transfer_count
+        from
+        report_agent_deposit_withdraw
+        ${ew.customSqlSegment}
+    </select>
+
+    <update id="addSumData" >
+        update report_agent_deposit_withdraw
+        set
+        currency_code=#{currencyCode,jdbcType=VARCHAR},
+        <if test="totalDepositAmount!=null">
+            total_deposit_amount = total_deposit_amount + #{totalDepositAmount},
+        </if>
+        <if test="totalDepositNum!=null">
+            total_deposit_num = total_deposit_num + #{totalDepositNum},
+        </if>
+        <if test="totalWithdrawAmount!=null">
+            total_withdraw_amount = total_withdraw_amount + #{totalWithdrawAmount},
+        </if>
+        <if test="totalWithdrawNum!=null">
+            total_withdraw_num = total_withdraw_num + #{totalWithdrawNum},
+        </if>
+        diff_deposit_withdraw= total_deposit_amount + #{totalDepositAmount}-total_withdraw_amount-#{totalWithdrawAmount},
+        <if test="agentSubordinatesAmount!=null">
+            agent_subordinates_amount = agent_subordinates_amount + #{agentSubordinatesAmount},
+        </if>
+        <if test="agentSubordinatesCount!=null">
+            agent_subordinates_count = agent_subordinates_count + #{agentSubordinatesCount},
+        </if>
+        <if test="agentSubordinatesUser!=null">
+            agent_subordinates_user =  #{agentSubordinatesUser},
+        </if>
+        <if test="agentTransferAmount!=null">
+            agent_transfer_amount = agent_transfer_amount + #{agentTransferAmount},
+        </if>
+        <if test="agentTransferCount!=null">
+            agent_transfer_count = agent_transfer_count + #{agentTransferCount},
+        </if>
+        <if test="agentTransferUser!=null">
+            agent_transfer_user =  #{agentTransferUser},
+        </if>
+        updated_time=#{updatedTime}
+        where id =#{id}
+    </update>
+</mapper>

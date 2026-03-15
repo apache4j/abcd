@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.play.repositories.SportEventsInfoRepository">
+
+    <select id="getSportEventsInfoPage" resultType="com.cloud.baowang.play.api.vo.venue.SportEventsInfoVO">
+        SELECT ev.id as siteEventsId,ev.sort,
+        ev.updater,
+        ev.updated_time,
+        info.sport_type,
+        info.league_name_zh_cn as leagueName,
+        info.league_id,info.id,
+        info.venue_code
+        FROM sport_events_info info
+        left join site_events ev ON ev.events_info_id = info.id and ev.site_code = #{siteCode}
+        WHERE 1 = 1
+
+        <if test="vo.sportType != null">
+            AND info.sport_type = #{vo.sportType}
+        </if>
+
+        <if test="vo.sportType == null and vo.sportTypeList != null and vo.sportTypeList.size > 0">
+            AND info.sport_type IN
+            <foreach collection="sportTypeList" item="type" open="(" separator="," close=")">
+                #{type}
+            </foreach>
+        </if>
+
+        <if test="vo.leagueName != null and vo.leagueName != ''">
+            AND info.league_name_cs LIKE CONCAT('%', #{vo.leagueName}, '%')
+        </if>
+
+        <if test="vo.leagueId != null and vo.leagueId != ''">
+            AND info.league_id = #{vo.leagueId}
+        </if>
+        ORDER BY
+        CASE
+        WHEN ev.sort IS NOT NULL THEN 0
+        ELSE info.id
+        END,
+        ev.sort asc,
+        info.id asc
+
+
+    </select>
+
+    <select id="getSportEventsInfoSortList" resultType="com.cloud.baowang.play.api.vo.venue.SportEventsInfoVO">
+        SELECT ev.id               as siteEventsId,
+               ev.sort,
+               ev.updater,
+               ev.updated_time,
+               info.sport_type,
+               info.league_name_cs as leagueName,
+               info.league_id,
+               info.id
+        FROM sport_events_info info
+                 INNER join site_events ev ON ev.events_info_id = info.id and ev.site_code = #{siteCode} AND ev.id is not null
+
+        where 1=1
+        <if test="vo.sportType != null">
+            AND info.sport_type = #{vo.sportType}
+        </if>
+
+
+        order by ev.sort
+    </select>
+</mapper>

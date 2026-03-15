@@ -1,0 +1,125 @@
+package com.cloud.baowang.admin.utils.auth;
+
+import com.cloud.baowang.common.core.constants.CommonConstant;
+import com.cloud.baowang.common.core.constants.SecurityConstants;
+import com.cloud.baowang.common.core.constants.TokenConstants;
+import com.cloud.baowang.common.core.context.SecurityContextHolder;
+import com.cloud.baowang.common.core.utils.ServletUtil;
+import com.cloud.baowang.system.api.vo.adminLogin.LoginAdmin;
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.util.ObjectUtils;
+
+
+/**
+ * 权限获取工具类
+ *
+ * @author qiqi
+ */
+public class SecurityUtils {
+    /**
+     * 获取用户ID
+     */
+    public static String getAdminId() {
+        return SecurityContextHolder.getAdminId();
+    }
+
+    /**
+     * 获取用户名称
+     */
+    public static String getUserName() {
+        return SecurityContextHolder.getUserName();
+    }
+
+    /**
+     * 获取用户key
+     */
+    public static String getUserKey() {
+        return SecurityContextHolder.getUserKey();
+    }
+
+    /**
+     * 获取登录用户信息
+     */
+    public static LoginAdmin getLoginAdmin() {
+        return SecurityContextHolder.get(SecurityConstants.LOGIN_USER, LoginAdmin.class);
+    }
+
+    /**
+     * 获取超管标识
+     *
+     * @return
+     */
+    public static Boolean getSuperAdmin() {
+        return SecurityContextHolder.getSuperAdmin();
+    }
+
+    /**
+     * 获取请求token
+     */
+    public static String getToken() {
+        return getToken(ServletUtil.getRequest());
+    }
+
+    /**
+     * 根据request获取请求token
+     */
+    public static String getToken(HttpServletRequest request) {
+        // 从header获取token标识
+        String token = request.getHeader(TokenConstants.SIGN);
+        return replaceTokenPrefix(token);
+    }
+
+    /**
+     * 裁剪token前缀
+     */
+    public static String replaceTokenPrefix(String token) {
+        // 如果前端设置了令牌前缀，则裁剪掉前缀
+        if (StringUtils.isNotEmpty(token) && token.startsWith(TokenConstants.PREFIX)) {
+            token = token.replaceFirst(TokenConstants.PREFIX, "");
+        } else if (!ObjectUtils.isEmpty(token) && token.startsWith(ServletUtil.urlEncode(TokenConstants.PREFIX))) {
+            token = ServletUtil.urlDecode(token);
+            token = token.replaceFirst(TokenConstants.PREFIX, ServletUtil.EMPTY_STRING);
+        }
+        return token;
+    }
+
+    /**
+     * 是否为管理员
+     *
+     * @param adminId 用户ID
+     * @return 结果
+     */
+    public static boolean isSuperAdmin(String adminId) {
+        return CommonConstant.business_one.toString().equals(adminId);
+    }
+
+    /**
+     * 生成BCryptPasswordEncoder密码
+     *
+     * @param password 密码
+     * @return 加密字符串
+     */
+    public static String encryptPassword(String password) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return passwordEncoder.encode(password);
+    }
+
+    /**
+     * 判断密码是否相同
+     *
+     * @param rawPassword     真实密码
+     * @param encodedPassword 加密后字符
+     * @return 结果
+     */
+    public static boolean matchesPassword(String rawPassword, String encodedPassword) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+    public static void main(String[] args) {
+        String u = "";
+        String token = replaceTokenPrefix(u);
+    }
+}

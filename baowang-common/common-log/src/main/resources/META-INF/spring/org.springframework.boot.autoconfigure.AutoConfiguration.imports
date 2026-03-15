@@ -1,0 +1,5 @@
+com.cloud.baowang.common.log.intreceptors.CustomWebConfiguration
+com.cloud.baowang.common.log.intreceptors.LogInterceptor
+com.cloud.baowang.common.log.intreceptors.RequestBodyAdviceInterceptor
+com.cloud.baowang.common.log.intreceptors.ResponseBodyAdviceInterceptor
+com.cloud.baowang.common.log.service.HttpRqRsLogService

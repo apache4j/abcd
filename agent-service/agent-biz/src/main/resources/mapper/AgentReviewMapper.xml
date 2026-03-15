@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentReviewRepository">
+
+    <select id="getReviewPage" resultType="com.cloud.baowang.agent.api.vo.agentreview.AgentReviewResponseVO">
+        SELECT
+            a.id id,
+            a.site_code siteCode,
+            a.review_order_no reviewOrderNo,
+            a.agent_id agentId,
+            a.agent_account agentAccount,
+            a.level level,
+            a.apply_info applyInfo,
+            a.apply_time applyTime,
+            a.applicant applicant,
+            a.one_review_finish_time oneReviewFinishTime,
+            a.reviewer reviewer,
+            a.review_operation reviewOperation,
+            IF(a.locker = #{adminName}, -1, 5) reviewOperation1,
+            a.review_status reviewStatus,
+            a.lock_status lockStatus,
+            a.locker locker
+        FROM agent_review a
+        <where>
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.applyTimeStart != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.oneReviewFinishTimeStart != null">
+                AND a.one_review_finish_time <![CDATA[ >= ]]> #{vo.oneReviewFinishTimeStart}
+            </if>
+            <if test="vo.oneReviewFinishTimeEnd != null">
+                AND a.one_review_finish_time <![CDATA[ <= ]]> #{vo.oneReviewFinishTimeEnd}
+            </if>
+            <if test="vo.reviewStatus != null and vo.reviewStatus.size() > 0">
+                AND a.review_status IN
+                <foreach collection="vo.reviewStatus" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.lockStatus != null">
+                AND a.lock_status = #{vo.lockStatus}
+            </if>
+            <if test="vo.reviewOperation != null">
+                AND a.review_operation = #{vo.reviewOperation}
+            </if>
+            <if test="vo.applicant != '' and vo.applicant != null">
+                AND a.applicant = #{vo.applicant}
+            </if>
+            <if test="vo.reviewer != '' and vo.reviewer != null">
+                AND a.reviewer = #{vo.reviewer}
+            </if>
+            <if test="vo.agentAccount != '' and vo.agentAccount != null">
+                AND a.agent_account = #{vo.agentAccount}
+            </if>
+            <if test="vo.reviewOrderNo != '' and vo.reviewOrderNo != null">
+                AND a.review_order_no = #{vo.reviewOrderNo}
+            </if>
+        </where>
+
+        <choose>
+            <when test="vo.orderField == 'applyTime' and vo.orderType == 'asc'">
+                ORDER BY applyTime asc
+            </when>
+            <when test="vo.orderField == 'applyTime' and vo.orderType == 'desc'">
+                ORDER BY applyTime desc
+            </when>
+
+            <when test="vo.orderField == 'oneReviewFinishTime' and vo.orderType == 'asc'">
+                ORDER BY oneReviewFinishTime asc
+            </when>
+            <when test="vo.orderField == 'oneReviewFinishTime' and vo.orderType == 'desc'">
+                ORDER BY oneReviewFinishTime desc
+            </when>
+
+            <otherwise>
+                ORDER BY reviewOperation1 ASC, a.review_operation ASC, a.review_status ASC, a.apply_time ASC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="getByAgentAccount" resultType="com.cloud.baowang.agent.po.AgentReviewPO">
+        SELECT
+        *
+        FROM agent_review
+        <where>
+            LOWER(agent_account) = LOWER(#{agentAccount})
+            and site_code =#{siteCode,jdbcType=VARCHAR}
+            AND review_status != 4
+        </where>
+    </select>
+</mapper>

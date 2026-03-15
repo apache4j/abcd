@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.activity.repositories.SiteActivityOrderRecordRepository">
+
+
+
+    <select id="getActivityOrderRecordPage" resultType="com.cloud.baowang.activity.api.vo.ActivityOrderRecordRespVO">
+        SELECT
+            id as id,
+        site_code AS siteCode,
+        order_no AS orderNo,
+        activity_id AS activityId,
+        activity_name_i18n_code AS activityNameI18nCode,
+        activity_template AS activityTemplate,
+        user_id AS userId,
+        user_account AS userAccount,
+        super_agent_id AS superAgentId,
+        vip_grade_code AS vipGradeCode,
+        vip_rank_code AS vipRankCode,
+        distribution_type AS distributionType,
+        receive_start_time AS receiveStartTime,
+        receive_end_time AS receiveEndTime,
+        receive_status AS receiveStatus,
+        final_rate AS finalRate,
+        activity_amount AS activityAmount,
+        currency_code AS currencyCode,
+        running_water_multiple AS runningWaterMultiple,
+        remark AS remark,
+        receive_time AS receiveTime,
+        created_time as createdTime,
+        device_no AS deviceNo,
+        ip AS ip,
+        redbag_session_id AS redbagSessionId,
+        reward_rank AS rewardRank,
+        prize_type AS prizeType,
+        prize_name AS prizeName,
+        principal_amount AS principalAmount
+        FROM site_activity_order_record a
+        WHERE 1=1
+        <if test="vo.releaseTimeType == '0'">
+            <if test="vo.startTime != null">
+                AND a.created_time <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND a.created_time <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+        </if>
+        <if test="vo.releaseTimeType == '1'">
+            <if test="vo.startTime != null">
+                AND a.receive_time <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND a.receive_time <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+        </if>
+        <if test="vo.id != null and vo.id !='' ">
+            AND a.id = #{vo.id}
+        </if>
+        <if test="vo.userId != null and vo.userId !='' ">
+            AND a.id = #{vo.userId}
+        </if>
+
+        <if test="vo.siteCode != null and vo.siteCode !=''">
+            AND site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.activityTemplate != null and vo.activityTemplate !=''">
+            AND activity_template = #{vo.activityTemplate}
+        </if>
+        <if test="vo.receiveStatus != null and vo.receiveStatus !=''">
+            AND receive_status = #{vo.receiveStatus}
+        </if>
+        <if test="vo.activityNameI18nCodeList != null and vo.activityNameI18nCodeList.size() > 0">
+            AND activity_name_i18n_code IN
+            <foreach item="item" collection="vo.activityNameI18nCodeList" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+       <!-- <if test="vo.activityId != null and vo.activityId != ''">
+            AND activity_id = #{vo.ac}
+        </if>-->
+
+        <if test="vo.activityTemplate != null and vo.activityTemplate != ''">
+            AND a.activity_template = #{vo.activityTemplate}
+        </if>
+        <if test="vo.orderNo != null and vo.orderNo != ''">
+            AND a.order_no = #{vo.orderNo}
+        </if>
+        <if test="vo.userAccount != null and vo.userAccount !='' ">
+            AND a.user_account = #{vo.userAccount}
+        </if>
+        <choose>
+            <when test="vo.orderField == 'receiveTime' and vo.orderType == 'asc'">
+                ORDER BY a.receive_time asc
+            </when>
+            <when test="vo.orderField == 'receiveTime' and vo.orderType == 'desc'">
+                ORDER BY a.receive_time desc
+            </when>
+            <otherwise>
+                ORDER BY a.receive_time DESC
+            </otherwise>
+        </choose>
+
+
+
+    </select>
+
+
+    <select id="financeListPage" resultType="com.cloud.baowang.activity.api.vo.finance.ActivityFinanceRespVO">
+
+        select * from (
+
+        SELECT
+        a.site_code AS siteCode,
+        a.order_no AS orderNo,
+        a.activity_no AS activityNo,
+        a.activity_template AS activityTemplate,
+        b.activity_name_i18n_code AS activityNameI18nCode,
+        a.user_id AS userId,
+        a.user_account AS userAccount,
+        a.account_type AS accountType,
+        a.distribution_type AS receiveWay,
+        a.receive_status AS receiveStatus,
+        a.currency_code AS currencyCode,
+        a.final_rate AS finalRate,
+        a.activity_amount AS activityAmount,
+        a.running_water_multiple AS runningWaterMultiple,
+        (
+        select acquire_num  from site_activity_free_game_record t where t.order_no=a.order_no
+        ) AS wheelNum,
+        a.created_time AS sendTime,
+        a.receive_time AS receiveTime,
+        a.receive_end_time AS receiveEndTime,
+        a.principal_amount AS principalAmount
+        FROM
+        site_activity_order_record a join
+        site_activity_base b on a.activity_id=b.id
+        where
+        a.activity_template !='SPIN_WHEEL'
+        <if test="vo.siteCode != null and vo.siteCode!='' ">
+            AND a.site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.sendStartTime != null">
+            AND a.created_time <![CDATA[ >= ]]> #{vo.sendStartTime}
+        </if>
+        <if test="vo.sendEndTime != null">
+            AND a.created_time <![CDATA[ <= ]]> #{vo.sendEndTime}
+        </if>
+
+        <if test="vo.receiveStartTime != null">
+            AND a.receive_time <![CDATA[ >= ]]> #{vo.receiveStartTime}
+        </if>
+        <if test="vo.receiveEndTime != null">
+            AND a.receive_time <![CDATA[ <= ]]> #{vo.receiveEndTime}
+        </if>
+
+
+        <if test="vo.overStartTime != null">
+            AND a.receive_end_time <![CDATA[ >= ]]> #{vo.overStartTime}
+        </if>
+        <if test="vo.overEndTime != null">
+            AND a.receive_end_time <![CDATA[ <= ]]> #{vo.overEndTime}
+        </if>
+
+        <if test="vo.userAccount != null and  vo.userAccount != '' ">
+            AND a.user_account  = #{vo.userAccount,jdbcType=VARCHAR}
+        </if>
+
+        <if test="vo.receiveWay != null and  vo.receiveWay != '' ">
+            AND a.distribution_type  = #{vo.receiveWay,jdbcType=VARCHAR}
+        </if>
+        <if test="vo.receiveStatus != null and  vo.receiveStatus != '' ">
+            AND a.receive_status  = #{vo.receiveStatus,jdbcType=VARCHAR}
+        </if>
+
+
+        <if test="vo.activityTemplates != null and vo.activityTemplates.size>=1">
+            AND a.activity_template in
+            <foreach collection="vo.activityTemplates" index="index" item="activityTemplate" open="(" separator="," close=")">
+                #{activityTemplate}
+            </foreach>
+        </if>
+
+
+        <if test="vo.activityTemplate != null and  vo.activityTemplate != ''">
+            AND a.activity_template  = #{vo.activityTemplate,jdbcType=VARCHAR}
+        </if>
+
+        <if test="vo.activityNo != null and  vo.activityNo != ''">
+            AND a.activity_no  = #{vo.activityNo,jdbcType=VARCHAR}
+        </if>
+
+
+        <if test="vo.activityOrderNo != null and  vo.activityOrderNo != ''">
+            AND a.order_no  = #{vo.activityOrderNo,jdbcType=VARCHAR}
+        </if>
+
+
+        <if test="vo.accountType != null and  vo.accountType != '' ">
+            AND a.account_type  = #{vo.accountType,jdbcType=VARCHAR}
+        </if>
+
+        union ALL
+        SELECT
+        a.site_code AS siteCode,
+        a.order_no AS orderNo,
+        a.activity_no AS activityNo,
+        a.activity_template AS activityTemplate,
+        b.activity_name_i18n_code AS activityNameI18nCode,
+        a.user_id AS userId,
+        c.user_account AS userAccount,
+        c.account_type AS accountType,
+        '2' AS receiveWay,
+        '1' AS receiveStatus,
+        ''  AS currencyCode,
+        '' AS finalRate,
+        bet_win_lose AS activityAmount,
+        '' AS runningWaterMultiple,
+        a.acquire_num AS wheelNum,
+        a.created_time AS sendTime,
+        a.created_time AS receiveTime,
+        '' AS receiveEndTime,
+        '' AS principalAmount
+        from site_activity_free_game_record a join
+        site_activity_base b on a.activity_id=b.id
+        join user_info c on a.user_id=c.user_id
+        where  1 =1
+        <if test="vo.siteCode != null and vo.siteCode!='' ">
+            AND a.site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.sendStartTime != null">
+            AND a.created_time <![CDATA[ >= ]]> #{vo.sendStartTime}
+        </if>
+        <if test="vo.sendEndTime != null">
+            AND a.created_time <![CDATA[ <= ]]> #{vo.sendEndTime}
+        </if>
+
+        <if test="vo.receiveStartTime != null">
+            AND a.created_time <![CDATA[ >= ]]> #{vo.receiveStartTime}
+        </if>
+        <if test="vo.receiveEndTime != null">
+            AND a.created_time <![CDATA[ <= ]]> #{vo.receiveEndTime}
+        </if>
+
+
+        <if test="vo.overStartTime != null">
+            AND a.created_time <![CDATA[ >= ]]> #{vo.overStartTime}
+        </if>
+        <if test="vo.overEndTime != null">
+            AND a.created_time <![CDATA[ <= ]]> #{vo.overEndTime}
+        </if>
+
+        <if test="vo.userAccount != null and  vo.userAccount != '' ">
+            AND c.user_account  = #{vo.userAccount,jdbcType=VARCHAR}
+        </if>
+
+        <if test="vo.receiveWay != null and  vo.receiveWay != '' ">
+            AND '2' = #{vo.receiveWay,jdbcType=VARCHAR}
+        </if>
+        <if test="vo.receiveStatus != null and  vo.receiveStatus != '' ">
+            AND '1'  = #{vo.receiveStatus,jdbcType=VARCHAR}
+        </if>
+
+
+        <if test="vo.activityTemplates != null and vo.activityTemplates.size>=1">
+            AND a.activity_template in
+            <foreach collection="vo.activityTemplates" index="index" item="activityTemplate" open="(" separator="," close=")">
+                #{activityTemplate}
+            </foreach>
+        </if>
+
+
+        <if test="vo.activityTemplate != null and  vo.activityTemplate != ''">
+            AND a.activity_template  = #{vo.activityTemplate,jdbcType=VARCHAR}
+        </if>
+
+        <if test="vo.activityNo != null and  vo.activityNo != ''">
+            AND a.activity_no  = #{vo.activityNo,jdbcType=VARCHAR}
+        </if>
+
+
+        <if test="vo.activityOrderNo != null and  vo.activityOrderNo != ''">
+            AND a.order_no  = #{vo.activityOrderNo,jdbcType=VARCHAR}
+        </if>
+
+
+        <if test="vo.accountType != null and  vo.accountType != '' ">
+            AND c.account_type  = #{vo.accountType,jdbcType=VARCHAR}
+        </if>
+
+
+        union all
+
+        SELECT
+        a.site_code AS siteCode,
+        a.order_number AS orderNo,
+        a.activity_no AS activityNo,
+        a.activity_template AS activityTemplate,
+        b.activity_name_i18n_code AS activityNameI18nCode,
+        a.user_id AS userId,
+        a.user_account AS userAccount,
+        a.account_type AS accountType,
+        2 AS receiveWay,
+        1 AS receiveStatus,
+        null AS currencyCode,
+        null AS finalRate,
+        null AS activityAmount,
+        null AS runningWaterMultiple,
+        a.reward_count AS wheelNum,
+        a.created_time AS sendTime,
+        null AS receiveTime,
+        null AS receiveEndTime,
+        null AS principalAmount
+        FROM
+        site_activity_lottery_record a join
+        site_activity_base b on a.activity_id=b.id
+
+        where 1=1
+        <if test="vo.siteCode != null and vo.siteCode!='' ">
+            AND a.site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.sendStartTime != null">
+            AND a.created_time <![CDATA[ >= ]]> #{vo.sendStartTime}
+        </if>
+        <if test="vo.sendEndTime != null">
+            AND a.created_time <![CDATA[ <= ]]> #{vo.sendEndTime}
+        </if>
+        <!--<if test="vo.receiveStartTime != null">
+            AND a.receive_time <![CDATA[ >= ]]> #{vo.receiveStartTime}
+        </if>
+        <if test="vo.receiveEndTime != null">
+            AND a.receive_time <![CDATA[ <= ]]> #{vo.receiveEndTime}
+        </if>
+
+
+        <if test="vo.overStartTime != null">
+            AND a.receive_end_time <![CDATA[ >= ]]> #{vo.overStartTime}
+        </if>
+        <if test="vo.overEndTime != null">
+            AND a.receive_end_time <![CDATA[ <= ]]> #{vo.overEndTime}
+        </if>-->
+
+        <if test="vo.userAccount != null and  vo.userAccount != '' ">
+            AND a.user_account  = #{vo.userAccount,jdbcType=VARCHAR}
+        </if>
+
+        <if test="vo.receiveWay != null and  vo.receiveWay != '' ">
+            AND 2 = #{vo.receiveWay,jdbcType=VARCHAR}
+        </if>
+        <if test="vo.receiveStatus != null and  vo.receiveStatus != '' ">
+            AND 1  = #{vo.receiveStatus,jdbcType=VARCHAR}
+        </if>
+
+        <if test="vo.activityTemplates != null and vo.activityTemplates.size>=1">
+            AND a.activity_template in
+            <foreach collection="vo.activityTemplates" index="index" item="activityTemplate" open="(" separator="," close=")">
+                #{activityTemplate}
+            </foreach>
+        </if>
+
+
+        <if test="vo.activityTemplate != null and  vo.activityTemplate != ''">
+            AND a.activity_template  = #{vo.activityTemplate,jdbcType=VARCHAR}
+        </if>
+
+        <if test="vo.activityNo != null and  vo.activityNo != ''">
+            AND a.activity_no  = #{vo.activityNo,jdbcType=VARCHAR}
+        </if>
+
+
+        <if test="vo.activityOrderNo != null and  vo.activityOrderNo != ''">
+            AND a.order_number  = #{vo.activityOrderNo,jdbcType=VARCHAR}
+        </if>
+
+
+        <if test="vo.accountType != null and  vo.accountType != '' ">
+            AND a.account_type  = #{vo.accountType,jdbcType=VARCHAR}
+        </if>
+
+        ) as t
+        <if test="vo.orderType=='asc'">
+            <if test="vo.orderField=='sendTime'">
+                order by t.sendTime
+            </if>
+            <if test="vo.orderField=='receiveTime'">
+                order by t.receiveTime
+            </if>
+            <if test="vo.orderField=='receiveEndTime'">
+                order by t.receiveEndTime
+            </if>
+        </if>
+
+        <if test="vo.orderType=='desc'">
+            <if test="vo.orderField=='sendTime'">
+                order by t.sendTime desc
+            </if>
+            <if test="vo.orderField=='receiveTime'">
+                order by t.receiveTime desc
+            </if>
+            <if test="vo.orderField=='receiveEndTime'">
+                order by t.receiveEndTime desc
+            </if>
+        </if>
+    </select>
+
+
+</mapper>

@@ -1,0 +1,1003 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.user.repositories.UserInfoRepository">
+
+    <resultMap type="com.cloud.baowang.user.api.vo.UserInfoVO" id="userInfoVOMap">
+        <result property="userAccount" column="user_account"/>
+        <result property="userName" column="user_name"/>
+        <result property="birthday" column="birthday"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="accountType" column="account_type"/>
+        <result property="accountStatus" column="account_status"/>
+        <result property="riskLevelId" column="risk_level_id"/>
+        <result property="firstDepositTime" column="first_deposit_time"/>
+        <result property="firstDepositAmount" column="first_deposit_amount"/>
+        <result property="lastLoginTime" column="last_login_time"/>
+        <result property="offlineDays" column="offline_days"/>
+        <result property="registerTime" column="register_time"/>
+        <result property="registerIp" column="register_ip"/>
+        <result property="registry" column="registry"/>
+        <result property="superAgentId" column="super_agent_id"/>
+        <result property="userLabelId" column="user_label_id"/>
+        <result property="vipGradeCode" column="vip_grade_code"/>
+        <result property="vipRank" column="vip_rank"/>
+        <result property="vipGradeUp" column="vip_grade_up"/>
+    </resultMap>
+
+    <select id="getPage" resultType="com.cloud.baowang.user.api.vo.UserInfoResponseVO">
+        SELECT
+        a.user_id userId,
+        a.user_account userAccount,
+        a.super_agent_id superAgentId,
+        a.main_currency mainCurrency,
+        a.account_type accountType,
+        a.user_label_id userLabelId,
+        a.risk_level_id riskLevelId,
+        a.account_status accountStatus,
+        a.vip_grade_code vipGrade,
+        a.vip_grade_up vipGradeUp,
+        a.vip_rank vipRank,
+        a.register_time registerTime,
+        a.first_deposit_time firstDepositTime,
+        a.first_deposit_amount firstDepositAmount,
+        a.last_login_time lastLoginTime,
+        b.available_amount centerWalletAmount,
+        a.offline_days offlineDays,
+        a.registry registry,
+        a.site_code siteCode,
+        a.register_ip registerIp,
+        a.last_login_ip lastLoginIp,
+        a.Inviter Inviter,
+        a.friend_invite_code,
+        c.address as ethAddress,
+        d.address as tronAddress,
+        a.area_code as areaCode,
+        a.phone as phone,
+        a.email as email,
+        a.ip_address as ipAddress,
+        b2.available_amount as platAmount
+        FROM user_info a
+        LEFT JOIN user_coin b ON a.user_id = b.user_id
+        LEFT JOIN user_platform_coin b2 ON a.user_id = b2.user_id
+        left join (select ad.user_id, GROUP_CONCAT(ad.address SEPARATOR ',') AS address from hot_wallet_address ad
+        where ad.chain_type='ETH' and ad.network_type='ERC20' group by ad.user_id)c on  c.user_id =a.user_id
+        left join (select ad.user_id, GROUP_CONCAT(ad.address SEPARATOR ',') AS address from hot_wallet_address ad
+        where ad.chain_type='TRON' and ad.network_type='TRC20' group by ad.user_id)d on  d.user_id =a.user_id
+        <where>
+
+            1 = 1
+            <if test="vo.registerTimeStart != null  and vo.registerTimeStart != ''">
+                AND a.register_time <![CDATA[ >= ]]> #{vo.registerTimeStart}
+            </if>
+            <if test="vo.registerTimeEnd != null  and vo.registerTimeEnd != ''">
+                AND a.register_time <![CDATA[ <= ]]> #{vo.registerTimeEnd}
+            </if>
+            <if test="vo.userId != '' and vo.userId != null">
+                AND a.user_id = #{vo.userId}
+            </if>
+            <if test="vo.registerIp != '' and vo.registerIp != null">
+                AND a.register_ip = #{vo.registerIp}
+            </if>
+            <if test="vo.lastLoginIp != '' and vo.lastLoginIp != null">
+                AND a.last_login_ip = #{vo.lastLoginIp}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND(
+                <foreach item="account" index="index" collection="vo.userAccount.split(',')" separator=" OR ">
+                    <if test="account != null and account != ''">
+                        a.user_account like concat('%', #{account}, '%')
+                    </if>
+                </foreach>
+                )
+            </if>
+            <if test="vo.accountStatus != null and vo.accountStatus.size() > 0">
+                <foreach collection="vo.accountStatus" item="value" separator=" OR " open=" AND (" close=")">
+                    FIND_IN_SET(#{value}, a.account_status)
+                </foreach>
+            </if>
+            <if test="vo.riskLevelId != '' and vo.riskLevelId != null">
+                AND a.risk_level_id = #{vo.riskLevelId}
+            </if>
+            <if test="vo.firstDepositTimeStart != null  and vo.firstDepositTimeStart != ''">
+                AND a.first_deposit_time <![CDATA[ >= ]]> #{vo.firstDepositTimeStart}
+            </if>
+            <if test="vo.firstDepositTimeEnd != null  and vo.firstDepositTimeEnd != '' ">
+                AND a.first_deposit_time <![CDATA[ <= ]]> #{vo.firstDepositTimeEnd}
+            </if>
+            <if test="vo.accountType != null and vo.accountType.size() > 0">
+                AND a.account_type IN
+                <foreach collection="vo.accountType" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <!--            <if test="vo.registry != null  and vo.registry != ''">
+                            AND a.registry = #{registry}
+                        </if>-->
+            <if test="vo.registry != null ">
+                AND a.registry = #{vo.registry}
+            </if>
+
+            <if test="vo.superAgentId != '' and vo.superAgentId != null">
+                AND a.super_agent_id = #{vo.superAgentId}
+            </if>
+            <if test="vo.superAgentAccount != '' and vo.superAgentAccount != null">
+                AND a.super_agent_account LIKE CONCAT('%', #{vo.superAgentAccount}, '%')
+            </if>
+            <if test="vo.agentFlag != null">
+                <choose>
+                    <when test="vo.agentFlag == 1">
+                        AND  a.super_agent_account IS NOT NULL
+                    </when>
+                    <when test="vo.agentFlag == 0">
+                        AND  a.super_agent_account IS NULL
+                    </when>
+                </choose>
+            </if>
+            <if test="vo.userLabelIds != null and vo.userLabelIds.size() > 0">
+                AND (
+                <foreach collection="vo.userLabelIds" item="labelId" separator=" OR ">
+                    FIND_IN_SET(#{labelId}, a.user_label_id)
+                </foreach>
+                )
+            </if>
+            <if test="vo.lastLoginTimeStart != null  and vo.lastLoginTimeStart != ''">
+                AND a.last_login_time <![CDATA[ >= ]]> #{vo.lastLoginTimeStart}
+            </if>
+            <if test="vo.lastLoginTimeEnd != null  and vo.lastLoginTimeEnd != ''">
+                AND a.last_login_time <![CDATA[ <= ]]> #{vo.lastLoginTimeEnd}
+            </if>
+            <if test="vo.offlineDaysStart != null and vo.offlineDaysStart != ''">
+                AND a.offline_days <![CDATA[ >= ]]> #{vo.offlineDaysStart}
+            </if>
+            <if test="vo.offlineDaysEnd != null and vo.offlineDaysEnd != ''">
+                AND a.offline_days <![CDATA[ <= ]]> #{vo.offlineDaysEnd}
+            </if>
+            <if test="vo.vipGrade != null ">
+                AND a.vip_grade_code = #{vo.vipGrade}
+            </if>
+            <if test="vo.vipGradeStart != null ">
+                AND a.vip_grade_code <![CDATA[ >= ]]> #{vo.vipGradeStart}
+            </if>
+            <if test="vo.vipGradeEnd != null  ">
+                AND a.vip_grade_code <![CDATA[ <= ]]> #{vo.vipGradeEnd}
+            </if>
+            <if test="vo.vipRank != null ">
+                AND a.vip_rank = #{vo.vipRank}
+            </if>
+            <if test="vo.mainCurrency != '' and vo.mainCurrency != null">
+                AND a.main_currency = #{vo.mainCurrency}
+            </if>
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.ethAddress != '' and vo.ethAddress != null">
+                AND c.address like concat('%', #{vo.ethAddress}, '%')
+            </if>
+            <if test="vo.tronAddress != '' and vo.tronAddress != null">
+                AND d.address like concat('%', #{vo.tronAddress}, '%')
+            </if>
+            <if test="vo.areaCode != '' and vo.areaCode != null">
+                AND a.area_code = #{vo.areaCode}
+            </if>
+            <if test="vo.phone != '' and vo.phone != null">
+                AND a.phone = #{vo.phone}
+            </if>
+            <if test="vo.email != '' and vo.email != null">
+                AND a.email = #{vo.email}
+            </if>
+
+
+        </where>
+
+        <choose>
+            <when test="vo.orderField == 'registerTime' and vo.orderType == 'asc'">
+                ORDER BY a.register_time asc
+            </when>
+            <when test="vo.orderField == 'registerTime' and vo.orderType == 'desc'">
+                ORDER BY a.register_time desc
+            </when>
+            <when test="vo.orderField == 'centerWalletAmount' and vo.orderType == 'asc'">
+                ORDER BY b.available_amount asc
+            </when>
+            <when test="vo.orderField == 'centerWalletAmount' and vo.orderType == 'desc'">
+                ORDER BY b.available_amount desc
+            </when>
+
+            <when test="vo.orderField == 'firstDepositAmount' and vo.orderType == 'asc'">
+                ORDER BY a.first_deposit_amount asc
+            </when>
+            <when test="vo.orderField == 'firstDepositAmount' and vo.orderType == 'desc'">
+                ORDER BY a.first_deposit_amount desc
+            </when>
+            <when test="vo.orderField == 'firstDepositTime' and vo.orderType == 'asc'">
+                ORDER BY a.first_deposit_time asc
+            </when>
+            <when test="vo.orderField == 'firstDepositTime' and vo.orderType == 'desc'">
+                ORDER BY first_deposit_time desc
+            </when>
+
+            <when test="vo.orderField == 'lastLoginTime' and vo.orderType == 'asc'">
+                ORDER BY a.last_login_time asc
+            </when>
+
+            <when test="vo.orderField == 'lastLoginTime' and vo.orderType == 'desc'">
+                ORDER BY a.last_login_time desc
+            </when>
+            <otherwise>
+                ORDER BY a.register_time DESC, a.last_login_time DESC, a.first_deposit_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="getTotalCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM user_info a
+        LEFT JOIN user_coin b ON a.user_id = b.user_id and a.site_code =b.site_code
+        left join (select ad.user_id, GROUP_CONCAT(ad.address SEPARATOR ',') AS address from hot_wallet_address ad
+        where ad.chain_type='ETH' and ad.network_type='ERC20' group by ad.user_id)c on  c.user_id =a.user_id
+        left join (select ad.user_id, GROUP_CONCAT(ad.address SEPARATOR ',') AS address from hot_wallet_address ad
+        where ad.chain_type='TRON' and ad.network_type='TRC20' group by ad.user_id)d on  d.user_id =a.user_id
+        <where>
+            1 = 1
+            <if test="vo.registerTimeStart != null  and vo.registerTimeStart != ''">
+                AND a.register_time <![CDATA[ >= ]]> #{vo.registerTimeStart}
+            </if>
+            <if test="vo.registerTimeEnd != null  and vo.registerTimeEnd != ''">
+                AND a.register_time <![CDATA[ <= ]]> #{vo.registerTimeEnd}
+            </if>
+            <if test="vo.userId != '' and vo.userId != null">
+                AND a.user_id = #{vo.userId}
+            </if>
+            <if test="vo.registerIp != '' and vo.registerIp != null">
+                AND a.register_ip = #{vo.registerIp}
+            </if>
+            <if test="vo.lastLoginIp != '' and vo.lastLoginIp != null">
+                AND a.last_login_ip = #{vo.lastLoginIp}
+            </if>
+            <!--<if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account like concat('%', #{vo.userAccount}, '%')
+            </if>-->
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND(
+                <foreach item="account" index="index" collection="vo.userAccount.split(',')" separator=" OR ">
+                    <if test="account != null and account != ''">
+                        a.user_account like concat('%', #{account}, '%')
+                    </if>
+                </foreach>
+                )
+            </if>
+            <if test="vo.accountStatus != null and vo.accountStatus.size() > 0">
+                <foreach collection="vo.accountStatus" item="value" separator=" OR " open=" AND (" close=")">
+                    FIND_IN_SET(#{value}, a.account_status)
+                </foreach>
+            </if>
+            <if test="vo.riskLevelId != '' and vo.riskLevelId != null">
+                AND a.risk_level_id = #{vo.riskLevelId}
+            </if>
+            <if test="vo.firstDepositTimeStart != null  and vo.firstDepositTimeStart != ''">
+                AND a.first_deposit_time <![CDATA[ >= ]]> #{vo.firstDepositTimeStart}
+            </if>
+            <if test="vo.firstDepositTimeEnd != null  and vo.firstDepositTimeEnd != '' ">
+                AND a.first_deposit_time <![CDATA[ <= ]]> #{vo.firstDepositTimeEnd}
+            </if>
+            <if test="vo.accountType != null and vo.accountType.size() > 0">
+                AND a.account_type IN
+                <foreach collection="vo.accountType" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.registry != null  and vo.registry != ''">
+                AND a.registry = #{vo.registry}
+            </if>
+            <if test="vo.superAgentId != '' and vo.superAgentId != null">
+                AND a.super_agent_id = #{vo.superAgentId}
+            </if>
+            <if test="vo.agentFlag != null">
+                <choose>
+                    <when test="vo.agentFlag == 1">
+                        AND   a.super_agent_account IS NOT NULL
+                    </when>
+                    <when test="vo.agentFlag == 0">
+                        AND   a.super_agent_account IS NULL
+                    </when>
+                </choose>
+            </if>
+            <if test="vo.userLabelIds != null and vo.userLabelIds.size() > 0">
+                AND (
+                <foreach collection="vo.userLabelIds" item="labelId" separator=" OR ">
+                    FIND_IN_SET(#{labelId}, a.user_label_id)
+                </foreach>
+                )
+            </if>
+            <if test="vo.lastLoginTimeStart != null  and vo.lastLoginTimeStart != ''">
+                AND a.last_login_time <![CDATA[ >= ]]> #{vo.lastLoginTimeStart}
+            </if>
+            <if test="vo.lastLoginTimeEnd != null  and vo.lastLoginTimeEnd != ''">
+                AND a.last_login_time <![CDATA[ <= ]]> #{vo.lastLoginTimeEnd}
+            </if>
+            <if test="vo.offlineDaysStart != null and vo.offlineDaysStart != ''">
+                AND a.offline_days <![CDATA[ >= ]]> #{vo.offlineDaysStart}
+            </if>
+            <if test="vo.offlineDaysEnd != null and vo.offlineDaysEnd != ''">
+                AND a.offline_days <![CDATA[ <= ]]> #{vo.offlineDaysEnd}
+            </if>
+            <if test="vo.vipGrade != null and vo.vipGrade != ''">
+                AND a.vip_grade_code = #{vo.vipGrade}
+            </if>
+            <if test="vo.vipGradeStart != null and vo.vipGradeStart != ''">
+                AND a.vip_grade_code <![CDATA[ >= ]]> #{vo.vipGradeStart}
+            </if>
+            <if test="vo.vipGradeEnd != null  and vo.vipGradeEnd != ''">
+                AND a.vip_grade_code <![CDATA[ <= ]]> #{vo.vipGradeEnd}
+            </if>
+            <if test="vo.vipRank != null and vo.vipRank != ''">
+                AND a.vip_rank = #{vo.vipRank}
+            </if>
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.ethAddress != '' and vo.ethAddress != null">
+                AND c.address like concat('%', #{vo.ethAddress}, '%')
+            </if>
+            <if test="vo.tronAddress != '' and vo.tronAddress != null">
+                AND d.address like concat('%', #{vo.tronAddress}, '%')
+            </if>
+            <if test="vo.phone != '' and vo.phone != null">
+                AND a.phone = #{vo.phone}
+            </if>
+            <if test="vo.email != '' and vo.email != null">
+                AND a.email = #{vo.email}
+            </if>
+        </where>
+
+    </select>
+
+    <select id="findUserInfoNotCase" resultMap="userInfoVOMap">
+        select `user_account`,`user_name` ,`birthday`,`phone`,`email`,
+        `account_type`,`account_status`,`risk_level_id`,`first_deposit_time`,
+        `first_deposit_amount`,`last_login_time`,`offline_days`,`register_time`,
+        `register_ip`,`registry`,`super_agent_id`,`user_label_id`,`vip_grade_code`,`vip_grade_up`
+        from user_info
+        where user_account = #{userAccount} and site_code= #{siteCode}
+    </select>
+
+    <select id="findUserReviewExist" resultType="com.cloud.baowang.user.api.vo.UserInfoVO">
+        SELECT
+        *
+        FROM user_info
+        <where>
+            <if test="vo.email != '' and vo.email != null">
+                and email = #{vo.email}
+            </if>
+            <if test="vo.phone != '' and vo.phone != null">
+                and phone = #{vo.phone}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                and user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                and site_code = #{vo.siteCode}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="getUserInfoList" resultType="com.cloud.baowang.user.api.vo.user.UserInfoQueryVO">
+        SELECT
+        user_account
+
+        FROM user_info
+        <where>
+            <if test="userAccount != '' and userAccount != null">
+                user_account like CONCAT('%', #{userAccount}, '%')
+            </if>
+
+        </where>
+    </select>
+
+    <select id="getUserLabelConfigListList" resultType="com.cloud.baowang.user.api.vo.userlabel.UserLabelConfigVO">
+        SELECT
+        a.user_account,
+        a.user_label_id
+        FROM user_info a
+        <where>
+            a.user_label_id is not null
+            and a.site_code = #{siteCode}
+            <if test="labelIds != null and labelIds.size() > 0">
+                <foreach collection="labelIds" item="value" separator=" OR " open=" AND (" close=")">
+                    FIND_IN_SET(#{value}, a.user_label_id)
+                </foreach>
+            </if>
+        </where>
+
+    </select>
+
+    <select id="getUserLabelConfig" resultType="com.cloud.baowang.user.api.vo.userlabel.UserLabelConfigVO">
+        SELECT
+        a.user_account,
+        a.user_label_id,
+        a.account_type
+        FROM user_info a
+        <where>
+            FIND_IN_SET(#{labelId}, a.user_label_id)
+        </where>
+        and a.site_code = #{siteCode}
+
+        order by created_time desc
+
+    </select>
+
+    <select id="getAllUserIdByLabelConfig" resultType="java.lang.String">
+        SELECT
+        a.id
+        FROM user_info a
+        <where>
+            a.user_label_id is not null
+            and a.site_code = #{siteCode}
+            and FIND_IN_SET(#{labelId}, a.user_label_id)
+        </where>
+
+        order by created_time desc
+
+    </select>
+
+    <select id="queryTeamUserInfo" resultType="com.cloud.baowang.agent.api.vo.agentreview.info.AgentAllDownUserVO">
+        select
+        main_currency,
+        user_id,
+        first_deposit_time,
+        first_deposit_amount
+        from user_info where 1 = 1
+        <if test="vo.allDownAgentNum != null and vo.allDownAgentNum.size() > 0">
+            AND super_agent_id IN
+            <foreach collection="vo.allDownAgentNum" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="selectAddUser" resultType="String">
+        SELECT
+        user_account
+        FROM
+        user_info
+        WHERE 1 = 1
+        <if test="vo.allDownAgentNum != null and vo.allDownAgentNum.size() > 0">
+            and register_time <![CDATA[ >= ]]> #{vo.startTime}
+            AND register_time <![CDATA[ <= ]]> #{vo.endTime}
+            AND super_agent_id IN
+            <foreach collection="vo.allDownAgentNum" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="queryUserDepositVIPUpgrade" resultType="java.lang.String">
+        SELECT t.user_account
+        FROM (SELECT user_account, MAX(id) AS id
+        FROM user_vip_flow_record
+        where updated_time  <![CDATA[ >= ]]> #{vipUpgradeStartTime}
+        AND updated_time  <![CDATA[ <= ]]> #{nowEndTime}
+        GROUP BY user_account) AS a,
+        user_vip_flow_record t,
+        vip_grade_config t1
+        WHERE a.id = t.id
+        AND t.vip_grade_code + 1 = t1.vip_grade_code
+        AND t1.`status` = 1
+        AND t.updated_time <![CDATA[ >= ]]> #{vipUpgradeStartTime}
+        AND t.updated_time <![CDATA[ <= ]]> #{nowEndTime}
+        AND t.valid_sum_amount <![CDATA[ >= ]]> t1.bet_amount_upgrade
+        AND t.user_account NOT IN
+        (SELECT t2.user_account
+        FROM vip_change_info t2
+        WHERE t2.change_type = 0
+        AND t2.change_time <![CDATA[ >= ]]> #{nowStartTime}
+        AND t2.change_time <![CDATA[ <= ]]> #{nowEndTime})
+    </select>
+
+    <select id="getRegisterStatisticsByAgentId"
+            resultType="com.cloud.baowang.user.api.vo.agent.GetRegisterStatisticsByAgentIdVO">
+
+        SELECT
+            myDay,
+            count(user_id) registerNumber
+        FROM
+        (
+            SELECT
+                DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(`register_time`/1000), @@session.time_zone, #{dbZone}), '%Y-%m-%d') myDay,
+                user_id
+            FROM
+            user_info
+            <where>
+                <if test="agentId != null and agentId != ''">
+                    AND super_agent_id = #{agentId}
+                </if>
+                <if test="start != null">
+                    AND `register_time` <![CDATA[ >= ]]> #{start}
+                </if>
+                <if test="end != null">
+                    AND `register_time` <![CDATA[ <= ]]> #{end}
+                </if>
+                AND account_type = 2
+            </where>
+        ) mm
+        GROUP BY myDay
+        ORDER BY myDay ASC
+    </select>
+
+    <select id="getRegisterStatisticsBySiteCode"
+            resultType="com.cloud.baowang.user.api.vo.site.GetRegisterStatisticsBySiteCodeVO">
+        SELECT
+            myDay,
+            count(user_id) registerNumber
+        FROM
+        (
+            SELECT
+                DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(`register_time`/1000), @@session.time_zone, #{dbZone}), '%Y-%m-%d') myDay,
+                user_id
+            FROM
+            user_info
+            <where>
+                <if test="siteCode != null and siteCode != ''">
+                    AND site_code = #{siteCode}
+                </if>
+                <if test="start != null">
+                    AND `register_time` <![CDATA[ >= ]]> #{start}
+                </if>
+                <if test="end != null">
+                    AND `register_time` <![CDATA[ <= ]]> #{end}
+                </if>
+                AND account_type = 2
+            </where>
+        ) mm
+        GROUP BY myDay
+        ORDER BY myDay ASC
+    </select>
+
+
+    <select id="getFirstDepositStatisticsByAgentId"
+            resultType="com.cloud.baowang.user.api.vo.agent.GetFirstDepositStatisticsByAgentIdVO">
+        SELECT
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(`first_deposit_time`/1000), @@session.time_zone, #{dbZone}), '%Y-%m-%d')
+        myDay,
+        count(1) firstDepositNumber
+        FROM
+        user_info
+        <where>
+            <if test="agentId != null and agentId != ''">
+                AND super_agent_id = #{agentId}
+            </if>
+            <if test="start != null">
+                AND `first_deposit_time` <![CDATA[ >= ]]> #{start}
+            </if>
+            <if test="end != null">
+                AND `first_deposit_time` <![CDATA[ <= ]]> #{end}
+            </if>
+            AND account_type = 2
+        </where>
+        GROUP BY myDay
+        ORDER BY myDay ASC
+    </select>
+    <select id="getFirstDepositStatisticsBySiteCode"
+            resultType="com.cloud.baowang.user.api.vo.site.GetFirstDepositStatisticsBySiteCodeVO">
+        SELECT
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(`first_deposit_time`/1000), @@session.time_zone, #{dbZone}), '%Y-%m-%d')
+        myDay,
+        count(1) firstDepositNumber
+        FROM
+        user_info
+        <where>
+            <if test="siteCode != null and siteCode != ''">
+                AND site_code = #{siteCode}
+            </if>
+            <if test="start != null">
+                AND `first_deposit_time` <![CDATA[ >= ]]> #{start}
+            </if>
+            <if test="end != null">
+                AND `first_deposit_time` <![CDATA[ <= ]]> #{end}
+            </if>
+            AND account_type = 2
+        </where>
+        GROUP BY myDay
+        ORDER BY myDay ASC
+    </select>
+
+    <update id="updateOfflineDaysTask">
+        update user_info
+        <set>
+            offline_days = IF(offline_days IS NULL, 1, offline_days + 1),
+            updated_time = #{currentTime},
+        </set>
+        where account_type != 0
+        and site_code = #{siteCode}
+    </update>
+
+
+    <select id="isExistsUserId" resultType="java.lang.String">
+        SELECT
+            user_id
+        FROM
+        user_info
+        where user_id = #{userId}
+        limit 1
+    </select>
+
+    <select id="isExistsUserIdList" resultType="java.lang.String">
+        SELECT
+            user_id
+        FROM
+            user_info
+        where  user_id IN
+        <foreach collection="userIdList" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getSiteStatistics" resultType="com.cloud.baowang.user.api.vo.site.UserDataOverviewRespVo">
+        SELECT
+            count(first_deposit_amount) AS newAddRechargeUser
+        FROM user_info
+        <where>
+            AND site_code = #{siteCode}
+
+            <if test="startTime != null" >
+                AND register_time &lt;= #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND register_time &gt;= #{endTime}
+            </if>
+            AND first_deposit_amount &gt; 0
+        </where>
+    </select>
+
+    <select id="getSiteUserLastLongin" resultType="java.lang.Integer">
+        SELECT  count(DISTINCT(user_id)) FROM user_login_info
+        <where>
+
+            <if test="siteCode != null and siteCode != ''">
+                AND site_code = #{siteCode}
+            </if>
+            <if test="startTime != null">
+                AND `login_time` <![CDATA[ >= ]]> #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND `login_time` <![CDATA[ <= ]]> #{endTime}
+            </if>
+            and login_type=0
+        </where>
+    </select>
+
+    <select id="getFirstDepositNumber" resultType="java.lang.Integer">
+        SELECT
+        COUNT(id)
+        FROM
+        user_info
+        <where>
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                AND site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.startTime != null">
+                AND `first_deposit_time` <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND `first_deposit_time` <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+
+        </where>
+    </select>
+    <select id="getCountByFriendInviteCodeAndSiteCode" resultType="java.lang.Integer">
+        SELECT 1
+        FROM user_info
+        where site_code = #{siteCode}
+        and friend_invite_code = #{friendInviteCode} limit 1
+
+    </select>
+
+    <select id="getAllUserIds" resultType="java.lang.String">
+        SELECT user_id
+        FROM user_info
+        where site_code = #{siteCode}
+
+
+    </select>
+    <select id="countInviteeChargeNum" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM user_info
+        where site_code = #{siteCode}
+        and inviter_id = #{userId}
+        and first_deposit_time is not null
+    </select>
+
+    <select id="selectAgentBenefit" resultType="com.cloud.baowang.agent.api.vo.agentreview.info.AgentInfoVO">
+        SELECT
+        t1.agent_id,
+        t1.agent_account,
+        t1.user_benefit
+        FROM
+        user_info t,
+        agent_info t1
+        WHERE
+        t.super_agent_id = t1.agent_id
+        AND t.user_id = #{userId}
+    </select>
+
+    <select id="getUnLabelByUserIds" resultType="String">
+        SELECT user_id
+        FROM
+        user_info
+        WHERE
+        FIND_IN_SET((SELECT id FROM site_user_label_config WHERE site_code = '0' AND label_id = #{labelId}),
+        user_label_id)
+        and site_code = #{siteCode}
+    </select>
+
+    <select id="getUnBenefitByUserIds" resultType="String">
+        SELECT
+        t.user_id
+        FROM
+        user_info t,
+        agent_info t1
+        WHERE
+        t.super_agent_id = t1.agent_id
+        AND t.site_code = #{siteCode}
+        and !FIND_IN_SET(#{awardCode},t1.user_benefit)
+    </select>
+
+
+
+
+    <select id="findAgentSubLineUserFirstDeposit"
+            resultType="com.cloud.baowang.user.api.vo.agent.UAgentSubLineUserResVO">
+        SELECT
+        super_agent_id agentId,
+        COUNT(user_id) userFirstDepositNum,
+        sum(first_deposit_amount) userFirstDepositAmount,
+        main_currency mainCurrency
+        FROM
+        user_info
+        WHERE
+        account_type = 2
+        AND
+        super_agent_id IN
+        <foreach collection="param.agentIds" item="value" separator="," open="(" close=")">
+            #{value}
+        </foreach>
+        <if test="param.startTime != null">
+            AND `first_deposit_time` <![CDATA[ >= ]]> #{param.startTime}
+        </if>
+        <if test="param.endTime != null">
+            AND `first_deposit_time` <![CDATA[ <= ]]> #{param.endTime}
+        </if>
+        <if test="param.currency != null and param.currency != ''">
+            AND `main_currency` = #{param.currency}
+        </if>
+        GROUP BY super_agent_id,main_currency
+
+    </select>
+
+    <select id="findAgentSubLineUserNum"
+            resultType="com.cloud.baowang.user.api.vo.agent.UAgentSubLineUserResVO">
+        SELECT
+        super_agent_id agentId,
+        COUNT(user_id) subLineUserNum
+        FROM
+        user_info
+        WHERE
+        account_type = 2
+        AND
+        super_agent_id IN
+        <foreach collection="param.agentIds" item="value" separator="," open="(" close=")">
+            #{value}
+        </foreach>
+        <if test="param.currency != null and param.currency != ''">
+            AND `main_currency` = #{param.currency}
+        </if>
+        GROUP BY super_agent_id
+    </select>
+
+    <select id="getUserCountGroupByAgentId"
+            resultType="com.cloud.baowang.user.api.vo.agent.UAgentSubLineUserResVO">
+        SELECT
+        super_agent_id as agentId,
+        COUNT(user_id) as subLineUserNum
+        FROM
+        user_info
+        WHERE
+        account_type = 2
+        AND
+        super_agent_id IN
+        <foreach collection="agentIds" item="agentId" separator="," open="(" close=")">
+            #{agentId}
+        </foreach>
+        GROUP BY super_agent_id
+    </select>
+    <select id="getSiteCurrencyUserList" resultType="com.cloud.baowang.user.api.vo.user.SiteUserDateQueryVO">
+        SELECT
+        #{dateStr} AS dateStr,
+        site_code AS siteCode,
+        main_currency AS mainCurrency,
+        COUNT(user_id) AS userCount
+        FROM
+        user_info
+        <where>
+            <if test="siteCodes != null and siteCodes.size >0 ">
+                and site_code in
+                <foreach collection="siteCodes" item="siteCode" close=")" open="(" separator=",">
+                    #{siteCode}
+                </foreach>
+            </if>
+            <if test="dateStr != null and dateStr != ''">
+                AND FROM_UNIXTIME(register_time / 1000, '%Y-%m-%d') &lt;= #{dateStr}
+            </if>
+            <if test="currencyCode != null and currencyCode != ''">
+                and main_currency = #{currencyCode}
+            </if>
+        </where>
+        GROUP BY
+        site_code, main_currency
+        ORDER BY
+        site_code, main_currency
+
+    </select>
+
+    <select id="selectListByRegIpSegment" resultType="com.cloud.baowang.user.po.UserInfoPO">
+        SELECT
+        id,
+        user_id,
+        user_account,
+        password,
+        nick_name,
+        salt,
+        user_name,
+        gender,
+        birthday,
+        area_code,
+        phone,
+        phone_status,
+        email,
+        mail_status,
+        main_currency,
+        account_type,
+        account_status,
+        risk_level_id,
+        first_deposit_time,
+        first_deposit_amount,
+        second_deposit_time,
+        second_deposit_amount,
+        last_login_time,
+        last_login_ip,
+        offline_days,
+        online_days,
+        register_time,
+        member_domain,
+        register_ip,
+        registry,
+        super_agent_id,
+        super_agent_account,
+        binding_agent_time,
+        user_label_id,
+        trans_agent_time,
+        vip_grade_code,
+        vip_rank,
+        vip_grade_up,
+        withdraw_pwd,
+        acount_remark,
+        agent_remark,
+        avatar_code,
+        avatar,
+        device_no,
+        device_control_id,
+        last_device_no,
+        wallet_address,
+        change_agent_count,
+        friend_invite_code,
+        inviter,
+        inviter_id,
+        site_code,
+        language,
+        ip_address,
+        auth_status,
+        creator,
+        created_time,
+        updater,
+        updated_time
+        FROM
+        user_info
+        <where>
+            <if test="!needKickOut">
+                AND id = -1
+            </if>
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                AND site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.ipStart != null and vo.ipStart != ''">
+                AND INET_ATON(register_ip) <![CDATA[ >= ]]> CAST(#{vo.ipStart} AS UNSIGNED)
+            </if>
+            <if test="vo.ipEnd != null and vo.ipEnd != ''">
+                AND INET_ATON(register_ip) <![CDATA[ <= ]]> CAST(#{vo.ipEnd} AS UNSIGNED)
+            </if>
+        </where>
+    </select>
+
+    <select id="selectListByLoginIpSegment" resultType="com.cloud.baowang.user.po.UserInfoPO">
+        SELECT
+        id,
+        user_id,
+        user_account,
+        password,
+        nick_name,
+        salt,
+        user_name,
+        gender,
+        birthday,
+        area_code,
+        phone,
+        phone_status,
+        email,
+        mail_status,
+        main_currency,
+        account_type,
+        account_status,
+        risk_level_id,
+        first_deposit_time,
+        first_deposit_amount,
+        second_deposit_time,
+        second_deposit_amount,
+        last_login_time,
+        last_login_ip,
+        offline_days,
+        online_days,
+        register_time,
+        member_domain,
+        register_ip,
+        registry,
+        super_agent_id,
+        super_agent_account,
+        binding_agent_time,
+        user_label_id,
+        trans_agent_time,
+        vip_grade_code,
+        vip_rank,
+        vip_grade_up,
+        withdraw_pwd,
+        acount_remark,
+        agent_remark,
+        avatar_code,
+        avatar,
+        device_no,
+        device_control_id,
+        last_device_no,
+        wallet_address,
+        change_agent_count,
+        friend_invite_code,
+        inviter,
+        inviter_id,
+        site_code,
+        language,
+        ip_address,
+        auth_status,
+        creator,
+        created_time,
+        updater,
+        updated_time
+        FROM
+        user_info
+        <where>
+            <if test="!needKickOut">
+                AND id = -1
+            </if>
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                AND site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.ipStart != null and vo.ipStart != ''">
+                AND INET_ATON(last_login_ip) <![CDATA[ >= ]]> CAST(#{vo.ipStart} AS UNSIGNED)
+            </if>
+            <if test="vo.ipEnd != null and vo.ipEnd != ''">
+                AND INET_ATON(last_login_ip) <![CDATA[ <= ]]> CAST(#{vo.ipEnd} AS UNSIGNED)
+            </if>
+        </where>
+    </select>
+
+</mapper>

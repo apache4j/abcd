@@ -1,0 +1,1789 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.report.repositories.ReportUserWinLoseRepository">
+
+    <insert id="saveData" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO report_user_win_lose (`day`,
+        `day_str`,
+        `agent_id`,
+        `user_account`,
+        `super_agent_account`,
+        `agent_attribution`,
+        `bet_num`,
+        `bet_amount`,
+        `valid_bet_amount`,
+        `run_water_correct`,
+        `bet_win_lose`,
+        `rebate_amount`,
+        `activity_amount`,
+        `already_use_amount`,
+        `vip_amount`,
+        `adjust_amount`,
+        `repair_order_other_adjust`,
+        `profit_and_loss`,
+        `creator`,
+        `updater`,
+        `created_time`,
+        `updated_time`)
+        VALUES (
+        #{po.day},
+        #{po.dayStr},
+        #{po.agentId},
+        #{po.userAccount},
+        #{po.superAgentAccount},
+        #{po.agentAttribution},
+        #{po.betNum},
+        #{po.betAmount},
+        #{po.validBetAmount},
+        #{po.runWaterCorrect},
+        #{po.betWinLose},
+        #{po.rebateAmount},
+        #{po.activityAmount},
+        #{po.alreadyUseAmount},
+        #{po.vipAmount},
+        #{po.adjustAmount},
+        #{po.repairOrderOtherAdjust},
+        #{po.profitAndLoss},
+        null,
+        null,
+        #{po.createdTime},
+        #{po.updatedTime}
+        )
+    </insert>
+
+
+    <update id="updateSettlement">
+        update report_user_win_lose
+        <set>
+            <if test="orderStatus == 1">
+                valid_bet_amount = valid_bet_amount + #{validBetAmount},
+                bet_win_lose = bet_win_lose + #{betWinLose},
+            </if>
+            <if test="orderStatus == 4 or orderStatus == 2">
+                valid_bet_amount = valid_bet_amount + #{validBetAmount} - #{lastValidBetAmount},
+                bet_win_lose = bet_win_lose + #{betWinLose} - #{lastBetWinLose},
+            </if>
+
+            <if test="isAddBetNum == 1">
+                bet_num = bet_num + 1,
+                bet_amount = bet_amount + #{betAmountSettlement},
+            </if>
+            profit_and_loss = bet_win_lose + already_use_amount,
+            updated_time = #{currentTime},
+        </set>
+        where id = #{id}
+    </update>
+
+
+    <update id="updateManualUp">
+        update report_user_win_lose
+        <set>
+            <if test="upCode == 6 ">
+                already_use_amount = already_use_amount + #{upAmount},
+            </if>
+            <if test="upCode == 2">
+                rebate_amount = rebate_amount + #{upAmount},
+            </if>
+            <if test="upCode == 0 or upCode == 3">
+                adjust_amount = adjust_amount + #{upAmount},
+            </if>
+
+            <if test="upCode == 7 or upCode == 9">
+                repair_order_other_adjust = repair_order_other_adjust + #{upAmount},
+            </if>
+            <if test="upCode == 5 ">
+                already_use_amount = already_use_amount + #{upAmount},
+            </if>
+            <if test="upCode == 10 ">
+                already_use_amount = already_use_amount + #{upAmount},
+            </if>
+            <if test="upCode == 11 ">
+                risk_amount = risk_amount + #{upAmount},
+            </if>
+            profit_and_loss = bet_win_lose + already_use_amount,
+            updated_time = #{currentTime},
+        </set>
+        where id = #{id}
+    </update>
+    <update id="updatePlateManualUp">
+        update report_user_win_lose
+        <set>
+            <if test="upCode == 2 ">
+                activity_amount = activity_amount + #{upAmount},
+            </if>
+            <if test="upCode == 3">
+                plat_adjust_amount = plat_adjust_amount + #{upAmount},
+            </if>
+            <if test="upCode == 1 ">
+                vip_amount = vip_amount + #{upAmount},
+            </if>
+
+            profit_and_loss = bet_win_lose + already_use_amount,
+            updated_time = #{currentTime},
+        </set>
+        where id = #{id}
+    </update>
+
+
+    <update id="updateManualDown">
+        update report_user_win_lose
+        <set>
+            <if test="downCode == 6">
+                already_use_amount = already_use_amount + #{downAmount},
+            </if>
+            <if test="downCode == 2">
+                rebate_amount = rebate_amount + #{downAmount},
+            </if>
+            <if test="downCode == 3">
+                adjust_amount = adjust_amount + #{downAmount},
+            </if>
+            <if test="downCode == 7 or downCode == 9">
+                repair_order_other_adjust = repair_order_other_adjust + #{downAmount},
+            </if>
+            <if test="downCode == 5">
+                already_use_amount = already_use_amount + #{downAmount},
+            </if>
+            <if test="downCode == 10 ">
+                already_use_amount = already_use_amount + #{downAmount},
+            </if>
+            <if test="downCode == 11 ">
+                risk_amount = risk_amount + #{downAmount},
+            </if>
+            profit_and_loss = bet_win_lose + already_use_amount ,
+            updated_time = #{currentTime},
+        </set>
+        where id = #{id}
+    </update>
+    <update id="updatePlateManualDown">
+        update report_user_win_lose
+        <set>
+            <if test="downCode == 2">
+                activity_amount = activity_amount + #{downAmount},
+            </if>
+
+            <if test="downCode == 3">
+                plat_adjust_amount = plat_adjust_amount + #{downAmount},
+            </if>
+
+            <if test="downCode == 1">
+                vip_amount = vip_amount + #{downAmount},
+            </if>
+
+            profit_and_loss = bet_win_lose + already_use_amount ,
+            updated_time = #{currentTime},
+        </set>
+        where id = #{id}
+    </update>
+    <update id="updateActivityByPlatForm">
+        update report_user_win_lose
+        <set>
+            activity_amount = activity_amount + #{activityAmount},
+            updated_time = #{currentTime},
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateActivityByMainCurrency">
+        update report_user_win_lose
+        <set>
+            already_use_amount = already_use_amount + #{activityAmount},
+            profit_and_loss = bet_win_lose + already_use_amount ,
+            updated_time = #{currentTime}
+        </set>
+        where id = #{id}
+    </update>
+    <update id="updateRebate">
+        update report_user_win_lose
+        <set>
+            rebate_amount = rebate_amount + #{rebateAmount},
+            already_use_amount = already_use_amount + #{rebateAmount},
+            updated_time = #{currentTime},
+        </set>
+        where id = #{id}
+    </update>
+    <update id="updateRebateMainCurrency">
+        update report_user_win_lose
+        <set>
+            already_use_amount = already_use_amount + #{rebateAmount},
+            updated_time = #{currentTime},
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateAlreadyAmount">
+        update report_user_win_lose
+        <set>
+            already_use_amount = already_use_amount + #{alreadyUseAmount},
+            profit_and_loss = bet_win_lose + already_use_amount ,
+            updated_time = #{currentTime},
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateVipBenefit">
+        update report_user_win_lose
+        <set>
+            vip_amount = vip_amount + #{vipBenefitAmount},
+            updated_time = #{currentTime},
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateVipBenefitMainCurrency">
+        update report_user_win_lose
+        <set>
+            already_use_amount = already_use_amount + #{vipBenefitAmount},
+            updated_time = #{currentTime},
+        </set>
+        where id = #{id}
+    </update>
+
+
+    <update id="updateOtherUserWinLose">
+        update report_user_win_lose
+        <set>
+            updated_time = #{currentTime}
+        </set>
+        <where>
+            <if test="ids != null and ids.size() > 0">
+                AND id IN
+                <foreach collection="ids" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+        </where>
+    </update>
+
+    <update id="updateBet">
+        update report_user_win_lose
+        <set>
+            bet_num = bet_num + 1,
+            bet_amount = bet_amount + #{betAmount},
+            profit_and_loss = bet_win_lose + activity_amount ,
+            updated_time = #{currentTime},
+        </set>
+        where id = #{id}
+    </update>
+
+
+    <select id="queryAgentWinLossInfo" resultType="com.cloud.baowang.agent.api.vo.winloss.AgentWInLossInfoVO">
+        select
+        main_currency,
+        sum(bet_amount) as totalBetAmount,
+        sum(valid_bet_amount) as validAmount,
+        sum(bet_win_lose) as betWinLoss,
+        sum(bet_win_lose)+sum(already_use_amount) as totalWinLoss,
+        sum(rebate_amount) as totalRebate,
+        sum(activity_amount) as totalDiscount,
+        sum(adjust_amount) as accountAdjust
+        from report_user_win_lose
+        where 1 = 1
+        <if test="vo.underAgentAccount != null and vo.underAgentAccount.size() > 0">
+            AND super_agent_account IN
+            <foreach collection="vo.underAgentAccount" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            and site_code = #{vo.siteCode}
+        </if>
+        group by main_currency
+    </select>
+
+    <select id="getAgentUserRecordByUserWinLoss" resultType="java.util.HashMap">
+        select
+        sum(t.valid_bet_amount) as validAmount,
+        t.user_account as userAccount
+        from report_user_win_lose t left join user_info t1
+        on t.super_agent_account = t1.super_agent_account and t.user_account = t1.user_account
+        where 1 = 1
+        <if test="vo.allDownAgentNum != null">
+            AND t1.super_agent_id IN
+            <foreach collection="vo.allDownAgentNum" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND t.day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND t.day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            and site_code = #{siteCode}
+        </if>
+        group by t.user_account
+    </select>
+    <select id="getUserBetsInfo" resultType="com.cloud.baowang.report.api.vo.user.ReportUserBetsVO">
+        SELECT
+        IFNULL(SUM(bet_amount),0) as totalBetsAmount,
+        IFNULL(SUM(bet_win_lose),0) as playerWinLose,
+        IFNULL(SUM(valid_bet_amount),0) as validBetAmount,
+        IFNULL(SUM(vip_amount),0) as vipAmount,
+        IFNULL(SUM(already_use_amount),0) as alreadyUseAmount,
+        IFNULL(SUM(adjust_amount),0) as adjustAmount,
+        IFNULL(SUM(rebate_amount),0) as rebateAmount,
+        IFNULL(SUM(activity_amount),0) as activityAmount,
+        IFNULL( sum(bet_win_lose)+sum(already_use_amount)-sum(tips_amount)+sum(adjust_amount) ,0) as profitAndLoss,
+        IFNULL(SUM(tips_amount),0) as tipsAmount,
+        IFNULL(SUM(risk_amount),0) as riskAmount,
+        IFNULL(SUM( plat_adjust_amount),0) AS platAdjustAmount
+
+        FROM
+        `report_user_win_lose`
+        WHERE
+        user_account = #{userAccount}
+        AND site_code = #{siteCode}
+    </select>
+
+    <select id="getUserWinLoseByAgent"
+            resultType="com.cloud.baowang.report.api.vo.agent.ReportAgentSubLineResVO"
+            parameterType="com.cloud.baowang.report.api.vo.agent.ReportAgentSubLineReqVO">
+        select
+        IFNULL(sum(t.bet_win_lose), 0) as amount,
+        t.super_agent_account as agentAccount,
+        t.main_currency as currency
+        from report_user_win_lose t
+        where
+            1 = 1
+        <if test="vo.agentAccountList != null and vo.agentAccountList.size > 0">
+            AND t.super_agent_account in
+            <foreach collection="vo.agentAccountList" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.agentIds != null and vo.agentIds.size > 0">
+            AND t.agent_id in
+            <foreach collection="vo.agentIds" item="agentId" separator="," open="(" close=")">
+                #{agentId}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND t.day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND t.day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            and site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.currency != null and vo.currency != ''">
+            and main_currency = #{vo.currency}
+        </if>
+        group by t.super_agent_account, t.main_currency
+    </select>
+
+    <select id="queryActiveDirectBetList" resultType="java.util.HashMap">
+        select
+        a.userAccount,
+        c.agent_account as superAgentAccount
+        from (
+        SELECT
+        user_account AS userAccount,
+        sum(valid_bet_amount) as validBetAmount,
+        super_agent_account as superAgentAccount
+        FROM
+        report_user_win_lose
+        WHERE
+        day_hour_millis  <![CDATA[ >= ]]> #{start}
+        AND day_hour_millis <![CDATA[ <= ]]> #{end}
+        and super_agent_account is not null
+        <if test="allDownAgentUser != null and allDownAgentUser.size() > 0">
+            and agent_id in
+            <foreach collection="allDownAgentUser" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            and site_code = #{siteCode}
+        </if>
+        group by user_account, super_agent_account
+        )a, agent_info c where a.superAgentAccount = c.agent_account
+        AND a.validBetAmount <![CDATA[ >= ]]> #{activeBet}
+    </select>
+
+    <select id="queryActiveDirectDepositList" resultType="java.util.HashMap">
+        SELECT
+        b.userAccount AS userAccount ,
+        c.agent_account as superAgentAccount
+        FROM
+        (
+        SELECT
+        a.userAccount,
+        sum( a.amount ) AS resultAmount
+        FROM
+        (
+        SELECT
+        user_account AS userAccount,
+        SUM( adjust_amount ) AS amount
+        FROM
+        user_manual_up_down_record
+        WHERE
+        adjust_way = 1
+        AND adjust_type = 3
+        AND audit_status = 3
+        <if test="allDownAgentUser != null and allDownAgentUser.size() > 0">
+            and agent_account in
+            <foreach collection="allDownAgentUser" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        AND updated_time <![CDATA[ >= ]]> #{start}
+        AND updated_time <![CDATA[ <= ]]> #{end} GROUP BY user_account UNION ( SELECT user_account AS userAccount, SUM(
+        arrive_amount ) AS amount FROM user_deposit_withdrawal
+        WHERE type = 1
+        <if test="allDownAgentUser != null and allDownAgentUser.size() > 0">
+            and agent_account in
+            <foreach collection="allDownAgentUser" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        AND updated_time <![CDATA[ >= ]]> #{start}
+        AND updated_time <![CDATA[ <= ]]> #{end} AND STATUS = 101 GROUP BY user_account ) UNION ( SELECT user_account AS
+        userAccount, SUM( amount ) AS amount FROM agent_deposit_subordinates WHERE 1 = 1
+        <if test="allDownAgentUser != null and allDownAgentUser.size() > 0">
+            and agent_account in
+            <foreach collection="allDownAgentUser" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        AND deposit_time <![CDATA[ >= ]]> #{start}
+        AND deposit_time <![CDATA[ <= ]]> #{end} GROUP BY user_account ) ) a GROUP BY a.userAccount ) b, user_info t,
+        agent_info c WHERE b.userAccount = t.user_account and t.super_agent_account = c.agent_account AND
+        t.super_agent_account is not null and b.resultAmount <![CDATA[ >= ]]> #{activeDeposit}
+    </select>
+
+    <select id="getWinLoseStatisticsByAgentId"
+            resultType="com.cloud.baowang.report.api.vo.agent.GetWinLoseStatisticsByAgentIdVO">
+        SELECT
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(`day_millis`/1000), @@session.time_zone, #{dbZone}), '%Y-%m-%d') myDay,
+        main_currency as currencyCode,
+        IFNULL(sum( bet_win_lose ), 0) betWinLose,
+        IFNULL(sum( valid_bet_amount ), 0) validBetAmount
+        FROM
+        report_user_win_lose
+        <where>
+            <if test="agentId != '' and agentId != null">
+                AND agent_id = #{agentId}
+            </if>
+            <if test="currencyCode != '' and currencyCode != null and currencyCode!='WTC' ">
+                AND main_currency = #{currencyCode}
+            </if>
+            <if test="start != null">
+                AND `day_hour_millis` <![CDATA[ >= ]]> #{start}
+            </if>
+            <if test="end != null">
+                AND `day_hour_millis` <![CDATA[ <= ]]> #{end}
+            </if>
+        </where>
+        GROUP BY DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(`day_millis`/1000), @@session.time_zone, #{dbZone}),
+        '%Y-%m-%d'),main_currency
+        ORDER BY myDay ASC
+    </select>
+
+
+
+    <select id="getWinLoseStatisticsByAgentIds"
+            resultType="com.cloud.baowang.report.api.vo.userwinlose.ReportUserBetAmountSumVO">
+        SELECT
+        user_id userId,
+        main_currency as currency,
+        IFNULL(sum( bet_win_lose ), 0) winLossAmount,
+        IFNULL(sum( valid_bet_amount ), 0) validAmount
+        FROM
+        report_user_win_lose
+        <where>
+            <if test="vo.agentIds !=null and vo.agentIds.size() > 0">
+                and agent_id in
+                <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.startTime != null">
+                AND `day_hour_millis` <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND `day_hour_millis` <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+        </where>
+        GROUP BY user_id,main_currency
+    </select>
+
+
+    <select id="getUserOrderAmountByUserId"
+            resultType="com.cloud.baowang.report.api.vo.userwinlose.ReportUserBetAmountSumVO">
+        SELECT
+        user_id userId,
+        main_currency as currency,
+        IFNULL(sum( bet_win_lose ), 0) winLossAmount,
+        IFNULL(sum( valid_bet_amount ), 0) validAmount
+        FROM
+        report_user_win_lose
+        <where>
+            <if test="vo.userId !=null ">
+                and user_id = #{vo.userId}
+            </if>
+            <if test="vo.agentId !=null ">
+                and agent_id = #{vo.agentId}
+            </if>
+            <if test="vo.startTime != null">
+                AND `day_hour_millis` <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND `day_hour_millis` <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+        </where>
+        GROUP BY user_id,main_currency
+    </select>
+
+
+    <select id="getWinLoseStatisticsBySiteCode"
+            resultType="com.cloud.baowang.report.api.vo.site.GetWinLoseStatisticsBySiteCodeVO">
+        SELECT
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(`day_millis`/1000), @@session.time_zone, #{dbZone}), '%Y-%m-%d') myDay,
+        main_currency as currencyCode,
+        IFNULL(sum( bet_win_lose ), 0) betWinLose
+        FROM
+        report_user_win_lose
+        <where>
+            <if test="siteCode != '' and siteCode != null">
+                AND site_code = #{siteCode}
+            </if>
+            <if test="currencyCode != null  and currencyCode != '' ">
+                AND `main_currency` = #{currencyCode}
+            </if>
+            <if test="start != null">
+                AND `day_hour_millis` <![CDATA[ >= ]]> #{start}
+            </if>
+            <if test="end != null">
+                AND `day_hour_millis` <![CDATA[ <= ]]> #{end}
+            </if>
+        </where>
+        GROUP BY DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(`day_millis`/1000), @@session.time_zone, #{dbZone}),
+        '%Y-%m-%d'),currencyCode
+        ORDER BY myDay ASC
+    </select>
+
+    <select id="getWinLoseStatisticsBySiteCodeHour"
+            resultType="com.cloud.baowang.report.api.vo.site.GetWinLoseStatisticsBySiteCodeVO">
+        SELECT
+        HOUR(CONVERT_TZ(FROM_UNIXTIME(`day_millis`/1000), @@session.time_zone, #{dbZone}))+1 myDay,
+        main_currency as currencyCode,
+        IFNULL(sum( bet_win_lose ), 0) betWinLose
+        FROM
+        report_user_win_lose
+        <where>
+            <if test="siteCode != '' and siteCode != null">
+                AND site_code = #{siteCode}
+            </if>
+            <if test="currencyCode != null  and currencyCode != ''">
+                AND `main_currency` = #{currencyCode}
+            </if>
+            <if test="start != null">
+                AND `day_hour_millis` <![CDATA[ >= ]]> #{start}
+            </if>
+            <if test="end != null">
+                AND `day_hour_millis` <![CDATA[ <= ]]> #{end}
+            </if>
+        </where>
+        GROUP BY myDay,currencyCode
+        ORDER BY myDay ASC
+    </select>
+
+    <select id="getWinLoseStatisticsBySiteCodeMonth"
+            resultType="com.cloud.baowang.report.api.vo.site.GetWinLoseStatisticsBySiteCodeVO">
+        SELECT
+        MONTH(CONVERT_TZ(FROM_UNIXTIME(`day_millis`/1000), @@session.time_zone, #{dbZone})) myDay,
+        main_currency as currencyCode,
+        IFNULL(sum( bet_win_lose ), 0) betWinLose
+        FROM
+        report_user_win_lose
+        <where>
+            <if test="siteCode != '' and siteCode != null">
+                AND site_code = #{siteCode}
+            </if>
+            <if test="start != null   and currencyCode != '' ">
+                AND `day_hour_millis` <![CDATA[ >= ]]> #{start}
+            </if>
+            <if test="end != null">
+                AND `day_hour_millis` <![CDATA[ <= ]]> #{end}
+            </if>
+            <if test="currencyCode != null">
+                AND `main_currency` = #{currencyCode}
+            </if>
+        </where>
+        GROUP BY myDay,currencyCode
+        ORDER BY myDay ASC
+    </select>
+
+    <select id="getWinLoseAndProfitAndLossStatisticsBySiteCode"
+            resultType="com.cloud.baowang.report.api.vo.site.GetWinLoseStatisticsBySiteCodeVO">
+        SELECT
+        main_currency as currencyCode,
+        IFNULL(sum( a.bet_win_lose ), 0) betWinLose,
+        IFNULL(sum(a.bet_win_lose)-sum(a.already_use_amount), 0) profitAndLoss
+        FROM
+        report_user_win_lose a
+        <where>
+            <if test="siteCode != '' and siteCode != null">
+                AND site_code = #{siteCode}
+            </if>
+            <if test="start != null">
+                AND `day_hour_millis` <![CDATA[ >= ]]> #{start}
+            </if>
+            <if test="end != null">
+                AND `day_hour_millis` <![CDATA[ <= ]]> #{end}
+            </if>
+            and account_type=2
+        </where>
+        GROUP BY currencyCode
+    </select>
+
+
+    <select id="getBetNumberByAgentId" resultType="com.cloud.baowang.report.api.vo.GetBetNumberByAgentIdVO">
+        SELECT
+        any_value ( user_account ) userAccount,
+        user_id as userId,
+        IFNULL(sum( bet_win_lose ), 0) betWinLose,
+        IFNULL(sum(a.bet_win_lose)+sum(a.already_use_amount)+sum(a.adjust_amount)-sum(a.tips_amount), 0) profitAndLoss,
+        IFNULL(sum( activity_amount ), 0) activityAmount,
+        IFNULL(sum( vip_amount ), 0) vipAmount,
+        IFNULL(sum( already_use_amount ), 0) alreadyUseAmount,
+        IFNULL(sum( rebate_amount ), 0) rebateAmount,
+        IFNULL(sum( valid_bet_amount ), 0) validBetAmount,
+        IFNULL(sum( bet_amount ), 0) betAmount,
+        IFNULL(sum( tips_amount ), 0) tipsAmount,
+        IFNULL(sum( adjust_amount ), 0) adjustAmount
+        FROM
+        report_user_win_lose a
+        <where>
+            <if test="agentId != '' and agentId != null">
+                AND agent_id = #{agentId}
+            </if>
+            <if test="userId != '' and userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="start != null">
+                AND `day_hour_millis` <![CDATA[ >= ]]> #{start}
+            </if>
+            <if test="end != null">
+                AND `day_hour_millis` <![CDATA[ <= ]]> #{end}
+            </if>
+        </where>
+        GROUP BY user_id
+    </select>
+
+    <select id="getPage" resultType="com.cloud.baowang.report.api.vo.userwinlose.UserWinLoseResponseVO">
+        SELECT
+        abc.userId userId,
+        abc.userAccount userAccount,
+        abc.userName userName,
+        abc.accountType accountType,
+        cc.super_agent_account superAgentAccount,
+        cc.agent_attribution agentAttribution,
+        abc.vipGradeCode vipGradeCode,
+        abc.vipRankCode vipRankCode,
+        abc.accountStatus accountStatus,
+        abc.userLabelId userLabelId,
+        abc.riskLevelId riskLevelId,
+        abc.mainCurrency mainCurrency,
+        abc.betNum betNum,
+        abc.betAmount betAmount,
+        abc.validBetAmount validBetAmount,
+        abc.runWaterCorrect runWaterCorrect,
+        abc.betWinLose betWinLose,
+        abc.activityAmount activityAmount,
+        abc.alreadyUseAmount alreadyUseAmount,
+        abc.rebateAmount rebateAmount,
+        abc.vipAmount vipAmount,
+        abc.adjustAmount adjustAmount,
+        abc.repairOrderOtherAdjust repairOrderOtherAdjust,
+        abc.platAdjustAmount platAdjustAmount,
+        abc.tipsAmount tipsAmount,
+        abc.riskAmount riskAmount,
+        abc.profitAndLoss profitAndLoss
+        FROM (
+        SELECT
+        a.user_id userId,
+        max(a.id) id,
+        any_value(b.user_name) userName,
+        any_value ( b.user_account ) userAccount,
+        any_value(b.account_type) accountType,
+        any_value(b.vip_grade_code) vipGradeCode,
+        any_value(b.vip_rank) vipRankCode,
+        any_value(b.account_status) accountStatus,
+        any_value(b.user_label_id) userLabelId,
+        any_value(b.risk_level_id) riskLevelId,
+        any_value(b.main_currency) mainCurrency,
+        sum(a.bet_num) betNum,
+        sum(a.bet_amount) betAmount,
+        sum(a.valid_bet_amount) validBetAmount,
+        sum(a.run_water_correct) runWaterCorrect,
+        sum(a.bet_win_lose) betWinLose,
+        sum(a.activity_amount) activityAmount,
+        sum(a.already_use_amount) alreadyUseAmount,
+        sum(a.rebate_amount) rebateAmount,
+        sum(a.vip_amount) vipAmount,
+        sum(a.adjust_amount) adjustAmount,
+        IFNULL(SUM(a.repair_order_other_adjust), 0) repairOrderOtherAdjust,
+        sum(a.plat_adjust_amount) platAdjustAmount,
+        sum(a.tips_amount) tipsAmount,
+        sum(a.risk_amount) riskAmount,
+        sum(a.bet_win_lose)+sum(a.already_use_amount)-sum(a.tips_amount)+sum(a.adjust_amount) profitAndLoss
+        FROM report_user_win_lose a
+        LEFT JOIN user_info b ON a.user_id = b.user_id
+        <where>
+            <if test="vo.startDay != null">
+                AND a.day_hour_millis <![CDATA[ >= ]]> #{vo.startDay}
+            </if>
+            <if test="vo.endDay != null">
+                AND a.day_hour_millis <![CDATA[ <= ]]> #{vo.endDay}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.superAgentAccount != '' and vo.superAgentAccount != null">
+                AND a.super_agent_account = #{vo.superAgentAccount}
+            </if>
+            <if test="vo.mainCurrency != '' and vo.mainCurrency != null">
+                AND a.main_currency = #{vo.mainCurrency}
+            </if>
+            <if test="vo.accountType != null">
+                AND b.account_type = #{vo.accountType}
+            </if>
+            <if test="vo.agentAttribution != null">
+                AND a.agent_attribution = #{vo.agentAttribution}
+            </if>
+
+        </where>
+        GROUP BY a.user_id,a.agent_id
+        ) abc
+        LEFT JOIN ( SELECT id,super_agent_account,agent_attribution FROM report_user_win_lose ) cc on abc.id = cc.id
+        <where>
+            <if test="vo.betNumMin != '' and vo.betNumMin != null">
+                AND abc.betNum <![CDATA[ >= ]]> #{vo.betNumMin}
+            </if>
+            <if test="vo.betNumMax != '' and vo.betNumMax != null">
+                AND abc.betNum <![CDATA[ <= ]]> #{vo.betNumMax}
+            </if>
+            <if test="vo.betAmountMin != '' and vo.betAmountMin != null">
+                AND abc.betAmount <![CDATA[ >= ]]> #{vo.betAmountMin}
+            </if>
+            <if test="vo.betAmountMax != '' and vo.betAmountMax != null">
+                AND abc.betAmount <![CDATA[ <= ]]> #{vo.betAmountMax}
+            </if>
+            <if test="vo.betWinLoseMin != '' and vo.betWinLoseMin != null">
+                AND abc.betWinLose <![CDATA[ >= ]]> #{vo.betWinLoseMin}
+            </if>
+            <if test="vo.betWinLoseMax != '' and vo.betWinLoseMax != null">
+                AND abc.betWinLose <![CDATA[ <= ]]> #{vo.betWinLoseMax}
+            </if>
+            <if test="vo.profitAndLossMin != '' and vo.profitAndLossMin != null">
+                AND abc.profitAndLoss <![CDATA[ >= ]]> #{vo.profitAndLossMin}
+            </if>
+            <if test="vo.profitAndLossMax != '' and vo.profitAndLossMax != null">
+                AND abc.profitAndLoss <![CDATA[ <= ]]> #{vo.profitAndLossMax}
+            </if>
+        </where>
+        <choose>
+            <when test="vo.orderField == 'betNum' and vo.orderType == 'asc'">
+                ORDER BY betNum asc
+            </when>
+            <when test="vo.orderField == 'betNum' and vo.orderType == 'desc'">
+                ORDER BY betNum desc
+            </when>
+
+            <when test="vo.orderField == 'betAmount' and vo.orderType == 'asc'">
+                ORDER BY betAmount asc
+            </when>
+            <when test="vo.orderField == 'betAmount' and vo.orderType == 'desc'">
+                ORDER BY betAmount desc
+            </when>
+
+            <when test="vo.orderField == 'validBetAmount' and vo.orderType == 'asc'">
+                ORDER BY validBetAmount asc
+            </when>
+            <when test="vo.orderField == 'validBetAmount' and vo.orderType == 'desc'">
+                ORDER BY validBetAmount desc
+            </when>
+
+            <when test="vo.orderField == 'runWaterCorrect' and vo.orderType == 'asc'">
+                ORDER BY runWaterCorrect asc
+            </when>
+            <when test="vo.orderField == 'runWaterCorrect' and vo.orderType == 'desc'">
+                ORDER BY runWaterCorrect desc
+            </when>
+
+            <when test="vo.orderField == 'betWinLose' and vo.orderType == 'asc'">
+                ORDER BY betWinLose asc
+            </when>
+            <when test="vo.orderField == 'betWinLose' and vo.orderType == 'desc'">
+                ORDER BY betWinLose desc
+            </when>
+
+            <when test="vo.orderField == 'rebateAmount' and vo.orderType == 'asc'">
+                ORDER BY rebateAmount asc
+            </when>
+            <when test="vo.orderField == 'rebateAmount' and vo.orderType == 'desc'">
+                ORDER BY rebateAmount desc
+            </when>
+
+            <when test="vo.orderField == 'activityAmount' and vo.orderType == 'asc'">
+                ORDER BY activityAmount asc
+            </when>
+            <when test="vo.orderField == 'activityAmount' and vo.orderType == 'desc'">
+                ORDER BY activityAmount desc
+            </when>
+            <when test="vo.orderField == 'alreadyUseAmount' and vo.orderType == 'asc'">
+                ORDER BY alreadyUseAmount asc
+            </when>
+            <when test="vo.orderField == 'alreadyUseAmount' and vo.orderType == 'desc'">
+                ORDER BY alreadyUseAmount desc
+            </when>
+            <when test="vo.orderField == 'vipAmount' and vo.orderType == 'asc'">
+                ORDER BY vipAmount asc
+            </when>
+            <when test="vo.orderField == 'vipAmount' and vo.orderType == 'desc'">
+                ORDER BY vipAmount desc
+            </when>
+
+            <when test="vo.orderField == 'adjustAmount' and vo.orderType == 'asc'">
+                ORDER BY adjustAmount asc
+            </when>
+            <when test="vo.orderField == 'adjustAmount' and vo.orderType == 'desc'">
+                ORDER BY adjustAmount desc
+            </when>
+
+            <when test="vo.orderField == 'repairOrderOtherAdjust' and vo.orderType == 'asc'">
+                ORDER BY repairOrderOtherAdjust asc
+            </when>
+            <when test="vo.orderField == 'repairOrderOtherAdjust' and vo.orderType == 'desc'">
+                ORDER BY repairOrderOtherAdjust desc
+            </when>
+
+            <when test="vo.orderField == 'profitAndLoss' and vo.orderType == 'asc'">
+                ORDER BY profitAndLoss asc
+            </when>
+            <when test="vo.orderField == 'profitAndLoss' and vo.orderType == 'desc'">
+                ORDER BY profitAndLoss desc
+            </when>
+            <when test="vo.orderField == 'tipsAmount' and vo.orderType == 'asc'">
+                ORDER BY tipsAmount asc
+            </when>
+            <when test="vo.orderField == 'tipsAmount' and vo.orderType == 'desc'">
+                ORDER BY tipsAmount desc
+            </when>
+            <when test="vo.orderField == 'platAdjustAmount' and vo.orderType == 'asc'">
+                ORDER BY platAdjustAmount asc
+            </when>
+            <when test="vo.orderField == 'platAdjustAmount' and vo.orderType == 'desc'">
+                ORDER BY platAdjustAmount desc
+            </when>
+            <when test="vo.orderField == 'riskAmount' and vo.orderType == 'asc'">
+                ORDER BY riskAmount asc
+            </when>
+            <when test="vo.orderField == 'riskAmount' and vo.orderType == 'desc'">
+                ORDER BY riskAmount desc
+            </when>
+
+
+
+            <otherwise>
+                ORDER BY abc.betWinLose DESC, abc.validBetAmount DESC, abc.betNum DESC ,abc.userAccount
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="getTotalCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM (
+        SELECT
+        a.user_id userId,
+        max(a.id) id,
+        any_value(b.user_name) userName,
+        any_value ( b.user_account ) userAccount,
+        any_value(b.account_type) accountType,
+        any_value(b.vip_grade_code) vipGradeCode,
+        any_value(b.account_status) accountStatus,
+        any_value(b.user_label_id) userLabelId,
+        any_value(b.risk_level_id) riskLevelId,
+        any_value(b.main_currency) mainCurrency,
+        sum(a.bet_num) betNum,
+        sum(a.bet_amount) betAmount,
+        sum(a.valid_bet_amount) validBetAmount,
+        sum(a.run_water_correct) runWaterCorrect,
+        sum(a.bet_win_lose) betWinLose,
+        sum(a.activity_amount) activityAmount,
+        sum(a.already_use_amount) alreadyUseAmount,
+        sum(a.rebate_amount) rebateAmount,
+        sum(a.vip_amount) vipAmount,
+        sum(a.adjust_amount) adjustAmount,
+        IFNULL(SUM(a.repair_order_other_adjust), 0) repairOrderOtherAdjust,
+        sum(a.plat_adjust_amount) platAdjustAmount,
+        sum(a.tips_amount) tipsAmount,
+        sum(a.risk_amount) riskAmount,
+        sum(a.bet_win_lose)+sum(a.already_use_amount)-sum(a.tips_amount)+sum(a.risk_amount) profitAndLoss
+        FROM report_user_win_lose a
+        LEFT JOIN user_info b ON a.user_id = b.user_id
+        <where>
+            <if test="vo.startDay != null">
+                AND a.day_hour_millis <![CDATA[ >= ]]> #{vo.startDay}
+            </if>
+            <if test="vo.endDay != null">
+                AND a.day_hour_millis <![CDATA[ <= ]]> #{vo.endDay}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.superAgentAccount != '' and vo.superAgentAccount != null">
+                AND a.super_agent_account = #{vo.superAgentAccount}
+            </if>
+            <if test="vo.mainCurrency != '' and vo.mainCurrency != null">
+                AND a.main_currency = #{vo.mainCurrency}
+            </if>
+            <if test="vo.accountType != null">
+                AND b.account_type = #{vo.accountType}
+            </if>
+            <if test="vo.agentAttribution != null">
+                AND a.agent_attribution = #{vo.agentAttribution}
+            </if>
+
+        </where>
+        GROUP BY a.user_id,a.agent_id
+        ) abc
+
+        LEFT JOIN ( SELECT id,super_agent_account,agent_attribution FROM report_user_win_lose ) cc on abc.id = cc.id
+        <where>
+            <if test="vo.betNumMin != '' and vo.betNumMin != null">
+                AND abc.betNum <![CDATA[ >= ]]> #{vo.betNumMin}
+            </if>
+            <if test="vo.betNumMax != '' and vo.betNumMax != null">
+                AND abc.betNum <![CDATA[ <= ]]> #{vo.betNumMax}
+            </if>
+            <if test="vo.betAmountMin != '' and vo.betAmountMin != null">
+                AND abc.betAmount <![CDATA[ >= ]]> #{vo.betAmountMin}
+            </if>
+            <if test="vo.betAmountMax != '' and vo.betAmountMax != null">
+                AND abc.betAmount <![CDATA[ <= ]]> #{vo.betAmountMax}
+            </if>
+            <if test="vo.betWinLoseMin != '' and vo.betWinLoseMin != null">
+                AND abc.betWinLose <![CDATA[ >= ]]> #{vo.betWinLoseMin}
+            </if>
+            <if test="vo.betWinLoseMax != '' and vo.betWinLoseMax != null">
+                AND abc.betWinLose <![CDATA[ <= ]]> #{vo.betWinLoseMax}
+            </if>
+            <if test="vo.profitAndLossMin != '' and vo.profitAndLossMin != null">
+                AND abc.profitAndLoss <![CDATA[ >= ]]> #{vo.profitAndLossMin}
+            </if>
+            <if test="vo.profitAndLossMax != '' and vo.profitAndLossMax != null">
+                AND abc.profitAndLoss <![CDATA[ <= ]]> #{vo.profitAndLossMax}
+            </if>
+        </where>
+
+    </select>
+
+
+    <select id="getTotalPage" resultType="com.cloud.baowang.report.api.vo.userwinlose.UserWinLoseResponseVO">
+        SELECT
+        'all' userId,
+        mainCurrency mainCurrency,
+        IFNULL(SUM(abc.betNum), 0) betNum,
+        IFNULL(SUM(abc.betAmount), 0) betAmount,
+        IFNULL(SUM(abc.validBetAmount), 0) validBetAmount,
+        IFNULL(SUM(abc.runWaterCorrect), 0) runWaterCorrect,
+        IFNULL(SUM(abc.betWinLose), 0) betWinLose,
+        IFNULL(SUM(abc.rebateAmount), 0) rebateAmount,
+        IFNULL(SUM(abc.activityAmount), 0) activityAmount,
+        IFNULL(SUM(abc.alreadyUseAmount), 0) alreadyUseAmount,
+        IFNULL(SUM(abc.vipAmount), 0) vipAmount,
+        IFNULL(SUM(abc.adjustAmount), 0) adjustAmount,
+        IFNULL(SUM(abc.repairOrderOtherAdjust), 0) repairOrderOtherAdjust,
+        IFNULL(SUM(abc.platAdjustAmount), 0) platAdjustAmount,
+        IFNULL(SUM(abc.tipsAmount), 0) tipsAmount,
+        IFNULL(SUM(abc.riskAmount), 0) riskAmount,
+        IFNULL(SUM(abc.profitAndLoss), 0) profitAndLoss
+        FROM (
+        SELECT
+        a.user_id userId,
+        a.main_currency mainCurrency,
+        max(a.id) id,
+        sum(a.bet_num) betNum,
+        sum(a.bet_amount) betAmount,
+        sum(a.valid_bet_amount) validBetAmount,
+        sum(a.run_water_correct) runWaterCorrect,
+        sum(a.bet_win_lose) betWinLose,
+        sum(a.rebate_amount) rebateAmount,
+        sum(a.activity_amount) activityAmount,
+        sum(a.already_use_amount) alreadyUseAmount,
+        sum(a.vip_amount) vipAmount,
+        sum(a.adjust_amount) adjustAmount,
+        sum(a.repair_order_other_adjust) repairOrderOtherAdjust,
+        sum(a.plat_adjust_amount) platAdjustAmount,
+        sum(a.tips_amount) tipsAmount,
+        sum(a.risk_amount) riskAmount,
+        sum(a.bet_win_lose)+sum(a.already_use_amount)-sum(a.tips_amount)+sum(a.adjust_amount) profitAndLoss
+        FROM report_user_win_lose a
+        LEFT JOIN user_info b ON a.user_id = b.user_id
+        <where>
+            <if test="vo.startDay != null">
+                AND a.day_hour_millis <![CDATA[ >= ]]> #{vo.startDay}
+            </if>
+            <if test="vo.endDay != null">
+                AND a.day_hour_millis <![CDATA[ <= ]]> #{vo.endDay}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.superAgentAccount != '' and vo.superAgentAccount != null">
+                AND a.super_agent_account = #{vo.superAgentAccount}
+            </if>
+            <if test="vo.accountType != null">
+                AND b.account_type = #{vo.accountType}
+            </if>
+            <if test="vo.mainCurrency != null and vo.mainCurrency != ''">
+                AND b.main_currency = #{vo.mainCurrency}
+            </if>
+            <if test="vo.agentAttribution != null">
+                AND a.agent_attribution = #{vo.agentAttribution}
+            </if>
+        </where>
+        GROUP BY a.user_id ,a.main_currency
+        ) abc
+
+        <where>
+            <if test="vo.betNumMin != '' and vo.betNumMin != null">
+                AND abc.betNum <![CDATA[ >= ]]> #{vo.betNumMin}
+            </if>
+            <if test="vo.betNumMax != '' and vo.betNumMax != null">
+                AND abc.betNum <![CDATA[ <= ]]> #{vo.betNumMax}
+            </if>
+            <if test="vo.betAmountMin != '' and vo.betAmountMin != null">
+                AND abc.betAmount <![CDATA[ >= ]]> #{vo.betAmountMin}
+            </if>
+            <if test="vo.betAmountMax != '' and vo.betAmountMax != null">
+                AND abc.betAmount <![CDATA[ <= ]]> #{vo.betAmountMax}
+            </if>
+            <if test="vo.betWinLoseMin != '' and vo.betWinLoseMin != null">
+                AND abc.betWinLose <![CDATA[ >= ]]> #{vo.betWinLoseMin}
+            </if>
+            <if test="vo.betWinLoseMax != '' and vo.betWinLoseMax != null">
+                AND abc.betWinLose <![CDATA[ <= ]]> #{vo.betWinLoseMax}
+            </if>
+            <if test="vo.profitAndLossMin != '' and vo.profitAndLossMin != null">
+                AND abc.profitAndLoss <![CDATA[ >= ]]> #{vo.profitAndLossMin}
+            </if>
+            <if test="vo.profitAndLossMax != '' and vo.profitAndLossMax != null">
+                AND abc.profitAndLoss <![CDATA[ <= ]]> #{vo.profitAndLossMax}
+            </if>
+        </where>
+        Group by mainCurrency
+    </select>
+
+    <select id="getPageCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM (
+        SELECT
+        a.user_account userAccount,
+        any_value(b.user_name) userName,
+        any_value(b.account_type) accountType,
+        any_value(b.super_agent_account) superAgentAccount,
+        concat('VIP', any_value(b.vip_rank_code)) vipRankCode,
+        any_value(b.account_status) accountStatus,
+        any_value(b.user_label_id) userLabelId,
+        any_value(b.risk_level_id) riskLevelId,
+        sum(a.bet_num) betNum,
+        sum(a.bet_amount) betAmount,
+        sum(a.valid_bet_amount) validBetAmount,
+        sum(a.run_water_correct) runWaterCorrect,
+        sum(a.bet_win_lose) betWinLose,
+        sum(a.rebate_amount) rebateAmount,
+        sum(a.activity_amount) activityAmount,
+        sum(a.already_use_amount) alreadyUseAmount,
+        sum(a.vip_amount) vip_amount,
+        sum(a.adjust_amount) adjustAmount,
+        sum(a.plat_adjust_amount) platAdjustAmount,
+        sum(a.tips_amount) tipsAmount,
+        sum(a.risk_amount) riskAmount,
+        sum(a.bet_win_lose)+sum(a.already_use_amount)-sum(a.tips_amount)+sum(a.risk_amount) profitAndLoss
+        FROM report_user_win_lose a
+        LEFT JOIN user_info b ON a.user_account = b.user_account
+        <where>
+            <if test="vo.startDay != null">
+                AND a.day_hour_millis <![CDATA[ >= ]]> #{vo.startDay}
+            </if>
+            <if test="vo.endDay != null">
+                AND a.day_hour_millis <![CDATA[ <= ]]> #{vo.endDay}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.superAgentAccount != '' and vo.superAgentAccount != null">
+                AND a.super_agent_account = #{vo.superAgentAccount}
+            </if>
+            <if test="vo.accountType != null">
+                AND b.account_type = #{vo.accountType}
+            </if>
+        </where>
+        GROUP BY a.user_account
+        ) abc
+        <where>
+            <if test="vo.betNumMin != '' and vo.betNumMin != null">
+                AND abc.betNum <![CDATA[ >= ]]> #{vo.betNumMin}
+            </if>
+            <if test="vo.betNumMax != '' and vo.betNumMax != null">
+                AND abc.betNum <![CDATA[ <= ]]> #{vo.betNumMax}
+            </if>
+            <if test="vo.betAmountMin != '' and vo.betAmountMin != null">
+                AND abc.betAmount <![CDATA[ >= ]]> #{vo.betAmountMin}
+            </if>
+            <if test="vo.betAmountMax != '' and vo.betAmountMax != null">
+                AND abc.betAmount <![CDATA[ <= ]]> #{vo.betAmountMax}
+            </if>
+            <if test="vo.betWinLoseMin != '' and vo.betWinLoseMin != null">
+                AND abc.betWinLose <![CDATA[ >= ]]> #{vo.betWinLoseMin}
+            </if>
+            <if test="vo.betWinLoseMax != '' and vo.betWinLoseMax != null">
+                AND abc.betWinLose <![CDATA[ <= ]]> #{vo.betWinLoseMax}
+            </if>
+            <if test="vo.profitAndLossMin != '' and vo.profitAndLossMin != null">
+                AND abc.profitAndLoss <![CDATA[ >= ]]> #{vo.profitAndLossMin}
+            </if>
+            <if test="vo.profitAndLossMax != '' and vo.profitAndLossMax != null">
+                AND abc.profitAndLoss <![CDATA[ <= ]]> #{vo.profitAndLossMax}
+            </if>
+        </where>
+    </select>
+    <select id="dailyWinLoseTotal" resultType="com.cloud.baowang.report.api.vo.userwinlose.DailyWinLoseResponseVO">
+        SELECT
+        day_millis,
+        count(distinct if(bet_num > 0, user_id, null)) betMemNum,
+        IFNULL(sum(a.bet_num),0) betNum,
+        IFNULL(sum(a.bet_amount),0) betAmount,
+        IFNULL(sum(a.valid_bet_amount),0) validBetAmount,
+        IFNULL(sum(a.run_water_correct),0) runWaterCorrect,
+        IFNULL(sum(a.bet_win_lose),0) betWinLose,
+        IFNULL(sum(a.rebate_amount),0) rebateAmount,
+        IFNULL(sum(a.activity_amount),0) activityAmount,
+        IFNULL(sum(a.vip_amount),0) vipAmount,
+        IFNULL(sum(a.adjust_amount),0) adjustAmount,
+        IFNULL(sum(a.repair_order_other_adjust), 0) repairOrderOtherAdjust,
+        IFNULL(sum(a.already_use_amount),0) alreadyUseAmount,
+        IFNULL(sum(a.rebate_amount),0) rebate_amount,
+        IFNULL(sum(a.plat_adjust_amount),0) platAdjustAmount,
+        IFNULL(sum(a.tips_amount),0) tipsAmount,
+        a.main_currency mainCurrency
+        FROM report_user_win_lose a
+
+        <where>
+            a.site_code = #{siteCode}
+            <if test="vo.startDay != null">
+                AND a.day_hour_millis <![CDATA[ >= ]]> #{vo.startDay}
+            </if>
+            <if test="vo.endDay != null">
+                AND a.day_hour_millis <![CDATA[ <= ]]> #{vo.endDay}
+            </if>
+            <if test="vo.mainCurrency != '' and vo.mainCurrency != null">
+                AND a.main_currency = #{vo.mainCurrency}
+            </if>
+        </where>
+        GROUP BY day_millis,main_currency
+    </select>
+
+    <select id="dailyWinLoseCurrency" resultType="com.cloud.baowang.report.api.vo.userwinlose.DailyWinLoseResponseVO">
+        SELECT
+            dayStr,
+            mm.main_currency,
+            IFNULL( sum( valid_bet_amount ), 0 ) validBetAmount,
+            IFNULL( sum( bet_win_lose ), 0 ) betWinLose,
+            -(IFNULL( sum( bet_win_lose ), 0 ) + IFNULL( sum( tips_amount ), 0 ) - IFNULL( sum( already_use_amount ), 0 ) - IFNULL( sum( adjust_amount ), 0 )) profitAndLoss
+        FROM
+        (
+
+            SELECT
+                DATE_FORMAT( CONVERT_TZ( FROM_UNIXTIME( day_millis / 1000 ), @@SESSION.time_zone, #{vo.timezone}), '%Y-%m-%d' ) AS dayStr,
+                IFNULL( a.valid_bet_amount, 0 ) valid_bet_amount,
+                IFNULL( a.bet_win_lose, 0 ) bet_win_lose,
+                IFNULL( a.tips_amount, 0 ) tips_amount,
+                IFNULL( a.already_use_amount, 0 ) already_use_amount,
+                IFNULL( a.adjust_amount, 0 ) adjust_amount,
+                a.main_currency
+            FROM report_user_win_lose a
+
+            <where>
+                a.site_code = #{vo.siteCode}
+
+                <if test="vo.userId != null and vo.userId != ''">
+                    and a.user_id =  #{vo.userId}
+                </if>
+
+                <if test="vo.startTime != null">
+                    AND a.day_millis <![CDATA[ >= ]]> #{vo.startTime}
+                </if>
+                <if test="vo.endTime != null">
+                    AND a.day_millis <![CDATA[ <= ]]> #{vo.endTime}
+                </if>
+                <if test="vo.currencyCode != null and vo.currencyCode != ''">
+                    AND a.main_currency = #{vo.currencyCode}
+                </if>
+            </where>
+        ) mm
+        GROUP BY dayStr,main_currency
+    </select>
+
+    <select id="dailyWinLosePage" resultType="com.cloud.baowang.report.api.vo.userwinlose.DailyWinLoseResponseVO">
+        SELECT
+        day_millis as dayMillisTime,
+        count(distinct if(bet_num > 0, user_id, null)) betMemNum,
+        IFNULL(sum(a.bet_num),0) betNum,
+        IFNULL(sum(a.bet_amount),0) betAmount,
+        IFNULL(sum(a.valid_bet_amount),0) validBetAmount,
+        IFNULL(sum(a.run_water_correct),0) runWaterCorrect,
+        IFNULL(sum(a.bet_win_lose),0) betWinLose,
+        IFNULL(sum(a.activity_amount),0) activityAmount,
+        IFNULL(sum(a.vip_amount),0) vipAmount,
+        IFNULL(sum(a.adjust_amount),0) adjustAmount,
+        IFNULL(SUM(a.repair_order_other_adjust), 0) repairOrderOtherAdjust,
+        IFNULL(sum(a.already_use_amount),0) alreadyUseAmount,
+        IFNULL(sum(a.rebate_amount),0) rebateAmount,
+        IFNULL(sum(a.tips_amount),0) tipsAmount,
+        IFNULL(sum(a.plat_adjust_amount),0) platAdjustAmount,
+        a.main_currency mainCurrency
+        FROM report_user_win_lose a
+        <where>
+            a.site_code = #{siteCode}
+            <if test="vo.startDay != null">
+                AND a.day_hour_millis <![CDATA[ >= ]]> #{vo.startDay}
+            </if>
+            <if test="vo.endDay != null">
+                AND a.day_hour_millis <![CDATA[ <= ]]> #{vo.endDay}
+            </if>
+            <if test="vo.mainCurrency != null and vo.mainCurrency != ''">
+                AND a.main_currency = #{vo.mainCurrency}
+            </if>
+        </where>
+        GROUP BY day_millis,main_currency
+        <choose>
+            <when test="vo.orderField == 'betNum' and vo.orderType == 'asc'">
+                ORDER BY betNum asc
+            </when>
+            <when test="vo.orderField == 'betNum' and vo.orderType == 'desc'">
+                ORDER BY betNum desc
+            </when>
+
+            <when test="vo.orderField == 'betAmount' and vo.orderType == 'asc'">
+                ORDER BY betAmount asc
+            </when>
+            <when test="vo.orderField == 'betAmount' and vo.orderType == 'desc'">
+                ORDER BY betAmount desc
+            </when>
+            <when test="vo.orderField == 'validBetAmount' and vo.orderType == 'asc'">
+                ORDER BY validBetAmount asc
+            </when>
+            <when test="vo.orderField == 'validBetAmount' and vo.orderType == 'desc'">
+                ORDER BY validBetAmount desc
+            </when>
+
+            <when test="vo.orderField == 'runWaterCorrect' and vo.orderType == 'asc'">
+                ORDER BY runWaterCorrect asc
+            </when>
+            <when test="vo.orderField == 'runWaterCorrect' and vo.orderType == 'desc'">
+                ORDER BY runWaterCorrect desc
+            </when>
+            <when test="vo.orderField == 'betWinLose' and vo.orderType == 'desc'">
+                ORDER BY betWinLose asc
+            </when>
+            <when test="vo.orderField == 'betWinLose' and vo.orderType == 'asc'">
+                ORDER BY betWinLose desc
+            </when>
+
+            <when test="vo.orderField == 'rebateAmount' and vo.orderType == 'asc'">
+                ORDER BY rebateAmount asc
+            </when>
+            <when test="vo.orderField == 'rebateAmount' and vo.orderType == 'desc'">
+                ORDER BY rebateAmount desc
+            </when>
+            <when test="vo.orderField == 'activityAmount' and vo.orderType == 'asc'">
+                ORDER BY activityAmount asc
+            </when>
+            <when test="vo.orderField == 'activityAmount' and vo.orderType == 'desc'">
+                ORDER BY activityAmount desc
+            </when>
+            <when test="vo.orderField == 'vipAmount' and vo.orderType == 'asc'">
+                ORDER BY vipAmount asc
+            </when>
+            <when test="vo.orderField == 'vipAmount' and vo.orderType == 'desc'">
+                ORDER BY vipAmount desc
+            </when>
+
+            <when test="vo.orderField == 'adjustAmount' and vo.orderType == 'asc'">
+                ORDER BY adjustAmount asc
+            </when>
+            <when test="vo.orderField == 'adjustAmount' and vo.orderType == 'desc'">
+                ORDER BY adjustAmount desc
+            </when>
+            <when test="vo.orderField == 'repairOrderOtherAdjust' and vo.orderType == 'asc'">
+                ORDER BY repairOrderOtherAdjust asc
+            </when>
+            <when test="vo.orderField == 'repairOrderOtherAdjust' and vo.orderType == 'desc'">
+                ORDER BY repairOrderOtherAdjust desc
+            </when>
+            <when test="vo.orderField == 'alreadyUseAmount' and vo.orderType == 'asc'">
+                ORDER BY alreadyUseAmount asc
+            </when>
+            <when test="vo.orderField == 'alreadyUseAmount' and vo.orderType == 'desc'">
+                ORDER BY alreadyUseAmount desc
+            </when>
+            <when test="vo.orderField == 'betMemNum' and vo.orderType == 'asc'">
+                ORDER BY betMemNum asc
+            </when>
+            <when test="vo.orderField == 'betMemNum' and vo.orderType == 'desc'">
+                ORDER BY betMemNum desc
+            </when>
+            <otherwise>
+                ORDER BY day_millis DESC , main_currency desc
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="dailyWinLosePageCount" resultType="java.lang.Long">
+        SELECT
+        COUNT( 1 )
+        FROM
+        (
+        SELECT
+        main_currency
+        FROM report_user_win_lose a
+        <where>
+            a.site_code = #{siteCode}
+            <if test="vo.startDay != null">
+                AND a.day_hour_millis <![CDATA[ >= ]]> #{vo.startDay}
+            </if>
+            <if test="vo.endDay != null">
+                AND a.day_hour_millis <![CDATA[ <= ]]> #{vo.endDay}
+            </if>
+
+            <if test="vo.mainCurrency != null and vo.mainCurrency != ''">
+                AND a.main_currency = #{vo.mainCurrency}
+            </if>
+        </where>
+        GROUP BY day_millis,main_currency
+        ) b
+    </select>
+
+
+    <select id="clickUserAccount" resultType="com.cloud.baowang.report.api.vo.userwinlose.ClickUserAccountVO">
+        SELECT
+        day_millis AS dayMillis,
+        any_value(a.super_agent_account) superAgentAccount,
+        any_value(a.main_currency) mainCurrency,
+        sum(a.bet_num) betNum,
+        sum(a.bet_amount) betAmount,
+        sum(a.valid_bet_amount) validBetAmount,
+        sum(a.run_water_correct) runWaterCorrect,
+        sum(a.bet_win_lose) betWinLose,
+        sum(a.rebate_amount) rebateAmount,
+        sum(a.activity_amount) activityAmount,
+        sum(a.already_use_amount) alreadyUseAmount,
+        sum(a.vip_amount) vipAmount,
+        sum(a.adjust_amount) adjustAmount,
+        sum(a.bet_win_lose)+sum(a.already_use_amount) -sum(a.tips_amount)+sum(a.adjust_amount) profitAndLoss,
+        sum(a.plat_adjust_amount) platAdjustAmount,
+        sum(a.tips_amount) tipsAmount,
+        sum(a.risk_amount) riskAmount
+        FROM report_user_win_lose a
+        <where>
+            <if test="vo.startDay != null">
+                AND a.day_hour_millis <![CDATA[ >= ]]> #{vo.startDay}
+            </if>
+            <if test="vo.endDay != null">
+                AND a.day_hour_millis <![CDATA[ <= ]]> #{vo.endDay}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND a.site_code = #{vo.siteCode}
+            </if>
+            <choose>
+                <when test="vo.superAgentAccount != '' and vo.superAgentAccount != null">
+                    AND a.super_agent_account = #{vo.superAgentAccount}
+                </when>
+                <otherwise>
+                    AND a.super_agent_account IS NULL
+                </otherwise>
+            </choose>
+        </where>
+        group by dayMillis
+        ORDER BY dayMillis
+    </select>
+
+    <select id="queryValidBetAmountMaxByTime" resultType="com.cloud.baowang.report.po.ReportUserWinLosePO">
+        SELECT t.main_currency, t.user_id,ANY_VALUE(t.user_account) user_account, SUM(t.valid_bet_amount) AS
+        validBetAmount
+        FROM report_user_win_lose t
+        WHERE
+        t.site_code = #{siteCode}
+        <if test="firstDayMilli != null">
+            AND t.day_hour_millis <![CDATA[ >= ]]> #{firstDayMilli}
+        </if>
+        <if test="lastDayMilli!= null">
+            AND t.day_hour_millis <![CDATA[ <= ]]> #{lastDayMilli}
+        </if>
+        GROUP BY t.main_currency, t.user_id
+        HAVING validBetAmount > 0 and validBetAmount = (
+        SELECT MAX(valid_bet_amount)
+        FROM (
+        SELECT SUM(valid_bet_amount) AS valid_bet_amount
+        FROM report_user_win_lose
+        WHERE
+        site_code = #{siteCode}
+        AND main_currency = t.main_currency
+        <if test="firstDayMilli != null">
+            AND day_hour_millis <![CDATA[ >= ]]> #{firstDayMilli}
+        </if>
+        <if test="lastDayMilli!= null">
+            AND day_hour_millis <![CDATA[ <= ]]> #{lastDayMilli}
+        </if>
+        GROUP BY user_id
+        ) AS sub
+        );
+
+    </select>
+    <select id="queryWinLoseAmountMaxByTime" resultType="com.cloud.baowang.report.po.ReportUserWinLosePO">
+        SELECT t.main_currency, t.user_id,ANY_VALUE(t.user_account) user_account, SUM(t.bet_win_lose) AS betWinLose
+        FROM report_user_win_lose t
+        WHERE
+        t.site_code = #{siteCode}
+        <if test="firstDayMilli != null">
+            AND t.day_hour_millis <![CDATA[ >= ]]> #{firstDayMilli}
+        </if>
+        <if test="lastDayMilli!= null">
+            AND t.day_hour_millis <![CDATA[ <= ]]> #{lastDayMilli}
+        </if>
+        GROUP BY t.main_currency, t.user_id
+        HAVING betWinLose <![CDATA[ < ]]> 0 and betWinLose = (
+        SELECT MIN(bet_win_lose)
+        FROM (
+        SELECT SUM(bet_win_lose) AS bet_win_lose
+        FROM report_user_win_lose
+        WHERE
+        site_code = #{siteCode}
+        AND main_currency = t.main_currency
+        <if test="firstDayMilli != null">
+            AND day_hour_millis <![CDATA[ >= ]]> #{firstDayMilli}
+        </if>
+        <if test="lastDayMilli!= null">
+            AND day_hour_millis <![CDATA[ <= ]]> #{lastDayMilli}
+        </if>
+        GROUP BY user_id
+        ) AS sub
+        );
+    </select>
+
+    <select id="getUserWinLossByAgentIds" resultType="com.cloud.baowang.report.api.vo.agent.ReportAgentWinLoseVO">
+        select
+        main_currency as currency,
+        IFNULL(count(distinct user_account),0) as betUserNum,
+        IFNULL(sum(bet_num),0) as betNum,
+        IFNULL(sum(activity_amount),0) as activityAmount,
+        IFNULL(sum(rebate_amount),0) as rebateAmount,
+        IFNULL(sum(vip_amount),0) as vipAmount,
+        IFNULL(sum(adjust_amount),0) as adjustAmount,
+        IFNULL(sum(repair_order_other_adjust),0) as totalOtherAdjustAmount,
+        IFNULL(sum(bet_amount),0) as betAmount,
+        IFNULL(sum(valid_bet_amount),0) as validAmount,
+        IFNULL(sum(bet_win_lose),0) as betWinLose,
+        IFNULL(sum(already_use_amount),0) as alreadyUseAmount,
+        IFNULL(sum(tips_amount),0) as tipsAmount
+        from report_user_win_lose
+        where agent_id is not null
+        AND agent_id != ''
+        <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+            AND agent_id IN
+            <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        group by main_currency
+    </select>
+    <select id="allChangeMemWinLostDetail" resultType="com.cloud.baowang.report.api.vo.MemberWinLossDetailVO">
+        SELECT
+        user_account,
+        user_id userId,
+        bet_amount betAmount,
+        bet_num betNumber,
+        bet_win_lose winLossAmount,
+        valid_bet_amount validAmount,
+        rebate_amount rebateAmount,
+        adjust_amount adjustAmount,
+        activity_amount activityAmount,
+        vip_amount vipAmount,
+        already_use_amount alreadyUseAmount,
+        bet_win_lose+already_use_amount profitAndLoss,
+        super_agent_account agentAccount,
+        agent_id agentId,
+        day_hour_millis betTime,
+        site_code siteCode,
+        main_currency mainCurrency,
+        plat_adjust_amount platAdjustAmount,
+        tips_amount tipsAmount,
+        risk_amount riskAmount,
+        day_millis dayMillis
+        FROM
+        `report_user_win_lose`
+        WHERE
+        1 = 1
+        <if test="vo.statTime != null and vo.statTime != ''">
+            AND day_hour_millis <![CDATA[ < ]]> #{vo.statTime}
+            AND updated_time <![CDATA[ >= ]]> #{vo.statTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND updated_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            AND site_code = #{vo.siteCode}
+        </if>
+    </select>
+    <select id="queryByTimeAndAgent"
+            resultType="com.cloud.baowang.report.api.vo.userwinlose.UserWinLoseAgentVO">
+        select
+        IFNULL(SUM(valid_bet_amount),0) AS validBetAmount,
+        IFNULL(SUM(bet_win_lose),0) AS winLoseAmount,
+        IFNULL(SUM(activity_amount),0) AS activityAwardAmount,
+        IFNULL(SUM(vip_amount),0) AS vipAwardAmount,
+        IFNULL(SUM(already_use_amount),0) AS usedAmount,
+        IFNULL(SUM(adjust_amount),0) AS adjustAmount,
+        IFNULL(SUM(rebate_amount),0) AS rebateAmount,
+        IFNULL(SUM(tips_amount),0) AS tipsAmount,
+        main_currency AS currency,
+        agent_id AS agentId
+        from report_user_win_lose
+        where
+        site_code = #{vo.siteCode}
+        <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+            AND agent_id IN
+            <foreach item="item" collection="vo.agentIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null and vo.startTime !='' ">
+            AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime !='' ">
+            AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode !='' ">
+            AND main_currency = #{vo.currencyCode}
+        </if>
+        group by agent_id,main_currency
+    </select>
+
+
+    <select id="queryListByParam"
+            resultType="com.cloud.baowang.report.api.vo.userwinlose.UserWinLoseResponseVO" >
+        select
+        *
+        from report_user_win_lose
+        where
+        site_code = #{vo.siteCode}
+        <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+            AND agent_id IN
+            <foreach item="item" collection="vo.agentIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null and vo.startTime !='' ">
+            AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime !='' ">
+            AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode !='' ">
+            AND main_currency = #{vo.currencyCode}
+        </if>
+    </select>
+
+    <select id="allMemWinLostDetail" resultType="com.cloud.baowang.report.api.vo.MemberWinLossDetailVO">
+        SELECT
+        user_account AS userAccount,
+        user_id AS userId,
+        SUM(bet_amount) AS betAmount,
+        SUM(bet_num) AS betNumber,
+        SUM(bet_win_lose) AS winLossAmount,
+        SUM(valid_bet_amount) AS validAmount,
+        SUM(rebate_amount) AS rebateAmount,
+        agent_id AS agentId,
+        super_agent_account AS agentAccount,
+        SUM(activity_amount) AS activityAmount,
+        SUM(vip_amount) AS vipAmount,
+        SUM(already_use_amount) AS alreadyUseAmount,
+        sum(bet_win_lose)+sum(already_use_amount) AS profitAndLoss,
+        SUM(adjust_amount) AS adjustAmount,
+        ANY_VALUE(main_currency) AS currency,
+        SUM(plat_adjust_amount) AS platAdjustAmount,
+        SUM(tips_amount) AS tipsAmount,
+        SUM(risk_amount) AS riskAmount,
+        ANY_VALUE(account_type) AS accountType
+        FROM
+        `report_user_win_lose`
+        WHERE
+        1 = 1
+        <if test="vo.statTime != null ">
+            AND day_hour_millis <![CDATA[ >= ]]> #{vo.statTime}
+        </if>
+        <if test="vo.endTime != null ">
+            AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            AND site_code = #{vo.siteCode}
+        </if>
+        group by user_id,user_account,agent_id,super_agent_account
+    </select>
+
+    <select id="getBetUserNum" resultType="java.lang.Long">
+        SELECT
+        count(distinct user_id) as memberBettingPeopleNumber
+        FROM report_user_win_lose
+        <where>
+            <if test="vo.startTime != null">
+                AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+            <if test="vo.agentIds != null">
+                AND agent_id IN
+                <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+        </where>
+
+    </select>
+    <select id="getSiteBetUserList" resultType="com.cloud.baowang.report.api.vo.UserWinLoseBetUserVO">
+        SELECT
+        DATE_FORMAT(FROM_UNIXTIME(day_hour_millis / 1000), '%Y-%m-%d') AS dateStr,
+        site_code as siteCode,
+        main_currency as currencyCode,
+        COUNT(DISTINCT user_id) AS betUserCount
+        FROM
+        report_user_win_lose
+        WHERE
+        valid_bet_amount > 0
+        AND site_code IN
+        <foreach collection="siteCodeList" open="(" close=")" item="item" separator=",">
+            #{item}
+        </foreach>
+        AND day_hour_millis BETWEEN #{startTime} AND #{endTime}
+        and account_type = "2"
+        GROUP BY
+        dateStr,
+        site_code,
+        main_currency
+        ORDER BY
+        dateStr DESC,
+        site_code,
+        main_currency
+    </select>
+
+    <update id="updateMainAmount">
+        update report_user_win_lose
+        <set>
+            already_use_amount = already_use_amount + #{alreadyUseAmount},
+            adjust_amount = adjust_amount + #{adjustAmount} ,
+            updated_time = #{currentTime},
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updatePlatAmount">
+        update report_user_win_lose
+        <set>
+            vip_amount = vip_amount + #{vipAmount},
+            activity_amount = activity_amount + #{activityAmount} ,
+            updated_time = #{currentTime},
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="getWayFeeAmountBySiteCode"
+            resultType="com.cloud.baowang.report.api.vo.site.SiteFeesVO">
+        SELECT udw.currency_code as currencyCode,sum(udw.way_fee_amount) as fees
+        FROM user_deposit_withdrawal udw LEFT JOIN user_info u on udw.user_id = u.user_id
+        <where>
+            1=1
+            <if test="siteCode != '' and siteCode != null">
+                AND udw.site_code = #{siteCode}
+            </if>
+            <if test="start != null">
+                AND udw.updated_time <![CDATA[ >= ]]> #{start}
+            </if>
+            <if test="end != null">
+                AND udw.updated_time <![CDATA[ <= ]]> #{end}
+            </if>
+            and udw.`status`=101
+            and u.account_type=2
+        </where>
+        GROUP BY currencyCode
+    </select>
+
+
+    <select id="queryUserOrderAmountByAgent" resultType="com.cloud.baowang.report.api.vo.userwinlose.UserWinLossAmountReportVO">
+        SELECT
+        user_account AS userAccount,
+        user_id AS userId,
+        main_currency  AS currency,
+        SUM(valid_bet_amount) AS validAmount,
+        SUM(bet_win_lose) AS winLossAmount
+        FROM
+        `report_user_win_lose`
+        WHERE
+        1 = 1
+        <if test="vo.startTime != null ">
+            AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null ">
+            AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            AND site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.agentIds != null and vo.agentIds.size()>0">
+            AND agent_id IN
+            <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        group by user_id,user_account,main_currency
+    </select>
+
+
+
+</mapper>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.user.repositories.VIPOperationRepository">
+    <select id="selectVIPOperationPage" resultType="com.cloud.baowang.user.api.vo.vip.VIPOperationVO">
+        select
+        operation_type as operationType,
+        operation as operation,
+        operation_before as operationBefore,
+        operation_after as operationAfter,
+        operation_time as operationTime,
+        operator as operator
+        from vip_operation_info
+        where 1 = 1
+        <if test="vo.operationType != null and vo.operationType != ''">
+            AND operation_type = #{vo.operationType}
+        </if>
+        <if test="vo.operation != null and vo.operation.size() >0 ">
+            AND operation in
+            <foreach collection="vo.operation" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="vo.operator != null and vo.operator != ''">
+            AND operator = #{vo.operator}
+        </if>
+        <if test="vo.operationStartTime != null and vo.operationStartTime != ''">
+            AND operation_time <![CDATA[ >= ]]> #{vo.operationStartTime}
+        </if>
+        <if test="vo.operationEndTime != null and vo.operationEndTime != ''">
+            AND operation_time <![CDATA[ <= ]]> #{vo.operationEndTime}
+        </if>
+
+        <choose>
+            <when test="vo.orderField == 'operationTime' and vo.orderType == 'asc'">
+                ORDER BY operationTime asc
+            </when>
+            <when test="vo.orderField == 'operationTime' and vo.orderType == 'desc'">
+                ORDER BY operationTime desc
+            </when>
+
+            <otherwise>
+                order by operation_time desc
+            </otherwise>
+        </choose>
+    </select>
+</mapper>

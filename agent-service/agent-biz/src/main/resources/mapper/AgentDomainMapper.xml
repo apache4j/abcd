@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentDomainRepository">
+    <select id="getPromotionDomain" resultType="com.cloud.baowang.agent.api.vo.domian.AgentDomainShortVO">
+        select domain_name as domainName, domain_type as domainType from agent_domain
+        where domain_type = #{vo.domainType}
+        and status = 1
+        and site_code = #{vo.siteCode}
+        and delete_status = 1
+        order by created_time desc
+        limit 1
+    </select>
+    <select id="getPromotionDomainAndSiteDomainPage"
+            resultType="com.cloud.baowang.agent.api.vo.PromotionDomainRespVO">
+        SELECT
+        url AS domainName,
+        0 AS shortType,
+        0 AS domainType,
+        '客户端专属域名' AS domainDescription
+        FROM (
+        WITH RECURSIVE numbers AS (
+        SELECT 1 AS n
+        UNION ALL
+        SELECT n + 1
+        FROM numbers
+        WHERE n &lt; (
+        SELECT LENGTH(short_url) - LENGTH(REPLACE(short_url, ',', '')) + 1
+        FROM agent_info
+        WHERE agent_account = #{param.agentAccount} AND site_code = #{param.siteCode}
+        )
+        )
+        SELECT
+        TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(short_url, ',', n), ',', -1)) AS url
+        FROM
+        agent_info
+        JOIN
+        numbers ON LENGTH(short_url) - LENGTH(REPLACE(short_url, ',', '')) &gt;= n - 1
+        WHERE
+        agent_account = #{param.agentAccount}
+        AND site_code = #{param.siteCode}
+        AND TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(short_url, ',', n), ',', -1)) &lt;&gt; ''
+        AND TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(short_url, ',', n), ',', -1)) &lt;&gt; ' '
+        ) AS short_table
+
+        UNION ALL
+
+        (
+        SELECT
+        domain_name AS domainName,
+        1 AS shortType,
+        domain_type AS domainType,
+        domain_description AS domainDescription
+        FROM
+        agent_domain
+        WHERE
+        site_code = #{param.siteCode}
+        <if test="param.domainType != null">
+            and domain_type = #{param.domainType}
+        </if>
+        ORDER BY
+        sort asc , updated_time desc
+        )
+
+    </select>
+
+</mapper>

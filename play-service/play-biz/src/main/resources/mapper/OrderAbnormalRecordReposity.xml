@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.play.repositories.OrderAbnormalRecordRepository">
+
+
+    <select id="getPage" resultType="com.cloud.baowang.play.po.OrderAbnormalRecordPO">
+        SELECT
+          *
+        FROM order_abnormal_record a
+        <where>
+            <if test="vo.siteCode != null and vo.siteCode !=''">
+                AND a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.orderId != null and vo.orderId !=''">
+               AND a.order_id = #{vo.orderId}
+            </if>
+            <if test="vo.thirdOrderId != null and vo.thirdOrderId !=''">
+                AND a.third_order_id = #{vo.thirdOrderId}
+            </if>
+            <if test="vo.currency != null and vo.currency !=''">
+                AND a.currency = #{vo.currency}
+            </if>
+            <if test="vo.venueTypeList != null and vo.venueTypeList.size() > 0">
+                AND a.venue_type in
+                <foreach collection="vo.venueTypeList" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.venueCode != null and vo.venueCode.size() > 0">
+                AND a.venue_code in
+                <foreach collection="vo.venueCode" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+
+            <if test="vo.userAccount != null and vo.userAccount !=''">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+
+            <if test="vo.betBeginTime != null">
+                AND a.bet_time <![CDATA[ >= ]]> #{vo.betBeginTime}
+            </if>
+            <if test="vo.betEndTime != null">
+                AND a.bet_time <![CDATA[ <= ]]> #{vo.betEndTime}
+            </if>
+
+            <if test="vo.gameName != null and vo.gameName !=''">
+                AND a.game_name = #{vo.gameName}
+            </if>
+
+            <if test="vo.accountType != null and vo.accountType.size() > 0">
+                AND a.account_type in
+                <foreach collection="vo.accountType" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+
+            <if test="vo.vipRankList != null and vo.vipRankList.size() > 0 ">
+                AND a.vip_rank in
+                <foreach collection="vo.vipRankList" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <!--vip等级-->
+            <if test="vo.vipGradeList != null and vo.vipGradeList.size() > 0 ">
+                AND a.vip_grade_code in
+                <foreach collection="vo.vipGradeList" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.betIp != null and vo.betIp !=''">
+                AND a.bet_ip = #{vo.betIp}
+            </if>
+            <if test="vo.settleBeginTime != null">
+                AND a.settle_time <![CDATA[ >= ]]> #{vo.settleBeginTime}
+            </if>
+            <if test="vo.settleEndTime != null">
+                AND a.settle_time <![CDATA[ <= ]]> #{vo.settleEndTime}
+            </if>
+            <if test="vo.agentAcct != null and vo.agentAcct !=''">
+                AND a.agent_acct = #{vo.agentAcct}
+            </if>
+            <if test="vo.casinoUserName != null and vo.casinoUserName !=''">
+                AND a.casino_user_name = #{vo.casinoUserName}
+            </if>
+
+            <if test="vo.gameNo != null and vo.gameNo !=''">
+                AND a.game_no = #{vo.gameNo}
+            </if>
+            <if test="vo.currency != null and vo.currency !=''">
+                AND a.currency = #{vo.currency}
+            </if>
+            <if test="vo.orderStatusList != null and vo.orderStatusList.size() > 0">
+                AND a.order_classify in
+                <foreach collection="vo.orderStatusList" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+
+            <!--<if test="vo.changeStatusList != null and vo.changeStatusList.size() > 0">
+                AND a.change_status in
+                <foreach collection="vo.changeStatusList" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>-->
+
+            <if test="vo.changeStatusList != null and vo.changeStatusList != ''">
+                AND a.change_status = #{vo.changeStatusList}
+            </if>
+
+            <if test="vo.betAmountMin != null">
+                AND a.bet_amount <![CDATA[ >= ]]> #{vo.betAmountMin}
+            </if>
+            <if test="vo.betAmountMax != null">
+                AND a.bet_amount <![CDATA[ <= ]]> #{vo.betAmountMax}
+            </if>
+            <if test="vo.winLossAmountMin != null">
+                AND a.win_loss_amount <![CDATA[ >= ]]> #{vo.winLossAmountMin}
+            </if>
+            <if test="vo.winLossAmountMax != null">
+                AND a.win_loss_amount <![CDATA[ <= ]]> #{vo.winLossAmountMax}
+            </if>
+        </where>
+        <choose>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''">
+                ORDER BY ${vo.orderField} ${vo.orderType}
+            </when>
+            <otherwise>
+                ORDER BY a.updated_time DESC
+            </otherwise>
+        </choose>
+
+    </select>
+
+    <select id="getTotalCount" resultType="java.lang.Long">
+        SELECT
+          count(id)
+        FROM order_abnormal_record a
+        <where>
+            <if test="vo.siteCode != null and vo.siteCode !=''">
+                AND a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.orderId != null and vo.orderId !=''">
+                AND a.order_id = #{vo.orderId}
+            </if>
+            <if test="vo.thirdOrderId != null and vo.thirdOrderId !=''">
+                AND a.third_order_id = #{vo.third_order_id}
+            </if>
+            <if test="vo.currency != null and vo.currency !=''">
+                AND a.currency = #{vo.currency}
+            </if>
+            <if test="vo.venueTypeList != null and vo.venueTypeList.size() > 0">
+                AND a.venue_type in
+                <foreach collection="vo.venueTypeList" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.venueCode != null and vo.venueCode.size() > 0">
+                AND a.venue_code in
+                <foreach collection="vo.venueCode" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+
+            <if test="vo.userAccount != null and vo.userAccount !=''">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+
+            <if test="vo.betBeginTime != null">
+                AND a.bet_time <![CDATA[ >= ]]> #{vo.betBeginTime}
+            </if>
+            <if test="vo.betEndTime != null">
+                AND a.bet_time <![CDATA[ <= ]]> #{vo.betEndTime}
+            </if>
+
+            <if test="vo.gameName != null and vo.gameName !=''">
+                AND a.game_name = #{vo.gameName}
+            </if>
+
+            <if test="vo.accountType != null and vo.accountType.size() > 0">
+                AND a.account_type in
+                <foreach collection="vo.accountType" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+
+            <if test="vo.vipRankList != null and vo.vipRankList.size() > 0 ">
+                AND a.vip_rank in
+                <foreach collection="vo.vipRankList" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <!--vip等级-->
+            <if test="vo.vipGradeList != null and vo.vipGradeList.size() > 0 ">
+                AND a.vip_grade_code in
+                <foreach collection="vo.vipGradeList" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.betIp != null and vo.betIp !=''">
+                AND a.bet_ip = #{vo.betIp}
+            </if>
+            <if test="vo.settleBeginTime != null">
+                AND a.settle_time <![CDATA[ >= ]]> #{vo.settleBeginTime}
+            </if>
+            <if test="vo.settleEndTime != null">
+                AND a.settle_time <![CDATA[ <= ]]> #{vo.settleEndTime}
+            </if>
+            <if test="vo.agentAcct != null and vo.agentAcct !=''">
+                AND a.agent_acct = #{vo.agentAcct}
+            </if>
+            <if test="vo.casinoUserName != null and vo.casinoUserName !=''">
+                AND a.casino_user_name = #{vo.casinoUserName}
+            </if>
+
+            <if test="vo.gameNo != null and vo.gameNo !=''">
+                AND a.game_no = #{vo.gameNo}
+            </if>
+            <if test="vo.currency != null and vo.currency !=''">
+                AND a.currency = #{vo.currency}
+            </if>
+            <if test="vo.orderStatusList != null and vo.orderStatusList.size() > 0">
+                AND a.order_classify in
+                <foreach collection="vo.orderStatusList" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+
+            <!--<if test="vo.changeStatusList != null and vo.changeStatusList.size() > 0">
+                AND a.change_status in
+                <foreach collection="vo.changeStatusList" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>-->
+
+            <if test="vo.changeStatusList != null and vo.changeStatusList != ''">
+                AND a.change_status = #{vo.changeStatusList}
+            </if>
+
+            <if test="vo.betAmountMin != null">
+                AND a.bet_amount <![CDATA[ >= ]]> #{vo.betAmountMin}
+            </if>
+            <if test="vo.betAmountMax != null">
+                AND a.bet_amount <![CDATA[ <= ]]> #{vo.betAmountMax}
+            </if>
+            <if test="vo.winLossAmountMin != null">
+                AND a.win_loss_amount <![CDATA[ >= ]]> #{vo.winLossAmountMin}
+            </if>
+            <if test="vo.winLossAmountMax != null">
+                AND a.win_loss_amount <![CDATA[ <= ]]> #{vo.winLossAmountMax}
+            </if>
+        </where>
+
+    </select>
+</mapper>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentRebateFinalReportRepository">
+
+
+    <select id="getFinalReportListGroupAgentId" resultType="com.cloud.baowang.agent.api.vo.commission.front.RebateBetDetailVO">
+        SELECT
+            t1.agent_id as agentId,
+            t2.venue_type as venueType,
+            sum(t2.valid_amount) as validAmount,
+            max(t1.rebate_amount) as commissionAmount,
+            max(t1.adjust_amount) as adjustAmount,
+            max(t1.rebate_adjust_amount) as rebateAdjustAmount
+        FROM
+        `agent_rebate_final_report` t1,
+        agent_rebate_report_detail t2
+        WHERE t1.id = t2.rebate_report_id
+        AND t1.id in (
+            select report_id from agent_commission_review_record t3
+            where t1.id = t3.report_id
+        <if test="vo.commissionType != null and vo.commissionType != ''">
+            AND t3.commission_type = #{vo.commissionType}
+        </if>
+        <if test="vo.statusList != null and vo.statusList.size() > 0">
+            and t3.order_status IN
+            <foreach collection="vo.statusList" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        )
+        AND t1.site_code = #{vo.siteCode}
+        <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+            and t1.agent_id IN
+            <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+
+        <if test="vo.agentAccount != null and vo.agentAccount != ''">
+            AND t1.agent_account = #{vo.agentAccount}
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND t1.end_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND t1.start_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        group by t1.agent_id, t2.venue_type
+    </select>
+
+    <select id="getPersonAmountGroupAgentId" resultType="com.cloud.baowang.agent.api.vo.commission.front.AgentPersonDetailVO">
+        SELECT
+        t1.agent_id as agentId,
+        sum(t1.new_valid_number) as newActiveNumber,
+        sum(t1.new_user_amount) as commissionAmount,
+        sum(t2.adjust_commission_amount) as reviewAdjustAmount
+        FROM
+        `agent_rebate_final_report` t1,
+        agent_commission_review_record t2
+        WHERE t1.id = t2.report_id
+        AND t1.site_code = #{vo.siteCode}
+        <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+            and t1.agent_id IN
+            <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.statusList != null and vo.statusList.size() > 0">
+            and t2.order_status IN
+            <foreach collection="vo.statusList" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.agentId != null and vo.agentId != ''">
+            AND t1.agent_id = #{vo.agentId}
+        </if>
+        <if test="vo.commissionType != null and vo.commissionType != ''">
+            AND t2.commission_type = #{vo.commissionType}
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND t1.end_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND t1.start_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        group by t1.agent_id
+    </select>
+</mapper>

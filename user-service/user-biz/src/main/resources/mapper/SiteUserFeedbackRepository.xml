@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.user.repositories.SiteUserFeedbackRepository">
+
+    <select id="feedbackList"
+            resultType="com.cloud.baowang.user.api.vo.user.SiteUserFeedbackSiteRespVO">
+        SELECT t2.*,
+        IF(t2.locker is not null and t2.locker = #{vo.curOperator}, 1,0) isSelf,
+        IF(t2.locker is null and t2.back_content is null, 1,0) unlocked,
+        IF(t2.back_content  is null or t2.back_content , 1, 0) back
+        FROM site_user_feedback t1
+        JOIN site_user_feedback t2 ON t1.feed_id = t2.id and t1.sort = 0
+        <where>
+            t1.site_code = #{siteCode}
+            <if test="vo.userAccount != null and vo.userAccount != ''">
+                AND t2.user_account like CONCAT('%',#{vo.userAccount}, '%')
+            </if>
+            <if test="vo.operator != null and vo.operator != ''">
+                AND t2.back_account like CONCAT('%',#{vo.operator}, '%')
+            </if>
+            <if test="vo.vipGradeCode != null and vo.vipGradeCode != ''">
+                AND t2.vip_grade_code = #{vo.vipGradeCode}
+            </if>
+            <if test="vo.lockStatus != null and vo.lockStatus != ''">
+                AND t2.lock_status = #{vo.lockStatus}
+            </if>
+            <if test="vo.type != null and vo.type != ''">
+                AND t2.type = #{vo.type}
+            </if>
+        </where>
+        <choose>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''">
+                ORDER BY ${vo.orderField} ${vo.orderType}
+            </when>
+            <when test="vo.curOperator != null and vo.curOperator != ''">
+                order BY isSelf desc, unlocked desc, back desc, updated_time desc
+            </when>
+            <otherwise>
+                order BY is_read asc, updated_time desc,created_time desc
+            </otherwise>
+        </choose>
+
+    </select>
+
+    <select id="latestReply" resultType="com.cloud.baowang.user.po.SiteUserFeedbackPO">
+        SELECT
+        *
+        FROM
+        site_user_feedback
+        WHERE
+        id IN ( SELECT max( id )
+        FROM site_user_feedback
+        WHERE
+        back_time > 0
+        <if test="vo != null and vo.size() > 0">
+            AND feed_id IN
+            <foreach collection="vo" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        GROUP BY feed_id )
+
+    </select>
+
+
+</mapper>

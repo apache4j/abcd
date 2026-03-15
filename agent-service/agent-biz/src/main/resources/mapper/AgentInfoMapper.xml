@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentInfoRepository">
+
+
+    <select id="findAgentInfoNotCase" resultType="com.cloud.baowang.agent.po.AgentInfoPO">
+        select
+        *
+        from agent_info
+        where
+        site_code = #{siteCode}
+        and LOWER(agent_account) = LOWER(#{agentAccount})
+    </select>
+
+    <select id="findAgentListByParam" resultType="java.lang.String">
+        select
+        agent_account
+        from agent_info
+        where site_code = #{siteCode}
+        and agent_account like concat ('%' #{agentAccount},'%')
+    </select>
+
+
+    <select id="findAllAgentInfoByIds" resultType="com.cloud.baowang.agent.api.vo.agentreview.list.GetAllListVO">
+        select a.id id,
+        a.agent_id agentId,
+        a.parent_id parentId,
+        a.path path,
+        a.agent_account agentAccount,
+        a.level level,
+        a.register_time registerTime
+        from agent_info a join  agent_info_relation b on a.agent_id=b.descendant_agent_id
+        <where>
+            <if test="ids != null and ids.size() > 0">
+                b.ancestor_agent_id in
+                <foreach collection="ids" item="id" separator=" , " open="  (" close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="findAllAgentInfoById" resultType="com.cloud.baowang.agent.api.vo.agentreview.list.GetAllListVO">
+        select
+        a.id as id,
+        a.agent_id agentId,
+        a.parent_id parentId,
+        a.path as path,
+        a.agent_account agentAccount,
+        a.level as level,
+        a.register_time registerTime
+        from agent_info a join  agent_info_relation b on a.agent_id=b.descendant_agent_id
+        where  b.ancestor_agent_id= #{id}
+    </select>
+
+    <select id="shortRecordPageList"
+            resultType="com.cloud.baowang.agent.api.vo.agentreview.info.ShortUrlChangeRecordPageVO">
+        SELECT
+        t3.short_url shortUrl,
+        t3.agent_account agentAccount,
+        t3.updated_time as operatorTime
+        from
+        agent_info t3
+        <where>
+            t3.short_url is not null and t3.short_url <![CDATA[ <> ]]>''
+            <if test="vo.agentAccount != '' and vo.agentAccount != null">
+                AND t3.agent_account = #{vo.agentAccount}
+            </if>
+            <if test="vo.shortUrl != '' and vo.shortUrl != null">
+                AND t3.short_url like concat('%', #{vo.shortUrl}, '%')
+            </if>
+        </where>
+
+    </select>
+
+
+    <select id="getAllList" resultType="com.cloud.baowang.agent.api.vo.agentreview.list.GetAllListVO">
+        SELECT
+        a.id id,
+        a.site_code siteCode,
+        a.parent_id parentId,
+        a.agent_id agentId,
+        a.path path,
+        a.agent_account agentAccount,
+        a.level level,
+        a.register_time registerTime
+        FROM agent_info a
+        where 1=1
+        <if test="siteCode!=null and siteCode!=''">
+            and a.site_code=#{siteCode}
+        </if>
+    </select>
+
+    <sql id="agent_page_condition">
+        <where>
+            <if test="vo.siteCode != null and vo.siteCode!='' ">
+                AND a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.inviteCode != null and vo.inviteCode!='' ">
+                AND a.invite_code = #{vo.inviteCode,jdbcType=VARCHAR}
+            </if>
+            <if test="vo.registerTimeStart != null">
+                AND a.register_time <![CDATA[ >= ]]> #{vo.registerTimeStart}
+            </if>
+            <if test="vo.registerTimeEnd != null">
+                AND a.register_time <![CDATA[ <= ]]> #{vo.registerTimeEnd}
+            </if>
+            <if test="vo.agentId != '' and vo.agentId != null">
+                <if test="vo.agentSubType == null">
+                    AND a.agent_id = #{vo.agentId}
+                </if>
+                <if test="vo.agentSubType != null">
+                    <if test="vo.agentSubType == 1">
+                        AND (a.agent_id = #{vo.agentId}
+                        OR a.parent_id = #{vo.agentId})
+                    </if>
+                    <if test="vo.agentSubType == 2">
+                        AND a.agent_id in(SELECT descendant_agent_id from agent_info_relation where ancestor_agent_id=#{vo.agentId})
+                    </if>
+                </if>
+            </if>
+            <if test="vo.agentType != null and vo.agentType.size() > 0">
+                AND a.agent_type IN
+                <foreach collection="vo.agentType" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.status != '' and vo.status != null">
+                AND FIND_IN_SET(#{vo.status}, a.status)
+            </if>
+            <if test="vo.riskLevelId != '' and vo.riskLevelId != null">
+                AND a.risk_level_id = #{vo.riskLevelId}
+            </if>
+            <if test="vo.merchantName != '' and vo.merchantName != null">
+                AND a.merchant_name = #{vo.merchantName}
+            </if>
+            <if test="vo.agentLabelId != '' and vo.agentLabelId != null">
+                AND FIND_IN_SET(#{vo.agentLabelId},a.agent_label_id)
+            </if>
+            <if test="vo.registerWay != null">
+                AND a.register_way = #{vo.registerWay}
+            </if>
+            <if test="vo.level != null">
+                AND a.level = #{vo.level}
+            </if>
+            <if test="vo.planName != null and vo.planName != ''">
+                AND acp.plan_name like concat('%', #{vo.planName}, '%')
+            </if>
+        </where>
+    </sql>
+
+    <select id="getAgentPage" resultType="com.cloud.baowang.agent.api.vo.agentinfo.AgentInfoResponseVO">
+        SELECT
+        a.id id,
+        a.agent_id agentId,
+        a.agent_account agentAccount,
+        a.invite_code inviteCode,
+        a.agent_attribution agentAttribution,
+        a.level level,
+        a.plan_code planCode,
+        acp.plan_name planName,
+        a.parent_id parentId,
+        a.agent_category agentCategory,
+        a.agent_type agentType,
+        a.status status,
+        a.risk_level_id riskLevelId,
+        a.agent_label_id agentLabelId,
+        a.register_way registerWay,
+        IFNULL(b.available_amount, 0) commissionWalletBalance,
+        IFNULL(c.available_amount, 0) quotaWalletBalance,
+        a.register_time registerTime,
+        a.last_login_time lastLoginTime,
+        a.agent_white_list agentWhiteList,
+        a.merchant_account merchantAccount,
+        a.merchant_name merchantName
+        FROM agent_info a
+        left join agent_commission_coin b on a.agent_id = b.agent_id
+        left join agent_quota_coin c on a.agent_id = c.agent_id
+        join agent_commission_plan acp on acp.plan_code = a.plan_code
+        <include refid="agent_page_condition"/>
+        <choose>
+            <when test="vo.orderField == 'registerTime' and vo.orderType == 'asc'">
+                ORDER BY registerTime asc
+            </when>
+            <when test="vo.orderField == 'registerTime' and vo.orderType == 'desc'">
+                ORDER BY registerTime desc
+            </when>
+            <otherwise>
+                ORDER BY a.register_time DESC, a.last_login_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="getTotalPage" resultType="com.cloud.baowang.agent.api.vo.agentinfo.AgentInfoResponseVO">
+        SELECT
+        a.id id,
+        a.agent_id agentId,
+        a.agent_account agentAccount,
+        a.level,
+        IFNULL(b.available_amount, 0) commissionWalletBalance,
+        IFNULL(c.available_amount, 0) quotaWalletBalance
+        FROM agent_info a
+        left join agent_commission_coin b on a.agent_id = b.agent_id
+        left join agent_quota_coin c on a.agent_id = c.agent_id
+        join  agent_info_relation ar on a.agent_id=ar.descendant_agent_id
+        <if test="vo.planName != null and vo.planName != ''">
+            join agent_commission_plan acp on acp.plan_code = a.plan_code
+        </if>
+        <include refid="agent_page_condition"/>
+    </select>
+
+    <select id="getTotalCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM agent_info a
+        join  agent_info_relation ar on a.agent_id=ar.descendant_agent_id
+        <if test="vo.planName != null and vo.planName != ''">
+            join agent_commission_plan acp on acp.plan_code = a.plan_code
+        </if>
+        <include refid="agent_page_condition"/>
+    </select>
+
+
+    <select id="selectByAgentId" resultType="com.cloud.baowang.agent.po.AgentInfoPO">
+        select
+        *
+        from agent_info
+        where agent_id=#{agentId,jdbcType=VARCHAR}
+    </select>
+
+
+    <select id="findByParentId" resultType="com.cloud.baowang.agent.api.vo.agentreview.list.GetAllListVO">
+        select a.id id,
+        a.agent_id agentId,
+        a.parent_id parentId,
+        a.path path,
+        a.agent_account agentAccount,
+        a.level level,
+        a.register_time registerTime
+        from agent_info a
+        <where>
+            <if test="parentIds != null and parentIds.size() > 0">
+                AND a.parent_id IN
+                <foreach collection="parentIds" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="agentLabelCount" resultType="com.cloud.baowang.agent.api.vo.label.AgentInfoLabelCountVO">
+        select count(1) as count, agent_label_id as agentLabelId
+        from agent_info
+        where agent_label_id is not null
+        and agent_label_id in
+        <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        group by agent_label_id;
+    </select>
+
+    <select id="findAllChildAgentsByPage" resultType="com.cloud.baowang.agent.api.vo.agentreview.info.AgentInfoVO">
+        select
+        a.id,
+        a.agent_id agentId,
+        a.agent_account agentAccount,
+        a.level ,
+        a.super_remark superRemark,
+        a.register_time registerTime
+        from agent_info a
+        join  agent_info_relation b on a.agent_id=b.descendant_agent_id
+        <where>
+            a.site_code = #{vo.siteCode}
+            <if test="vo.lowerLevelAccount != null and vo.lowerLevelAccount != ''">
+                and a.agent_account = #{vo.lowerLevelAccount}
+            </if>
+            <choose>
+                <when test="containsSelf != null and containsSelf ">
+                    and b.ancestor_agent_id=#{vo.agentId}
+                    and a.level <![CDATA[ >= ]]> #{vo.level}
+                    order by a.level asc ,a.created_time asc
+                </when>
+                <otherwise>
+                    and b.ancestor_agent_id=#{vo.agentId}
+                    and a.level <![CDATA[ > ]]> #{vo.level}
+                    order by a.created_time desc
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <select id="findAllDirectChildAgents" resultType="com.cloud.baowang.agent.api.vo.agentreview.info.AgentInfoVO">
+        select
+        id,
+        agent_id agentId,
+        agent_account agentAccount,
+        level ,
+        super_remark superRemark
+        from agent_info where 1=1
+        <if test="agentIds != null and agentIds.size > 0">
+            AND parent_id in
+            <foreach collection="agentIds" item="value" open="(" separator="," close=")">
+                #{value}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="findAgentInfoByAgentAccounts" resultType="com.cloud.baowang.agent.api.vo.agentreview.info.AgentInfoVO">
+        select
+        id,
+        agent_id agentId,
+        agent_account agentAccount,
+        level ,
+        super_remark superRemark
+        from agent_info where 1=1
+        <if test="agentAccounts != null and agentAccounts.size > 0">
+            AND agent_account in
+            <foreach collection="agentAccounts" item="value" open="(" separator="," close=")">
+                #{value}
+            </foreach>
+        </if>
+    </select>
+
+
+    <select id="findByIdSelf" resultType="com.cloud.baowang.agent.api.vo.agentreview.info.AgentInfoVO">
+        select
+        id,
+        agent_id agentId,
+        agent_account agentAccount,
+        level ,
+        super_remark superRemark
+        from agent_info where agent_id = #{agentId}
+
+    </select>
+
+    <!--<select id="findAgentSubLineUserNum"
+            resultType="com.cloud.baowang.agent.api.vo.agent.agentLowerLevelManager.AgentSubLineUserResVO"
+            parameterType="com.cloud.baowang.agent.api.vo.agent.agentLowerLevelManager.AgentSubLineReqVO">
+        select
+        main_currency mainCurrency,
+        super_agent_account agentAccount,
+        count(user_account) subLineUserNum,
+        count(first_deposit_amount > 0 or null) userFirstDepositNum,
+        IFNULL(sum(first_deposit_amount),0) userFirstDepositAmount
+        from user_info where
+        super_agent_account in
+        <foreach collection="vo.agentAccountList" item="value" separator="," open="(" close=")">
+            #{value}
+        </foreach>
+        <if test="vo.currency != null and vo.currency != ''">
+            AND main_currency = #{vo.currency}
+        </if>
+        and binding_agent_time <![CDATA[ >= ]]> #{vo.startTime}
+        and binding_agent_time <![CDATA[ <= ]]> #{vo.endTime}
+        group by super_agent_account,main_currency
+    </select>-->
+
+    <select id="findAgentInfoTree" resultType="com.cloud.baowang.agent.po.AgentInfoPO">
+        select
+        a.*
+        from agent_info a
+        join  agent_info_relation b on a.agent_id=b.descendant_agent_id
+        where b.ancestor_agent_id=#{agentId}
+    </select>
+
+    <select id="getAgentLabelCount" resultType="java.lang.Long">
+        SELECT COUNT(id)
+        FROM agent_info
+        WHERE FIND_IN_SET(#{labelId}, agent_label_id) > 0
+    </select>
+    <select id="findInSetPageByLabelId" resultType="com.cloud.baowang.agent.po.AgentInfoPO">
+        SELECT
+        agent_account as agentAccount,
+        agent_type as agentType
+        FROM agent_info
+        WHERE FIND_IN_SET(#{labelId}, agent_label_id) > 0
+    </select>
+
+    <select id="getSubAgentIdList" resultType="java.lang.String">
+        select
+        a.agent_id
+        from agent_info a
+        join  agent_info_relation b on a.agent_id=b.descendant_agent_id
+        where b.ancestor_agent_id=#{agentId}
+    </select>
+
+
+    <select id="getSubAgentIdDirectReportList" resultType="java.lang.String">
+        select
+        agent_id
+        from agent_info
+        where parent_id = #{agentId}
+    </select>
+
+
+    <select id="getAgentBenefit" resultType="com.cloud.baowang.agent.api.vo.agentreview.info.AgentInfoVO">
+        SELECT
+        t1.agent_id as agentId,
+        t1.agent_account as agentAccount,
+        t1.user_benefit as userBenefit,
+        t1.fb_token as FbToken,
+        t1.fb_pix_id as FbPixId,
+        t1.google_token as GoogleToken,
+        t1.google_pix_id as GooglePixId
+        FROM
+        user_info t,
+        agent_info t1
+        WHERE
+        t.super_agent_id = t1.agent_id
+        AND t.user_id = #{userId}
+    </select>
+    <select id="selectLabelUseCount" resultType="java.lang.Long">
+        SELECT count(id)
+        FROM agent_info
+        WHERE FIND_IN_SET(#{labelId}, agent_label_id) > 0
+    </select>
+
+    <select id="getCountGroupByMerchant" resultType="com.cloud.baowang.agent.api.vo.merchant.MerchantAgentCountVO">
+        SELECT merchant_account as merchantAccount, COUNT(*) AS agentCount
+        FROM agent_info
+        WHERE merchant_account IN
+        <foreach collection="merchantAccountList" separator="," open="(" close=")" item="merchantAccount">
+            #{merchantAccount}
+        </foreach>
+        AND level = 1
+        and site_code = #{siteCode}
+        GROUP BY merchant_account
+    </select>
+    <select id="selectAgentCount" resultType="java.lang.Long">
+        select count(id) from agent_info where site_code = #{siteCode} and merchant_account = #{merchantAccount} and
+        parent_account is NULL
+    </select>
+    <select id="pageQuery" resultType="com.cloud.baowang.agent.po.AgentInfoPO">
+        SELECT *
+        FROM (
+        WITH RECURSIVE numbers AS (
+        SELECT 1 AS n
+        UNION ALL
+        SELECT n + 1
+        FROM numbers
+        WHERE n &lt;= 30
+        )
+        SELECT
+        agent_info.id AS id,
+        agent_info.agent_account AS agentAccount,
+        agent_info.bind_short_url_operator AS bindShortUrlOperator,
+        agent_info.bind_short_url_time AS bindShortUrlTime,
+        TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(agent_info.short_url, ',', numbers.n), ',', -1)) AS shortUrl
+        FROM
+        agent_info
+        JOIN
+        numbers ON LENGTH(agent_info.short_url) - LENGTH(REPLACE(agent_info.short_url, ',', '')) &gt;= numbers.n - 1
+        <where>
+            <if test="param.siteCode != null and param.siteCode != ''">
+                AND agent_info.site_code = #{param.siteCode}
+            </if>
+        </where>
+        ) t1
+        <where>
+            <if test="param.agentAccount != null and param.agentAccount != ''">
+                AND t1.agentAccount = #{param.agentAccount}
+            </if>
+            <if test="param.shortUrl != null and param.shortUrl != ''">
+                AND t1.shortUrl LIKE CONCAT('%', #{param.shortUrl}, '%')
+            </if>
+            <if test="param.bindShortUrlOperator != null and param.bindShortUrlOperator != ''">
+                AND t1.bindShortUrlOperator = #{param.bindShortUrlOperator}
+            </if>
+        </where>
+        ORDER BY t1.bindShortUrlTime DESC,t1.shortUrl desc
+    </select>
+
+    <select id="selectAgentTeamNumMerchant"  resultType="java.lang.Long">
+        select count(id) from agent_info where site_code = #{siteCode} and merchant_account = #{merchantAccount}
+    </select>
+
+
+    <select id="queryWithdrawWay"  resultType="com.cloud.baowang.agent.api.vo.withdrawConfig.AgentWithdrawWayVO">
+        SELECT si.site_code as siteCode,
+               sy.currency_code as currency,
+               si.withdraw_id as withdrawWayId,
+               sy.withdraw_way_i18 as withdrawWayI18
+        FROM site_withdraw_way si inner JOIN system_withdraw_way sy ON si.withdraw_id=sy.id
+        WHERE si.status=1 and si.site_code=#{siteCode}
+    </select>
+
+
+    <select id="listPage" resultType="com.cloud.baowang.agent.api.vo.agentinfo.AgentInfoPageResultVo">
+        SELECT
+         *
+        FROM agent_info
+        where 1=1
+        <if test="vo.siteCode!=null">
+            and site_code=#{vo.siteCode,jdbcType=VARCHAR}
+        </if>
+        <if test="vo.inviteCode!=null">
+            and invite_code=#{vo.inviteCode,jdbcType=VARCHAR}
+        </if>
+        <if test="vo.registerTimeStart != null">
+            AND register_time <![CDATA[ >= ]]> #{vo.registerTimeStart}
+        </if>
+        <if test="vo.registerTimeEnd != null">
+            AND register_time <![CDATA[ <= ]]> #{vo.registerTimeEnd}
+        </if>
+    </select>
+    <select id="getAgentBenefitList" resultType="com.cloud.baowang.agent.api.vo.agentreview.info.AgentInfoVO">
+        SELECT
+        t1.agent_id as agentId,
+        t1.agent_account as agentAccount,
+        t1.user_benefit as userBenefit,
+        t.user_id as userId
+        FROM
+        user_info t,
+        agent_info t1
+        WHERE
+        t.super_agent_id = t1.agent_id
+        AND t.user_id in
+        <foreach collection="userId" separator="," open="(" close=")" item="u">
+            #{u}
+        </foreach>
+    </select>
+</mapper>

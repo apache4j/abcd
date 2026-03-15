@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.activity.repositories.SiteActivityFreeGameRecordRepository">
+
+
+
+    <select id="getLatestUserRecord" resultType="com.cloud.baowang.activity.po.SiteActivityFreeGameRecordPO">
+        SELECT t1.*
+        FROM site_activity_free_game_record t1
+        JOIN (
+        SELECT user_id, MAX(id) AS max_id
+        FROM site_activity_free_game_record
+        <where>
+            <if test="userIds != null and userIds.size() > 0">
+                AND user_id in
+                <foreach collection="userIds" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="siteCode != null and siteCode !=''">
+                AND site_code = #{siteCode}
+            </if>
+            <if test="venueCode != null and venueCode !=''">
+                AND venue_code = #{venueCode}
+            </if>
+
+        </where>
+        GROUP BY user_id
+        ) t2
+        ON t1.id = t2.max_id;
+    </select>
+
+    <select id="queryGameAuthorize" resultType="com.cloud.baowang.play.api.vo.venue.SiteGameResponsePageVO">
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            SELECT
+            t.id as id,
+            t.game_id as gameId,
+            t.game_name as gameName,
+            t.venue_name as venueName,
+            t.venue_type as venueType,
+            t.status as status,
+            t.updated_time as operatorTime,
+            t.updater_name as operator,
+            (case when t.id = t1.game_info_id then 1
+            else 0 end) as chooseFlag
+            FROM
+            game_info t left join site_game t1
+            on
+            t.id = t1.game_info_id and t1.site_code = #{vo.siteCode}
+            WHERE t.venue_code = #{vo.venueCode}
+            <if test="vo.gameName !=null and vo.gameName!=''">
+                and t.game_name = #{vo.gameName}
+            </if>
+            <if test="vo.gameId !=null and vo.gameId!=''">
+                and t.game_id = #{vo.gameId}
+            </if>
+            <if test="vo.status !=null and vo.status!=''">
+                and t.status = #{vo.status}
+            </if>
+            order by t.status asc, t.updated_time desc
+        </if>
+        <if test="vo.siteCode == null or vo.siteCode == ''">
+            SELECT
+            t.id as id,
+            t.game_id as gameId,
+            t.game_name as gameName,
+            t.venue_name as venueName,
+            t.venue_type as venueType,
+            t.status as status,
+            t.updated_time as operatorTime,
+            t.updater_name as operator
+            FROM
+            game_info t
+            WHERE t.venue_code = #{vo.venueCode}
+            <if test="vo.gameName !=null and vo.gameName!=''">
+                and t.game_name = #{vo.gameName}
+            </if>
+            <if test="vo.gameId !=null and vo.gameId!=''">
+                and t.game_id = #{vo.gameId}
+            </if>
+            <if test="vo.status !=null and vo.status!=''">
+                and t.status = #{vo.status}
+            </if>
+            order by t.status asc, t.updated_time desc
+        </if>
+
+    </select>
+</mapper>

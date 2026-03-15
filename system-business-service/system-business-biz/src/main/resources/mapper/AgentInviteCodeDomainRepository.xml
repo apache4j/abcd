@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.system.repositories.AgentInviteCodeDomainRepository">
+
+    <select id="getDomainAndInCode" resultType="com.cloud.baowang.system.api.vo.AgentInviteCodeDomainVO">
+        select invite_code inviteCode,di.domain_addr domainAddr,ai.site_code siteCode,
+        ai.fb_pix_id FbPixId,
+        ai.fb_token FbToken,
+        ai.google_pix_id GooglePixId,
+        ai.google_token GoogleToken
+        from agent_info ai
+        left join domain_info di on ai.site_code = di.site_code
+        where
+        FIND_IN_SET(#{shortUrl},short_url) > 0
+        and di.domain_type = #{domainType} and di.bind = #{bind}
+        order by di.updated_time desc limit 0,1
+    </select>
+</mapper>

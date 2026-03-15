@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.user.repositories.SiteUserLabelConfigRecordRepository">
+
+    <select id="getLabelConfigRecordPage"
+            resultType="com.cloud.baowang.user.api.vo.userlabel.UserLabelConfigRecordPageResVO">
+        SELECT
+        a.id id,
+        a.label_name labelName,
+        a.change_type changeType,
+        a.before_change beforeChange,
+        a.after_change afterChange,
+        a.last_operator updaterName,
+        a.created_time updatedTime
+        FROM site_user_label_config_record a
+        <where>
+            a.site_code = #{siteCode}
+            <if test="vo.updateTimeStart != null">
+                AND a.created_time <![CDATA[ >= ]]> #{vo.updateTimeStart}
+            </if>
+            <if test="vo.updateTimeEnd != null">
+                AND a.created_time <![CDATA[ <= ]]> #{vo.updateTimeEnd}
+            </if>
+            <if test="vo.changeType != '' and vo.changeType != null">
+                AND a.change_type = #{vo.changeType}
+            </if>
+            <if test="vo.updaterName != '' and vo.updaterName != null">
+                AND a.last_operator like CONCAT('%',#{vo.updaterName}, '%')
+            </if>
+        </where>
+        <choose>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''">
+                ORDER BY ${vo.orderField} ${vo.orderType}
+            </when>
+            <otherwise>
+                ORDER BY a.created_time DESC
+            </otherwise>
+        </choose>
+
+    </select>
+
+    <select id="getLabelConfigRecordTotal" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM site_user_label_config_record a
+        <where>
+            and a.site_code = #{siteCode}
+            <if test="vo.updateTimeStart != null">
+                AND a.created_time <![CDATA[ >= ]]> #{vo.updateTimeStart}
+            </if>
+            <if test="vo.updateTimeEnd != null">
+                AND a.created_time <![CDATA[ <= ]]> #{vo.updateTimeEnd}
+            </if>
+            <if test="vo.changeType != '' and vo.changeType != null">
+                AND a.change_type = #{vo.changeType}
+            </if>
+            <if test="vo.updaterName != '' and vo.updaterName != null">
+                AND a.last_operator = #{vo.updaterName}
+            </if>
+        </where>
+
+    </select>
+
+</mapper>

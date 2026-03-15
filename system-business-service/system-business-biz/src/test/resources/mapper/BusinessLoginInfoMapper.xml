@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.system.repositories.member.BusinessLoginInfoRepository">
+
+
+    <select id="queryBusinessLoginInfoPage" resultType="com.cloud.baowang.system.api.vo.member.BusinessLoginInfoVO">
+
+        SELECT
+        a.user_name as userName,
+        a.ipaddr as ipaddr,
+        a.login_location as loginLocation,
+        a.browser as browser,
+        a.os as os,
+        a.device_code as deviceCode,
+        a.status as status,
+        a.access_time as accessTime,
+        a.user_id as userId
+        FROM business_login_info a
+        <where>
+            <if test="vo.loginStartTime != null">
+                AND a.access_time <![CDATA[ >= ]]> #{vo.loginStartTime}
+            </if>
+            <if test="vo.loginEndTime != null">
+                AND a.access_time <![CDATA[ <= ]]> #{vo.loginEndTime}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_name like   concat('%', #{vo.userAccount}, '%')
+            </if>
+            <if test="vo.loginType != null">
+                AND a.status = #{vo.loginType}
+            </if>
+            <!--            <if test="vo.accountType != null and vo.accountType.size() > 0">-->
+            <!--                AND a.account_type IN-->
+            <!--                <foreach collection="vo.accountType" item="value" separator="," open="(" close=")">-->
+            <!--                    #{value}-->
+            <!--                </foreach>-->
+            <!--            </if>-->
+            <if test="vo.loginTerminal != null">
+                AND a.os = #{vo.os}
+            </if>
+            <if test="vo.ip != '' and vo.ip != null">
+                AND a.ipaddr = #{vo.ip}
+            </if>
+            <if test="vo.deviceNo != '' and vo.deviceNo != null">
+                AND a.device_code = #{vo.deviceNo}
+            </if>
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND a.site_code = #{vo.siteCode}
+            </if>
+        </where>
+
+        <!--<choose>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''
+                            and (vo.orderName == null or vo.orderName == '')
+                            and (vo.orderValue == null or vo.orderValue == '')">
+                ORDER BY ${vo.orderField} ${vo.orderType}
+            </when>
+            <when test="vo.orderName != null and vo.orderName != ''
+                            and vo.orderValue != null and vo.orderValue != ''
+                            and (vo.orderField == null or vo.orderField == '')
+                            and (vo.orderType == null or vo.orderType == '')">
+                ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc
+            </when>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''
+                            and vo.orderName != null and vo.orderName != ''
+                            and vo.orderValue != null and vo.orderValue != ''">
+                ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc, ${vo.orderField} ${vo.orderType}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>-->
+        ORDER BY a.access_time DESC
+
+    </select>
+
+
+</mapper>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.user.repositories.SiteUserInviteRecordRepository">
+
+    <select id="getInviteRecordPage" resultType="com.cloud.baowang.user.api.vo.user.invite.SiteUserInviteRecordResVO">
+        SELECT
+        t1.id as id,
+        t1.currency as currency,
+        t1.invite_code as inviteCode,
+        t1.register_time as registerTime,
+        t1.user_id as userId,
+        t1.user_account as userAccount,
+        t1.target_account as targetAccount,
+        t1.target_user_id as targetUserId,
+        t1.creator as creator,
+        t1.created_time as createdTime,
+        t1.updater as updater,
+        t1.updated_time as updatedTime,
+        t2.first_deposit_time as firstDepositTime
+        FROM
+        `site_user_invite_record` t1,
+        user_info t2
+        where t1.target_user_id = t2.user_id
+          and t2.site_code = #{vo.siteCode}
+        <if test="vo.startTime != null">
+            AND t1.register_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND t1.register_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        <if test="vo.userAccount != '' and vo.userAccount != null">
+            AND t1.user_account = #{vo.userAccount}
+        </if>
+
+        <if test="vo.targetAccount != '' and vo.targetAccount != null">
+            AND t1.target_account = #{vo.targetAccount}
+        </if>
+
+        <if test="vo.inviteCode != '' and vo.inviteCode != null">
+            AND t1.invite_code = #{vo.inviteCode}
+        </if>
+        order by t2.first_deposit_time desc
+    </select>
+
+
+    <select id="getInviteRecord" resultType="com.cloud.baowang.user.api.vo.user.invite.SiteUserInviteRecordTaskResVO">
+        SELECT
+        t1.id as id,
+        t1.currency as currency,
+        t1.invite_code as inviteCode,
+        t1.register_time as registerTime,
+        t1.user_id as userId,
+        t1.user_account as userAccount,
+        t1.target_account as targetAccount,
+        t1.target_user_id as targetUserId,
+        t1.creator as creator,
+        t1.created_time as createdTime,
+        t1.updater as updater,
+        t1.updated_time as updatedTime,
+        t2.first_deposit_time as firstDepositTime,
+        t2.first_deposit_amount as firstDepositAmount
+        FROM
+        `site_user_invite_record` t1,
+        user_info t2
+        where t1.target_user_id = t2.user_id
+        and t2.first_deposit_time is not null
+          and t2.first_deposit_amount > 0
+        and t2.site_code = #{vo.siteCode}
+        <if test="vo.startTime != null">
+            AND t2.register_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND t2.register_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        <if test="vo.userId != '' and vo.userId != null">
+            AND t1.user_id = #{vo.userId}
+        </if>
+        <if test="vo.userAccount != '' and vo.userAccount != null">
+            AND t1.user_account = #{vo.userAccount}
+        </if>
+
+        <if test="vo.startTime != null">
+            AND t2.first_deposit_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND t2.first_deposit_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+
+    </select>
+</mapper>

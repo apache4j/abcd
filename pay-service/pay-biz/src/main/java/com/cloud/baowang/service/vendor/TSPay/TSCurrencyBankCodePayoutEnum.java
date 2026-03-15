@@ -1,0 +1,238 @@
+package com.cloud.baowang.service.vendor.TSPay;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.Arrays;
+import java.util.Optional;
+
+@SuppressWarnings("SpellCheckingInspection")
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public enum TSCurrencyBankCodePayoutEnum {
+
+    //巴西
+
+    PIX_CPF("BRL","PIX_CPF", "/cashout/bra/order/create"),
+    PIX_CNPJ("BRL","PIX_CNPJ", "/cashout/bra/order/create"),
+    PIX_PHONE("BRL","PIX_PHONE", "/cashout/bra/order/create"),
+    PIX_EMAIL("BRL","PIX_EMAIL", "/cashout/bra/order/create"),
+    PIX_EVP("BRL","PIX_EVP", "/cashout/bra/order/create"),
+
+    //印度
+    BANK_IN("INR","BANK_IN", "/cashout/india/order/create"),
+
+    //菲律宾
+    GCASH("PHP", "GCASH", "/cashout/ph/order/create"),
+    BPI("PHP", "BPI", "/cashout/ph/order/create"),
+    UNIBANK("PHP", "UNIBANK", "/cashout/ph/order/create"),
+    MBT("PHP", "MBT", "/cashout/ph/order/create"),
+    LBOB("PHP", "LBOB", "/cashout/ph/order/create"),
+    SBC("PHP", "SBC", "/cashout/ph/order/create"),
+    UBP("PHP", "UBP", "/cashout/ph/order/create"),
+    PNB("PHP", "PNB", "/cashout/ph/order/create"),
+    CBC("PHP", "CBC", "/cashout/ph/order/create"),
+    EWBC("PHP", "EWBC", "/cashout/ph/order/create"),
+    RCBC("PHP", "RCBC", "/cashout/ph/order/create"),
+    UCPB("PHP", "UCPB", "/cashout/ph/order/create"),
+    PSB("PHP", "PSB", "/cashout/ph/order/create"),
+    AUB("PHP", "AUB", "/cashout/ph/order/create"),
+    PBC("PHP", "PBC", "/cashout/ph/order/create"),
+    DBP("PHP", "DBP", "/cashout/ph/order/create"),
+    AB("PHP", "AB", "/cashout/ph/order/create"),
+    ASENSO("PHP", "ASENSO", "/cashout/ph/order/create"),
+    BM("PHP", "BM", "/cashout/ph/order/create"),
+    BC("PHP", "BC", "/cashout/ph/order/create"),
+    BK("PHP", "BK", "/cashout/ph/order/create"),
+    BAYAD("PHP", "BAYAD", "/cashout/ph/order/create"),
+    BNB("PHP", "BNB", "/cashout/ph/order/create"),
+    CB("PHP", "CB", "/cashout/ph/order/create"),
+    CARD_BANK("PHP", "CARD_BANK", "/cashout/ph/order/create"),
+    CLB("PHP", "CLB", "/cashout/ph/order/create"),
+    CBS("PHP", "CBS", "/cashout/ph/order/create"),
+    COINS("PHP", "COINS", "/cashout/ph/order/create"),
+    CTBC("PHP", "CTBC", "/cashout/ph/order/create"),
+    DCDB("PHP", "DCDB", "/cashout/ph/order/create"),
+    DB("PHP", "DB", "/cashout/ph/order/create"),
+    ESB("PHP", "ESB", "/cashout/ph/order/create"),
+    GP("PHP", "GP", "/cashout/ph/order/create"),
+    IB("PHP", "IB", "/cashout/ph/order/create"),
+    ISLA("PHP", "ISLA", "/cashout/ph/order/create"),
+    JC("PHP", "JC", "/cashout/ph/order/create"),
+    KOMO("PHP", "KOMO", "/cashout/ph/order/create"),
+    LSB("PHP", "LSB", "/cashout/ph/order/create"),
+    MBS("PHP", "MBS", "/cashout/ph/order/create"),
+    MBP("PHP", "MBP", "/cashout/ph/order/create"),
+    MCCB("PHP", "MCCB", "/cashout/ph/order/create"),
+    NB("PHP", "NB", "/cashout/ph/order/create"),
+    OP("PHP", "OP", "/cashout/ph/order/create"),
+    PRB("PHP", "PRB", "/cashout/ph/order/create"),
+    PMP("PHP", "PMP", "/cashout/ph/order/create"),
+    PBB("PHP", "PBB", "/cashout/ph/order/create"),
+    PTC("PHP", "PTC", "/cashout/ph/order/create"),
+    PDB("PHP", "PDB", "/cashout/ph/order/create"),
+    QB("PHP", "QB", "/cashout/ph/order/create"),
+    QCRB("PHP", "QCRB", "/cashout/ph/order/create"),
+    RSB("PHP", "RSB", "/cashout/ph/order/create"),
+    RBB("PHP", "RBB", "/cashout/ph/order/create"),
+    SB("PHP", "SB", "/cashout/ph/order/create"),
+    SP("PHP", "SP", "/cashout/ph/order/create"),
+    SCB("PHP", "SCB", "/cashout/ph/order/create"),
+    STP("PHP", "STP", "/cashout/ph/order/create"),
+    SLB("PHP", "SLB", "/cashout/ph/order/create"),
+    SSB("PHP", "SSB", "/cashout/ph/order/create"),
+    TC("PHP", "TC", "/cashout/ph/order/create"),
+    USB("PHP", "USB", "/cashout/ph/order/create"),
+    USSC("PHP", "USSC", "/cashout/ph/order/create"),
+    VB("PHP", "VB", "/cashout/ph/order/create"),
+    WDB("PHP", "WDB", "/cashout/ph/order/create"),
+
+    //越南
+    ZALOPAY("VND", "ZALOPAY", "/cashout/vn/order/create"),
+    ABB("VND", "ABB", "/cashout/vn/order/create"),
+    ACB("VND", "ACB", "/cashout/vn/order/create"),
+    AGRIBANK("VND", "AGRIBANK", "/cashout/vn/order/create"),
+    BACABANK("VND", "BACABANK", "/cashout/vn/order/create"),
+    BIDV("VND", "BIDV", "/cashout/vn/order/create"),
+    DONGABANK("VND", "DONGABANK", "/cashout/vn/order/create"),
+    EIB("VND", "EIB", "/cashout/vn/order/create"),
+    GPBANK("VND", "GPBANK", "/cashout/vn/order/create"),
+    HDB("VND", "HDB", "/cashout/vn/order/create"),
+    HLBANK("VND", "HLBANK", "/cashout/vn/order/create"),
+    HSBC("VND", "HSBC", "/cashout/vn/order/create"),
+    IVB("VND", "IVB", "/cashout/vn/order/create"),
+    KienLongBank("VND", "KienLongBank", "/cashout/vn/order/create"),
+    LVPB("VND", "LVPB", "/cashout/vn/order/create"),
+    MB("VND", "MB", "/cashout/vn/order/create"),
+    MSB("VND", "MSB", "/cashout/vn/order/create"),
+    NAMABANK("VND", "NAMABANK", "/cashout/vn/order/create"),
+    NCB("VND", "NCB", "/cashout/vn/order/create"),
+    OCB("VND", "OCB", "/cashout/vn/order/create"),
+    OJB("VND", "OJB", "/cashout/vn/order/create"),
+    PGBANK("VND", "PGBANK", "/cashout/vn/order/create"),
+    PVCOMBANK("VND", "PVCOMBANK", "/cashout/vn/order/create"),
+    SACOMBANK("VND", "SACOMBANK", "/cashout/vn/order/create"),
+    SAIGONBANK("VND", "SAIGONBANK", "/cashout/vn/order/create"),
+    SCBVND("VND", "SCB", "/cashout/vn/order/create"),
+    SEABANK("VND", "SEABANK", "/cashout/vn/order/create"),
+    SHB("VND", "SHB", "/cashout/vn/order/create"),
+    SHINABANK("VND", "SHINABANK", "/cashout/vn/order/create"),
+    TCB("VND", "TCB", "/cashout/vn/order/create"),
+    TPB("VND", "TPB", "/cashout/vn/order/create"),
+    VCB("VND", "VCB", "/cashout/vn/order/create"),
+    VIB("VND", "VIB", "/cashout/vn/order/create"),
+    VIETABANK("VND", "VIETABANK", "/cashout/vn/order/create"),
+    VIETCAPITALBANK("VND", "VIETCAPITALBANK", "/cashout/vn/order/create"),
+    VPB("VND", "VPB", "/cashout/vn/order/create"),
+    VTB("VND", "VTB", "/cashout/vn/order/create"),
+    WOORIBANK("VND", "WOORIBANK", "/cashout/vn/order/create"),
+    BVB("VND", "BVB", "/cashout/vn/order/create"),
+    STB("VND", "STB", "/cashout/vn/order/create"),
+
+    KVZALOPAY("KVND", "ZALOPAY", "/cashout/vn/order/create"),
+    KVABB("KVND", "ABB", "/cashout/vn/order/create"),
+    KVACB("KVND", "ACB", "/cashout/vn/order/create"),
+    KVAGRIBANK("KVND", "AGRIBANK", "/cashout/vn/order/create"),
+    KVBACABANK("KVND", "BACABANK", "/cashout/vn/order/create"),
+    KVBIDV("KVND", "BIDV", "/cashout/vn/order/create"),
+    KVDONGABANK("KVND", "DONGABANK", "/cashout/vn/order/create"),
+    KVEIB("KVND", "EIB", "/cashout/vn/order/create"),
+    KVGPKBANK("KVND", "GPBANK", "/cashout/vn/order/create"),
+    KVHDB("KVND", "HDB", "/cashout/vn/order/create"),
+    KVHLBANK("KVND", "HLBANK", "/cashout/vn/order/create"),
+    KVHSBC("KVND", "HSBC", "/cashout/vn/order/create"),
+    KVIVB("KVND", "IVB", "/cashout/vn/order/create"),
+    KVKienLongBank("KVND", "KienLongBank", "/cashout/vn/order/create"),
+    KVLVPB("KVND", "LVPB", "/cashout/vn/order/create"),
+    KVMB("KVND", "MB", "/cashout/vn/order/create"),
+    KVMAN("KVND", "MSB", "/cashout/vn/order/create"),
+    KVNAMABANK("KVND", "NAMABANK", "/cashout/vn/order/create"),
+    KVCB("KVND", "NCB", "/cashout/vn/order/create"),
+    KVOCB("KVND", "OCB", "/cashout/vn/order/create"),
+    KVOJB("KVND", "OJB", "/cashout/vn/order/create"),
+    KVPGBANK("KVND", "PGBANK", "/cashout/vn/order/create"),
+    KVPVCOMBANK("KVND", "PVCOMBANK", "/cashout/vn/order/create"),
+    KVSACOMBANK("KVND", "SACOMBANK", "/cashout/vn/order/create"),
+    KVSAIGONBANK("KVND", "SAIGONBANK", "/cashout/vn/order/create"),
+    KVSCB("KVND", "SCB", "/cashout/vn/order/create"),
+    KVSEABANK("KVND", "SEABANK", "/cashout/vn/order/create"),
+    KVSHB("KVND", "SHB", "/cashout/vn/order/create"),
+    KVSHINABANK("KVND", "SHINABANK", "/cashout/vn/order/create"),
+    KVTCCB("KVND", "TCB", "/cashout/vn/order/create"),
+    KVTPB("KVND", "TPB", "/cashout/vn/order/create"),
+    KVVCB("KVND", "VCB", "/cashout/vn/order/create"),
+    KVVIB("KVND", "VIB", "/cashout/vn/order/create"),
+    KVVIETABANK("KVND", "VIETABANK", "/cashout/vn/order/create"),
+    KVVIETCAPITALBANK("KVND", "VIETCAPITALBANK", "/cashout/vn/order/create"),
+    KVVPB("KVND", "VPB", "/cashout/vn/order/create"),
+    KVVTCB("KVND", "VTB", "/cashout/vn/order/create"),
+    KVWOORIBANK("KVND", "WOORIBANK", "/cashout/vn/order/create"),
+    KVBVB("KVND", "BVB", "/cashout/vn/order/create"),
+    KVSTB("KVND", "STB", "/cashout/vn/order/create"),
+
+
+
+    //泰国
+    BBL("THB", "BBL", "/cashout/thb/order/create"),
+    KBANK("THB", "KBANK", "/cashout/thb/order/create"),
+    SCBTHB("THB", "SCB", "/cashout/thb/order/create"),
+    KTB("THB", "KTB", "/cashout/thb/order/create"),
+    TTB("THB", "TTB", "/cashout/thb/order/create"),
+    BAY("THB", "BAY", "/cashout/thb/order/create"),
+    TBANK("THB", "TBANK", "/cashout/thb/order/create"),
+    BAAC("THB", "BAAC", "/cashout/thb/order/create"),
+    LHBANK("THB", "LHBANK", "/cashout/thb/order/create"),
+    SCBT("THB", "SCBT", "/cashout/thb/order/create"),
+    GHB("THB", "GHB", "/cashout/thb/order/create"),
+    KK("THB", "KK", "/cashout/thb/order/create"),
+    CIMBT("THB", "CIMBT", "/cashout/thb/order/create"),
+    UOB("THB", "UOB", "/cashout/thb/order/create"),
+    GSB("THB", "GSB", "/cashout/thb/order/create"),
+    CITI("THB", "CITI", "/cashout/thb/order/create"),
+    MHCB("THB", "MHCB", "/cashout/thb/order/create"),
+    IBANK("THB", "IBANK", "/cashout/thb/order/create"),
+    TISCO("THB", "TISCO", "/cashout/thb/order/create"),
+    ICBC("THB", "ICBC", "/cashout/thb/order/create"),
+    TCRB("THB", "TCRB", "/cashout/thb/order/create"),
+    SMBC("THB", "SMBC", "/cashout/thb/order/create"),
+    HSBCTHB("THB", "HSBC", "/cashout/thb/order/create"),
+    DBTHB("THB", "DB", "/cashout/thb/order/create"),
+    BOC("THB", "BOC", "/cashout/thb/order/create"),
+    ANZ("THB", "ANZ", "/cashout/thb/order/create"),
+    IOB("THB", "IOB", "/cashout/thb/order/create"),
+    TMB("THB", "TMB", "/cashout/thb/order/create"),
+    AIG("THB", "AIG", "/cashout/thb/order/create"),
+    BOA("THB", "BOA", "/cashout/thb/order/create"),
+    BNP("THB", "BNP", "/cashout/thb/order/create"),
+    ABI("THB", "ABI", "/cashout/thb/order/create"),
+    EXIMB("THB", "EXIMB", "/cashout/thb/order/create"),
+    JPMCB("THB", "JPMCB", "/cashout/thb/order/create"),
+    MICB("THB", "MICB", "/cashout/thb/order/create"),
+    OCBC("THB", "OCBC", "/cashout/thb/order/create"),
+    ABN("THB", "ABN", "/cashout/thb/order/create"),
+    RHB("THB", "RHB", "/cashout/thb/order/create"),
+    SMEB("THB", "SMEB", "/cashout/thb/order/create"),
+
+    //孟加拉
+    UPAY("BDT", "UPAY", "/cashout/bengal/order/create"),
+    NAGAD("BDT", "NAGAD", "/cashout/bengal/order/create"),
+    BKASH("BDT", "BKASH", "/cashout/bengal/order/create"),
+
+    //巴基斯坦
+    JAZZCASH("PKR", "JAZZCASH", "/cashout/pakistan/order/create"),
+    EASYPAISA("PKR", "EASYPAISA", "/cashout/pakistan/order/create");
+
+
+    String currency;
+    String code;
+    String uri;
+
+    public static Optional<TSCurrencyBankCodePayoutEnum> findByCurrencyAndCode(String currency, String code) {
+        return Arrays.stream(values())
+                .filter(bankCode -> bankCode.getCurrency().equalsIgnoreCase(currency) && bankCode.getCode().equalsIgnoreCase(code))
+                .findFirst();
+    }
+
+}

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.report.repositories.ReportUserDepositWithdrawRepository">
+
+
+    <select id="sumReportDepositWithdraw" resultType="com.cloud.baowang.report.api.vo.rechagerwithdraw.ReportUserDepositWithdrawVO">
+        SELECT
+        MAX(currency_code) AS currencyCode,
+        IFNULL(SUM(a.depositors_nums),0) AS depositorsNums,
+        IFNULL(SUM(a.deposit_times),0) AS depositTimes,
+        IFNULL(SUM(a.deposit_total_amount),0) AS depositTotalAmount,
+        IFNULL(SUM(a.withdrawals_nums),0) AS withdrawalsNums,
+        IFNULL(SUM(a.big_money_withdrawals_nums),0) AS bigMoneyWithdrawalsNums,
+        IFNULL(SUM(a.withdraw_times),0) AS withdrawTimes,
+        IFNULL(SUM(a.big_money_withdraw_times),0) AS bigMoneyWithdrawTimes,
+        IFNULL(SUM(a.big_money_withdraw_amount),0) AS bigMoneyWithdrawAmount,
+        IFNULL(SUM(a.withdraw_total_amount),0) AS withdrawTotalAmount,
+        IFNULL(SUM(a.deposit_withdrawal_difference),0) AS depositWithdrawalDifference
+        FROM
+        report_user_deposit_withdraw a
+        WHERE 1=1
+        <if test="vo.siteCode != null and vo.siteCode !=''">
+            AND a.site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.startDay != null and vo.startDay !=''">
+            AND a.day <![CDATA[ >= ]]> #{vo.startDay}
+        </if>
+        <if test="vo.endDay != null and vo.endDay != ''">
+            AND a.day <![CDATA[ <= ]]> #{vo.endDay}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode != ''">
+            AND a.currency_code = #{vo.currencyCode}
+        </if>
+
+    </select>
+
+    <select id="reportDepositWithdrawList" resultType="com.cloud.baowang.report.api.vo.rechagerwithdraw.ReportUserDepositWithdrawVO">
+        SELECT
+        a.day AS day,
+        a.currency_code AS currencyCode,
+        a.depositors_nums AS depositorsNums,
+        a.deposit_times AS depositTimes,
+        a.deposit_total_amount AS depositTotalAmount,
+        a.deposit_subordinates_nums AS  depositSubordinatesNums,
+        a.deposit_subordinates_times AS depositSubordinatesTimes ,
+        a.deposit_subordinates_amount AS depositSubordinatesAmount,
+        a.withdrawals_nums AS withdrawalsNums,
+        a.big_money_withdrawals_nums AS bigMoneyWithdrawalsNums,
+        a.withdraw_times AS withdrawTimes,
+        a.big_money_withdraw_times AS bigMoneyWithdrawTimes,
+        a.big_money_withdraw_amount AS bigMoneyWithdrawAmount,
+        a.withdraw_total_amount AS withdrawTotalAmount,
+        a.deposit_withdrawal_difference AS depositWithdrawalDifference
+        FROM
+        report_user_deposit_withdraw a
+        WHERE 1=1
+        <if test="vo.siteCode != null and vo.siteCode !=''">
+            AND a.site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.startDay != null and vo.startDay !=''">
+            AND a.day <![CDATA[ >= ]]> #{vo.startDay}
+        </if>
+        <if test="vo.endDay != null and vo.endDay != ''">
+            AND a.day <![CDATA[ <= ]]> #{vo.endDay}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode != ''">
+            AND a.currency_code = #{vo.currencyCode}
+        </if>
+
+    </select>
+
+</mapper>

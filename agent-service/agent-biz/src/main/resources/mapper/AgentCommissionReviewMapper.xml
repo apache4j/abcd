@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentCommissionReviewRepository">
+
+    <select id="getCommissionReviewPage" resultType="com.cloud.baowang.agent.api.vo.commission.AgentCommissionReviewVO">
+        SELECT
+        a.id id,
+        a.agent_id agentId,
+        a.agent_account agentAccount,
+        a.agent_name agentName,
+        a.order_no orderNo,
+        a.agent_status agentStatus,
+        a.commission_type commissionType,
+        a.apply_amount commissionAmount,
+        a.start_time startTime,
+        a.end_time endTime,
+        a.apply_time applyTime,
+        a.settle_time settleTime,
+        a.settle_status settleStatus,
+        a.order_status orderStatus,
+        a.currency currency,
+        a.settle_cycle settleCycle,
+        a.lock_status lockStatus,
+        IF(a.locker = #{adminName}, -1, 1) lockStatus1,
+        a.locker locker,
+        a.one_reviewer oneReviewer,
+        a.one_review_finish_time oneReviewFinishTime,
+        a.one_review_start_time oneReviewStartTime,
+        a.second_review_remark secondReviewRemark
+        FROM agent_commission_review_record a
+        <where>
+
+            <if test = "vo.orderStatusList != null and vo.orderStatusList.size > 0">
+                AND a.order_status in
+                <foreach collection="vo.orderStatusList" item="value" open="(" separator="," close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test = "vo.orderStatus != null ">
+                AND a.order_status  = #{vo.orderStatus}
+            </if>
+            <if test="vo.applyStartTime != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyStartTime}
+            </if>
+            <if test="vo.applyEndTime != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyEndTime}
+            </if>
+            <if test="vo.auditStartTime != null">
+                AND a.one_review_finish_time <![CDATA[ >= ]]> #{vo.auditStartTime}
+            </if>
+            <if test="vo.auditEndTime != null">
+                AND a.one_review_finish_time <![CDATA[ <= ]]> #{vo.auditEndTime}
+            </if>
+            <if test="vo.agentAccount != '' and vo.agentAccount != null">
+                AND  a.agent_account =  #{vo.agentAccount}
+            </if>
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND  a.site_code =  #{vo.siteCode}
+            </if>
+            <if test="vo.commissionType != '' and vo.commissionType != null">
+                AND  a.commission_type =  #{vo.commissionType}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.settleCycle != '' and vo.settleCycle != null">
+                AND a.settle_cycle = #{vo.settleCycle}
+            </if>
+            <if test="vo.lockStatus != null">
+                AND a.lock_status = #{vo.lockStatus}
+            </if>
+            <if test="vo.locker != '' and vo.locker != null">
+                AND a.locker = #{vo.locker}
+            </if>
+            <if test="vo.oneReviewer != '' and vo.oneReviewer != null">
+                AND a.one_reviewer = #{vo.oneReviewer}
+            </if>
+        </where>
+        <if test="auditPageIndex==1">
+            ORDER BY  a.one_review_finish_time desc,a.id
+        </if>
+        <if test="auditPageIndex==0">
+            ORDER BY lockStatus1 ASC, a.lock_status ASC, a.apply_time desc
+        </if>
+    </select>
+
+
+
+
+    <select id="getCommissionReviewRecordPage" resultType="com.cloud.baowang.agent.api.vo.commission.AgentCommissionReviewRecordVO">
+        SELECT
+        a.id id,
+        a.agent_id agentId,
+        a.agent_account agentAccount,
+        a.agent_name agentName,
+        a.order_no orderNo,
+        a.agent_status agentStatus,
+        a.commission_type commissionType,
+        a.apply_amount commissionAmount,
+        a.start_time startTime,
+        a.end_time endTime,
+        a.apply_time applyTime,
+        a.settle_time settleTime,
+        a.settle_status settleStatus,
+        a.final_status orderStatus,
+        a.currency currency,
+        a.settle_cycle settleCycle,
+        a.one_reviewer oneReviewer,
+        a.one_review_finish_time oneReviewFinishTime,
+        a.one_review_start_time oneReviewStartTime,
+        a.one_review_remark oneReviewRemark,
+        a.second_review_remark secondReviewRemark,
+        a.second_review_start_time secondReviewStartTime,
+        a.second_review_finish_time secondReviewFinishTime,
+        a.second_reviewer secondReviewer,
+        a.adjust_commission_amount adjustCommissionAmount,
+        a.commission_amount ackCommissionAmount,
+        a.adjust_commission_remark adjustCommissionRemark
+        FROM agent_commission_review_record a
+        <where>
+
+            <if test = "vo.orderStatusList != null and vo.orderStatusList.size > 0">
+                AND a.final_status in
+                <foreach collection="vo.orderStatusList" item="value" open="(" separator="," close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test = "vo.orderStatus != null ">
+                AND a.final_status  = #{vo.orderStatus}
+            </if>
+            <if test="vo.applyStartTime != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyStartTime}
+            </if>
+            <if test="vo.applyEndTime != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyEndTime}
+            </if>
+            <if test="vo.auditStartTime != null">
+                AND a.one_review_finish_time <![CDATA[ >= ]]> #{vo.auditStartTime}
+            </if>
+            <if test="vo.auditEndTime != null">
+                AND a.one_review_finish_time <![CDATA[ <= ]]> #{vo.auditEndTime}
+            </if>
+            <if test="vo.agentAccount != '' and vo.agentAccount != null">
+                AND  a.agent_account =  #{vo.agentAccount}
+            </if>
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND  a.site_code =  #{vo.siteCode}
+            </if>
+            <if test="vo.commissionType != '' and vo.commissionType != null">
+                AND  a.commission_type =  #{vo.commissionType}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.settleCycle != '' and vo.settleCycle != null">
+                AND a.settle_cycle = #{vo.settleCycle}
+            </if>
+            <if test="vo.lockStatus != null">
+                AND a.lock_status = #{vo.lockStatus}
+            </if>
+            <if test="vo.locker != '' and vo.locker != null">
+                AND a.locker = #{vo.locker}
+            </if>
+            <if test="vo.oneReviewer != '' and vo.oneReviewer != null">
+                AND a.one_reviewer = #{vo.oneReviewer}
+            </if>
+        </where>
+        <if test="auditPageIndex==1">
+            ORDER BY  a.one_review_finish_time desc,a.id
+        </if>
+        <if test="auditPageIndex==0">
+            ORDER BY lockStatus1 ASC, a.lock_status ASC, a.apply_time desc
+        </if>
+    </select>
+
+    <select id="getCommissionReviewCount" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM agent_commission_review_record a
+        <where>
+
+            <if test = "vo.orderStatusList != null and vo.orderStatusList.size > 0">
+                AND a.order_status in
+                <foreach collection="vo.orderStatusList" item="value" open="(" separator="," close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.applyStartTime != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyStartTime}
+            </if>
+            <if test="vo.applyEndTime != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyEndTime}
+            </if>
+            <if test="vo.agentAccount != '' and vo.agentAccount != null">
+                AND  a.agent_account =  #{vo.agentAccount}
+            </if>
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND  a.site_code =  #{vo.siteCode}
+            </if>
+            <if test="vo.commissionType != '' and vo.commissionType != null">
+                AND  a.commission_type =  #{vo.commissionType}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.settleCycle != '' and vo.settleCycle != null">
+                AND a.settle_cycle = #{vo.settleCycle}
+            </if>
+            <if test="vo.lockStatus != null">
+                AND a.lock_status = #{vo.lockStatus}
+            </if>
+            <if test="vo.locker != '' and vo.locker != null">
+                AND a.locker = #{vo.locker}
+            </if>
+        </where>
+    </select>
+
+    <select id="getTotalCommissionByAgentId" resultType="java.math.BigDecimal">
+        select sum(commission_amount) from agent_commission_review_record
+        where agent_id = #{agentId}
+         and order_status = 3
+    </select>
+
+    <delete id="deleteByReportId" >
+        delete from agent_commission_review_record where report_id = #{reportId}
+    </delete>
+
+</mapper>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentRebateExpectReportRepository">
+    <select id="getLatestRebateDetail"  resultType="com.cloud.baowang.agent.api.vo.commission.RebateDetailVO">
+        SELECT venue_type as venueType,
+               rebate_rate as rebateRate
+        FROM agent_rebate_report_detail
+        WHERE
+                rebate_report_id = (
+                SELECT
+                    id
+                FROM
+                    `agent_rebate_expect_report`
+                WHERE agent_id = #{agentId}
+                ORDER BY
+                    created_time DESC
+            LIMIT 1
+            )
+    </select>
+
+</mapper>

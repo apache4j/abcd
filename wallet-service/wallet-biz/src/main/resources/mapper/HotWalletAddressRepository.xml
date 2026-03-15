@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.wallet.repositories.HotWalletAddressRepository">
+
+    <select id="listUserHotAddress" resultType="com.cloud.baowang.wallet.api.vo.userCoinRecord.UserHotWalletAddressVO">
+       SELECT
+        hotWalletAddress.userId AS userId,
+        hotWalletAddress.userAccount AS userAccount,
+        hotWalletAddress.trcAddress AS  trcAddress,
+        hotWalletAddress.trcAddressBalance AS  trcAddressBalance,
+        hotWalletAddress.ercAddress AS ercAddress,
+        hotWalletAddress.ercAddressBalance AS ercAddressBalance,
+        hotWalletAddress.trcOutAddressNo  AS trcOutAddressNo,
+        hotWalletAddress.ercOutAddressNo  AS ercOutAddressNo,
+        (hotWalletAddress.trcAddressBalance + hotWalletAddress.ercAddressBalance) AS sumBalance
+       FROM (SELECT
+            MAX(hwa.user_id) AS userId,
+            MAX(hwa.user_account) AS userAccount,
+            MAX(IF(hwa.chain_type = 'TRON',hwa.address,'')) AS  trcAddress,
+            MAX(IF(hwa.chain_type = 'TRON',hwa.balance,'')) AS  trcAddressBalance,
+            MAX(IF(hwa.chain_type = 'ETH',hwa.address,'')) AS ercAddress,
+            MAX(IF(hwa.chain_type = 'ETH',hwa.balance,'')) AS ercAddressBalance,
+            MAX(IF(hwa.chain_type = 'TRON',hwa.out_address_no,''))  AS trcOutAddressNo,
+            MAX(IF(hwa.chain_type = 'ETH',hwa.out_address_no,''))  AS ercOutAddressNo
+        FROM hot_wallet_address hwa
+        WHERE
+            hwa.site_code = #{vo.siteCode}
+        AND hwa.wallet_user_type = 'USER'
+        <if test="vo.userId != null and vo.userId != '' ">
+            AND hwa.user_id = #{vo.userId}
+        </if>
+        <if test="vo.userAccount != null and vo.userAccount != '' ">
+            AND hwa.user_account = #{vo.userAccount}
+        </if>
+        <if test="vo.trcAddress != null and vo.trcAddress != '' ">
+            AND hwa.chain_type = 'TRON' AND hwa.address LIKE CONCAT('%', #{vo.trcAddress}, '%')
+        </if>
+        <if test="vo.ercAddress != null and vo.ercAddress != '' ">
+            AND hwa.chain_type = 'ETH' AND hwa.address LIKE CONCAT('%', #{vo.ercAddress}, '%')
+        </if>
+        GROUP BY hwa.user_id) as hotWalletAddress
+        ORDER BY sumBalance DESC
+
+    </select>
+    <select id="sumUserHotWalletAddress"
+            resultType="com.cloud.baowang.wallet.api.vo.userCoinRecord.UserHotWalletAddressVO">
+        SELECT
+        '总计' AS userId,
+        SUM(IF(hwa.chain_type = 'TRON',hwa.balance,'')) AS  trcAddressBalance,
+        SUM(IF(hwa.chain_type = 'ETH',hwa.balance,'')) AS ercAddressBalance
+        FROM hot_wallet_address hwa
+        WHERE
+        hwa.site_code = #{vo.siteCode}
+        AND hwa.wallet_user_type = 'USER'
+        <if test="vo.userId != null and vo.userId != '' ">
+            AND hwa.user_id = #{vo.userId}
+        </if>
+        <if test="vo.userAccount != null and vo.userAccount != '' ">
+            AND hwa.user_account = #{vo.userAccount}
+        </if>
+        <if test="vo.trcAddress != null and vo.trcAddress != '' ">
+            AND hwa.chain_type = 'TRON' AND hwa.address LIKE CONCAT('%', #{vo.trcAddress}, '%')
+        </if>
+        <if test="vo.ercAddress != null and vo.ercAddress != '' ">
+            AND hwa.chain_type = 'ETH' AND hwa.address LIKE CONCAT('%', #{vo.ercAddress}, '%')
+        </if>
+    </select>
+    <select id="userHotWalletAddressPageCount" resultType="java.lang.Long">
+        SELECT COUNT(hotWalletAddress.userId) FROM (
+           SELECT
+               max(hwa.user_id) AS userId
+           FROM hot_wallet_address hwa
+        WHERE
+            hwa.site_code = #{vo.siteCode}
+            AND hwa.wallet_user_type = 'USER'
+            <if test="vo.userId != null and vo.userId != '' ">
+                AND hwa.user_id = #{vo.userId}
+            </if>
+            <if test="vo.userAccount != null and vo.userAccount != '' ">
+                AND hwa.user_account = #{vo.userAccount}
+            </if>
+        <if test="vo.trcAddress != null and vo.trcAddress != '' ">
+            AND hwa.chain_type = 'TRON' AND hwa.address LIKE CONCAT('%', #{vo.trcAddress}, '%')
+        </if>
+        <if test="vo.ercAddress != null and vo.ercAddress != '' ">
+            AND hwa.chain_type = 'ETH' AND hwa.address LIKE CONCAT('%', #{vo.ercAddress}, '%')
+        </if>
+           GROUP BY hwa.user_id) as hotWalletAddress
+
+    </select>
+
+
+    <select id="listAgentHotAddress" resultType="com.cloud.baowang.wallet.api.vo.userCoinRecord.AgentHotWalletAddressVO">
+        SELECT
+        hotWalletAddress.agentAccount AS agentAccount,
+        hotWalletAddress.trcAddress AS  trcAddress,
+        hotWalletAddress.trcAddressBalance AS  trcAddressBalance,
+        hotWalletAddress.ercAddress AS ercAddress,
+        hotWalletAddress.ercAddressBalance AS ercAddressBalance,
+        hotWalletAddress.trcOutAddressNo  AS trcOutAddressNo,
+        hotWalletAddress.ercOutAddressNo  AS ercOutAddressNo,
+        (hotWalletAddress.trcAddressBalance + hotWalletAddress.ercAddressBalance) AS sumBalance
+        FROM (SELECT
+        MAX(hwa.user_account) AS agentAccount,
+        MAX(IF(hwa.chain_type = 'TRON',hwa.address,'')) AS  trcAddress,
+        MAX(IF(hwa.chain_type = 'TRON',hwa.balance,'')) AS  trcAddressBalance,
+        MAX(IF(hwa.chain_type = 'ETH',hwa.address,'')) AS ercAddress,
+        MAX(IF(hwa.chain_type = 'ETH',hwa.balance,'')) AS ercAddressBalance,
+        MAX(IF(hwa.chain_type = 'TRON',hwa.out_address_no,''))  AS trcOutAddressNo,
+        MAX(IF(hwa.chain_type = 'ETH',hwa.out_address_no,''))  AS ercOutAddressNo
+        FROM hot_wallet_address hwa
+        WHERE
+        hwa.site_code = #{vo.siteCode}
+        AND hwa.wallet_user_type = 'AGENT'
+        <if test="vo.agentAccount != null and vo.agentAccount != '' ">
+            AND hwa.user_account = #{vo.agentAccount}
+        </if>
+        <if test="vo.trcAddress != null and vo.trcAddress != '' ">
+            AND hwa.chain_type = 'TRON' AND hwa.address LIKE CONCAT('%', #{vo.trcAddress}, '%')
+        </if>
+        <if test="vo.ercAddress != null and vo.ercAddress != '' ">
+            AND hwa.chain_type = 'ETH' AND hwa.address LIKE CONCAT('%', #{vo.ercAddress}, '%')
+        </if>
+        GROUP BY hwa.user_id) as hotWalletAddress
+        ORDER BY sumBalance DESC
+
+    </select>
+    <select id="sumAgentHotWalletAddress"
+            resultType="com.cloud.baowang.wallet.api.vo.userCoinRecord.AgentHotWalletAddressVO">
+        SELECT
+        '总计' AS agentAccount,
+        SUM(IF(hwa.chain_type = 'TRON',hwa.balance,'')) AS  trcAddressBalance,
+        SUM(IF(hwa.chain_type = 'ETH',hwa.balance,'')) AS ercAddressBalance
+        FROM hot_wallet_address hwa
+        WHERE
+        hwa.site_code = #{vo.siteCode}
+        AND hwa.wallet_user_type = 'AGENT'
+        <if test="vo.agentAccount != null and vo.agentAccount != '' ">
+            AND hwa.user_account = #{vo.agentAccount}
+        </if>
+        <if test="vo.trcAddress != null and vo.trcAddress != '' ">
+            AND hwa.chain_type = 'TRON' AND hwa.address LIKE CONCAT('%', #{vo.trcAddress}, '%')
+        </if>
+        <if test="vo.ercAddress != null and vo.ercAddress != '' ">
+            AND hwa.chain_type = 'ETH' AND hwa.address LIKE CONCAT('%', #{vo.ercAddress}, '%')
+        </if>
+    </select>
+    <select id="agentHotWalletAddressPageCount" resultType="java.lang.Long">
+        SELECT COUNT(hotWalletAddress.userId) FROM (
+        SELECT
+        max(hwa.user_id) AS userId
+        FROM hot_wallet_address hwa
+        WHERE
+        hwa.site_code = #{vo.siteCode}
+        AND hwa.wallet_user_type = 'AGENT'
+        <if test="vo.agentAccount != null and vo.agentAccount != '' ">
+            AND hwa.user_account = #{vo.agentAccount}
+        </if>
+        <if test="vo.trcAddress != null and vo.trcAddress != '' ">
+            AND hwa.chain_type = 'TRON' AND hwa.address LIKE CONCAT('%', #{vo.trcAddress}, '%')
+        </if>
+        <if test="vo.ercAddress != null and vo.ercAddress != '' ">
+            AND hwa.chain_type = 'ETH' AND hwa.address LIKE CONCAT('%', #{vo.ercAddress}, '%')
+        </if>
+        GROUP BY hwa.user_id) as hotWalletAddress
+
+
+    </select>
+
+
+</mapper>

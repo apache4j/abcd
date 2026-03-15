@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentDepositSubordinatesRepository">
+
+    <select id="queryDepositOfSubordinatesAmountTotal" resultType="com.cloud.baowang.agent.po.AgentDepositSubordinatesPO">
+        select
+            sum(amount) amount
+        FROM
+            agent_deposit_subordinates
+        where 1 = 1
+        and site_code=#{vo.siteCode}
+        <if test="vo.orderNo != null and vo.orderNo != ''">
+            AND order_no = #{vo.orderNo}
+        </if>
+        <if test="vo.agentAccount != null and vo.agentAccount != ''">
+            AND agent_account = #{vo.agentAccount}
+        </if>
+        <if test="vo.startTime != null">
+            AND deposit_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND deposit_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        <if test="vo.amountMin != null">
+            AND amount <![CDATA[ >= ]]> #{vo.amountMin}
+        </if>
+        <if test="vo.amountMax != null">
+            AND amount <![CDATA[ <= ]]> #{vo.amountMax}
+        </if>
+    </select>
+
+    <select id="depositOfSubordinatesRecordExportCount" resultType="java.lang.Long">
+        select
+            count(1)
+        FROM
+            agent_deposit_subordinates
+        where 1 = 1
+        and site_code=#{vo.siteCode}
+        <if test="vo.orderNo != null and vo.orderNo != ''">
+            AND order_no = #{vo.orderNo}
+        </if>
+        <if test="vo.agentAccount != null and vo.agentAccount != ''">
+            AND agent_account = #{vo.agentAccount}
+        </if>
+        <if test="vo.startTime != null">
+            AND deposit_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND deposit_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        <if test="vo.amountMin != null">
+            AND amount <![CDATA[ >= ]]> #{vo.amountMin}
+        </if>
+        <if test="vo.amountMax != null">
+            AND amount <![CDATA[ <= ]]> #{vo.amountMax}
+        </if>
+    </select>
+
+
+
+
+    <select id="getProxyStoreSalaryTotal" resultType="java.math.BigDecimal">
+        select sum(amount) as amount
+        from agent_deposit_subordinates s
+                left join agent_info a on a.agent_account = s.agent_account
+        where s.deposit_time between #{beginTime} and #{endTime}
+                and s.deposit_subordinates_type=#{subordType}
+                and a.agent_type in (1,2)
+    </select>
+
+
+
+    <select id="getProxyStoreSalaryTimeCount" resultType="String">
+        select s.agent_account
+        from agent_deposit_subordinates s
+                 left join agent_info a on a.agent_account = s.agent_account
+        where s.deposit_time between #{beginTime} and #{endTime}
+                  and s.deposit_subordinates_type=#{subordType}
+                  and a.agent_type in (1,2)
+    </select>
+
+
+
+
+    <select id="getProxyAndUserDepositTotal" resultType="java.math.BigDecimal">
+        select sum(amount) as amount
+        from agent_deposit_subordinates
+        where  created_time  between #{beginTime} and #{endTime}
+        and user_account in (select user_account from user_info where  account_type in (2,3)
+        and super_agent_account in (select agent_account  from agent_info where agent_type in (1,2)))
+    </select>
+
+
+    <select id="getProxyAndUserDepositCount" resultType="String">
+        select user_account
+        from agent_deposit_subordinates
+        where  created_time  between #{beginTime} and #{endTime}
+          and user_account in (select user_account from user_info where  account_type in (2,3)
+          and super_agent_account in (select agent_account  from agent_info where agent_type in (1,2)))
+    </select>
+    <select id="distributeLog" resultType="com.cloud.baowang.agent.api.vo.agent.agentLowerLevelManager.AgentDistributeLogPageVO">
+        select
+        s.user_account AS account,
+        s.deposit_time AS distributeTime,
+        s.remark AS remark,
+        a.coin_from AS beforeDistributionAmount,
+        a.coin_to AS afterDistributionAmount,
+        a.coin_amount AS distributionAmount,
+        s.running_water_multiple AS turnoverMultiple,
+        a.wallet_type AS walletType
+        from agent_deposit_subordinates s
+        left join agent_coin_record a on a.order_no = s.order_no
+        <where>
+            <if test="vo.searchAccount != null and vo.searchAccount != ''">
+                and s.user_account = #{vo.searchAccount}
+            </if>
+            and s.site_code = #{vo.siteCode}
+            and s.agent_account = #{vo.agentAccount}
+            and s.deposit_time <![CDATA[ >= ]]> #{vo.startTime}
+            and s.deposit_time <![CDATA[ <= ]]> #{vo.endTime}
+        </where>
+        order by s.deposit_time desc
+    </select>
+    <select id="depositSubordinatesByAgentList"
+            resultType="com.cloud.baowang.wallet.api.vo.agent.WalletAgentSubLineResVO">
+        select
+        IFNULL(sum(amount),0) as amount,
+        agent_account as agentAccount,
+        currency_code as currency
+        from agent_deposit_subordinates
+        where 1=1
+        and site_code=#{vo.siteCode}
+        and deposit_time <![CDATA[ >= ]]>  #{vo.startTime}
+        and deposit_time <![CDATA[ <= ]]> #{vo.endTime}
+        <if test="vo.agentAccountList != null and vo.agentAccountList.size > 0">
+            AND agent_account in
+            <foreach collection="vo.agentAccountList" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.agentIds != null and vo.agentIds.size > 0">
+            AND agent_id in
+            <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.currency != null and vo.currency != ''">
+            and currency_code = #{vo.currency}
+        </if>
+        group by agent_account,currency_code
+    </select>
+
+    <select id="getAgentDepositSum" resultType="com.cloud.baowang.agent.api.vo.user.AgentStoredMemberVO">
+        SELECT
+            site_code ,
+            #{vo.startTime}  date,
+            currency_code as currency,
+            count(1) as storedMembersLimitTimes,
+            count(distinct user_id) as storedMembersLimitPeopleNumber,
+            sum(amount) as storedMembersLimit
+        from
+            agent_deposit_subordinates
+        <where>
+            <if test="vo.startTime != null">
+                AND `deposit_time` <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND `deposit_time` <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+        </where>
+        group by site_code ,currency_code
+    </select>
+</mapper>

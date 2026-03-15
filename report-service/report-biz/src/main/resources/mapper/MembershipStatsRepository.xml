@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.report.repositories.MembershipStatsRepository">
+
+
+    <select id="getRegSumInfo" resultType="com.cloud.baowang.report.api.vo.user.complex.dto.UserRegInfoVO">
+        SELECT
+        site_code as siteCode,
+        #{vo.startTime} as date,
+        main_currency as currency,
+        COUNT(ui.user_id) as memberRegistrationCount,
+        count(case when registry =0 then 1 else null end ) memberRegistrationCountBacked,
+        count(case when registry =1 then 1 else null end ) memberRegistrationCountPc,
+        count(case when registry =2 then 1 else null end ) memberRegistrationCountIosH5,
+        count(case when registry =3 then 1 else null end ) memberRegistrationCountIosApp,
+        count(case when registry =4 then 1 else null end ) memberRegistrationCountAndroidH5,
+        count(case when registry =5 then 1 else null end ) memberRegistrationCountAndroidApp
+        from
+        user_info ui
+        <where>
+            1=1
+            <if test="vo.startTime != null">
+                AND `register_time` <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND `register_time` <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+            <if test="vo.siteCode != null">
+                AND ui.`site_code` = #{vo.siteCode}
+            </if>
+        </where>
+        group by
+        site_code ,main_currency
+
+    </select>
+    <!-- 通用查询映射结果 -->
+
+    <select id="getAgentRegSumInfo" resultType="com.cloud.baowang.report.api.vo.user.complex.dto.AgentRegInfoVO">
+        SELECT
+        ui.site_code as siteCode,
+        #{vo.startTime} as date,
+        ui.main_currency as currency,
+        COUNT(DISTINCT ui.user_id) as agentRegistrationCount,
+        count(case when registry =0 then 1 else null end ) agentRegistrationCountBacked,
+        count(case when registry =1 then 1 else null end ) agentRegistrationCountPc,
+        count(case when registry =2 then 1 else null end ) agentRegistrationCountIosH5,
+        count(case when registry =3 then 1 else null end ) agentRegistrationCountIosApp,
+        count(case when registry =4 then 1 else null end ) agentRegistrationCountAndroidH5,
+        count(case when registry =5 then 1 else null end ) agentRegistrationCountAndroidApp
+        from
+        user_info ui
+        where super_agent_id !=''
+        <if test="vo.startTime != null">
+            AND `register_time` <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND `register_time` <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        <if test="vo.siteCode != null">
+            AND ui.`site_code` = #{vo.siteCode}
+        </if>
+        group by
+        site_code ,main_currency
+    </select>
+
+
+    <select id="getLoginSumInfo" resultType="com.cloud.baowang.report.api.vo.user.complex.dto.UserLoginReportVO">
+        SELECT
+        u.main_currency as currency,
+        ul.site_code,
+        #{vo.startTime} as date,
+        COUNT(DISTINCT ul.user_id) AS memberLoginCount,
+        count(distinct (case when ul.login_terminal=0 then ul.user_id else null end )) as memberLoginCountBacked,
+        count(distinct (case when ul.login_terminal=1 then ul.user_id else null end )) as memberLoginCountPc,
+        count(distinct (case when ul.login_terminal=2 then ul.user_id else null end )) as memberLoginCountIosH5,
+        count(distinct (case when ul.login_terminal=3 then ul.user_id else null end )) as memberLoginCountIosApp,
+        count(distinct (case when ul.login_terminal=4 then ul.user_id else null end )) as memberLoginCountAndroidH5,
+        count(distinct (case when ul.login_terminal=5 then ul.user_id else null end )) as memberLoginCountAndroidApp
+        FROM
+        user_login_info ul
+        LEFT JOIN
+        user_info u ON ul.user_id = u.user_id
+        where
+        ul.user_id = u.user_id  and ul.login_type = 0
+        <if test="vo.startTime != null">
+            AND `login_time` <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND `login_time` <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        <if test="vo.siteCode != null">
+            AND u.`site_code` = #{vo.siteCode}
+        </if>
+        group by
+        u.main_currency ,
+        ul.site_code
+        order by ul.site_code,u.main_currency
+    </select>
+
+
+    <select id="getUserFirstDepositInfo" resultType="com.cloud.baowang.report.api.vo.user.complex.dto.UserFirstDepositInfoVO">
+        SELECT
+        site_code as siteCode,
+        main_currency as currency,
+        #{vo.startTime} date,
+        sum(first_deposit_amount) as firstMemberDepositAmount,
+        count(distinct user_id) as firstMemberDepositPeopleNumber
+        from
+        user_info ui
+        <where>
+            <if test="vo.startTime != null">
+                AND `first_deposit_time` <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND `first_deposit_time` <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+            <if test="vo.siteCode != null">
+                AND `site_code` = #{vo.siteCode}
+            </if>
+        </where>
+        group by
+        site_code ,main_currency
+        order by
+        site_code ,main_currency
+    </select>
+
+
+    <select id="getUserBettingInfo" resultType="com.cloud.baowang.report.api.vo.user.complex.dto.UserMemberBettingVO">
+        SELECT
+        site_code ,
+        main_currency as currency,
+        #{vo.startTime} date,
+        sum(bet_amount) as memberBettingAmount,
+        sum(valid_bet_amount) as memberBettingValidAmount,
+        sum(bet_win_lose) as memberProfitLoss,
+        sum(vip_amount) as memberVipBenefitsAmount,
+        sum(activity_amount) as memberActivityDiscountsAmount,
+        sum(already_use_amount) as usedDiscounts,
+        sum(tips_amount) as tipsAmount,
+        count(DISTINCT(CASE WHEN vip_amount >0 THEN user_id END)) as memberVipBenefitsPeopleNumber,
+        count(DISTINCT(CASE WHEN activity_amount >0 THEN user_id END)) as memberActivityDiscountsPeopleNumber,
+        count(DISTINCT(CASE WHEN bet_amount >0 THEN user_id END)) as memberBettingPeopleNumber,
+        sum(bet_num) as memberBettingNumber
+
+        FROM report_user_win_lose
+        <where>
+            <if test="vo.startTime != null">
+                AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+            <if test="vo.siteCode != null">
+                AND `site_code` = #{vo.siteCode}
+            </if>
+        </where>
+        group by site_code ,main_currency
+    </select>
+
+
+    <select id="getAgentDepositSum" resultType="com.cloud.baowang.agent.api.vo.user.AgentStoredMemberVO">
+        SELECT
+        site_code ,
+        #{vo.startTime}  date,
+        currency_code as currency,
+        count(1) as storedMembersLimitTimes,
+        count(distinct user_id) as storedMembersLimitPeopleNumber,
+        sum(amount) as storedMembersLimit
+        from
+        agent_deposit_subordinates
+        <where>
+            <if test="vo.startTime != null">
+                AND `deposit_time` <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND `deposit_time` <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+            <if test="vo.siteCode != null">
+                AND `site_code` = #{vo.siteCode}
+            </if>
+        </where>
+        group by site_code ,currency_code
+    </select>
+
+
+    <select id="getUserAdjustments" resultType="com.cloud.baowang.report.api.vo.user.complex.dto.UserMemberAdjustmentsVO">
+        select
+        site_code,
+        currency ,
+        #{vo.startTime} date,
+        sum(if(coin_type = 19,coin_value,0)) as memberAdjustmentsAddAmount,
+        sum(if(coin_type = 20,coin_value,0)) as memberAdjustmentsReduceAmount,
+        count(DISTINCT(CASE WHEN coin_type = 19 THEN user_id END)) as memberAdjustmentsAddPeopleNumber,
+        count(DISTINCT(CASE WHEN coin_type = 20 THEN user_id END)) as memberAdjustmentsReducePeopleNumber,
+
+        sum(if(coin_type = 25,coin_value,0)) as riskAddAmount,
+        sum(if(coin_type = 26,coin_value,0)) as riskReduceAmount,
+        count(DISTINCT(CASE WHEN coin_type = 25 THEN user_id END)) as riskAddPeopleNum,
+        count(DISTINCT(CASE WHEN coin_type = 26 THEN user_id END)) as riskReducePeopleNum
+        from
+        user_coin_record
+        where 1=1
+        and coin_type in(19,20,25,26) and business_coin_type IN(9,11)
+        <if test="vo.startTime != null">
+            AND `created_time` <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND `created_time` <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        <if test="vo.siteCode != null">
+            AND `site_code` = #{vo.siteCode}
+        </if>
+        group by
+        site_code ,currency
+    </select>
+
+
+    <select id="getUserDepositWithdrawInfo" resultType="com.cloud.baowang.report.api.vo.user.complex.dto.UserDepositWithdrawalReportVO">
+        SELECT site_code, #{vo.startTime} date, currency,
+                count(DISTINCT(CASE WHEN type = 1 THEN user_id END)) AS totalMemberDepositPeopleNumber,
+               SUM(IF(type=1,nums,0)) as totalMemberDepositTimes,
+               SUM(IF(type = 1, amount, 0)) AS totalMemberDeposit,
+               SUM(IF(type = 2, amount, 0)) AS totalMemberWithdrawal,
+                count(DISTINCT(CASE WHEN type = 2 THEN user_id END)) AS totalMemberWithdrawalPeopleNumber,
+               SUM(IF(type=2,nums,0)) as totalMemberWithdrawalTimes,
+                COUNT(DISTINCT(CASE WHEN large_amount >0 THEN user_id END)) as totalMemberWithdrawalBigPeopleNumber,
+               sum(IF(large_amount>0,large_nums,0)) as totalMemberWithdrawalBigTimes
+        FROM report_user_recharge_withdraw
+        WHERE 1=1
+        <if test="vo.startTime != null and vo.startTime != ''">
+            and day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            and day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        <if test="vo.siteCode != null">
+            AND `site_code` = #{vo.siteCode}
+        </if>
+        GROUP BY site_code,day_hour_millis,currency
+
+    </select>
+
+
+
+    <select id="getPlatformAdjustInfo" resultType="com.cloud.baowang.report.api.vo.user.complex.dto.PlatformAdjustCollectVO">
+        SELECT
+        site_code as siteCode,
+        currency_code as currency,
+        #{vo.startTime} date,
+        SUM(IF(adjust_way=1,adjust_amount,0)) as platformAddAmount,
+        SUM(IF(adjust_way=2,adjust_amount,0)) as platformReduceAmount,
+        count(DISTINCT(CASE WHEN adjust_way = 1 THEN user_id END)) AS platformAddPeopleNum,
+        COUNT(DISTINCT(CASE WHEN adjust_way =2 THEN user_id END)) as platformReducePeopleNums
+        from
+        user_platform_coin_manual_up_down_record
+        <where>
+            adjust_type = 3 and audit_status=3 and balance_change_status=1
+            <if test="vo.startTime != null">
+                AND `updated_time` <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND `updated_time` <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+            <if test="vo.siteCode != null">
+                AND `site_code` = #{vo.siteCode}
+            </if>
+        </where>
+        group by
+        site_code ,currency_code
+        order by
+        site_code ,currency_code
+    </select>
+
+</mapper>

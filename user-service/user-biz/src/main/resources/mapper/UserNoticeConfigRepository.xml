@@ -1,0 +1,606 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.user.repositories.UserNoticeConfigRepository">
+
+    <select id="getUserHeadNoticeListNew" resultType="com.cloud.baowang.user.api.vo.notice.user.reponse.UserNoticeRespVO">
+        SELECT id as targetId,notice_title_i18n_code ,message_content_i18n_code
+        FROM user_notice_config
+        WHERE site_code=#{vo.siteCode} and  pop_up_type = 1 and  notice_type=#{vo.noticeType} and status=1 and target_type!=4
+        and (terminal IS NULL OR terminal = '' OR FIND_IN_SET(#{vo.deviceTerminal}, terminal))
+        and sort is not null
+        ORDER BY sort asc, created_time desc limit 5
+    </select>
+
+    <select id="getForceUserNoticeHeadListNew" resultType="com.cloud.baowang.user.api.vo.notice.user.reponse.UserNoticeRespVO">
+
+        SELECT t.id as targetId,c.notice_title_i18n_code ,c.message_content_i18n_code,c.pic_icon_i18n_code,c.notice_type
+        FROM user_notice_target t LEFT JOIN user_notice_config c ON t.notice_id=c.id
+        WHERE c.site_code=#{vo.siteCode} and  c.pop_up_type = 2 and c.status=1 and  c.notice_type=#{vo.noticeType}
+          and (c.terminal IS NULL OR c.terminal = '' OR FIND_IN_SET(#{vo.deviceTerminal}, c.terminal))
+           and t.read_state=0 and t.delete_state=1 AND t.platform = 1
+        ORDER BY c.sort asc, c.updated_time desc limit 1
+
+    </select>
+
+
+    <update id="updateUserNoticeStatus" >
+        UPDATE user_notice_target t
+            LEFT JOIN user_notice_config c ON t.notice_id = c.id
+        <set>
+                t.read_state=1
+            <if test="vo.isDelete==0">
+                , t.delete_state = 2
+            </if>
+        </set>
+            WHERE t.user_id = #{vo.userId}
+        <if test="vo.noticeType==2 ">
+            AND t.notice_type = 2
+        </if>
+        <if test="vo.noticeType==1 ">
+            AND t.notice_type in (1,3,4)
+        </if>
+          AND t.platform = 1
+          AND t.delete_state = 1
+          AND (c.terminal IS NULL OR c.terminal = '' OR FIND_IN_SET(#{vo.deviceTerminal}, c.terminal));
+
+    </update>
+
+
+    <select id="getUserUnreadNoticeNums" resultType="java.lang.Long">
+        SELECT count(1) FROM user_notice_target t
+        LEFT JOIN user_notice_config c ON t.notice_id = c.id
+        WHERE t.user_id = #{vo.userId}
+        <if test="vo.noticeType==2 ">
+            AND t.notice_type = 2
+        </if>
+        <if test="vo.noticeType==1 ">
+            AND t.notice_type in (1,3,4)
+        </if>
+        AND t.platform = 1
+        AND t.delete_state = 1
+        AND	t.read_state=0
+        and t.revoke_state=1
+        AND (c.terminal IS NULL OR c.terminal = '' OR FIND_IN_SET(#{vo.deviceTerminal}, c.terminal));
+
+    </select>
+
+
+    <select id="getUserNoticeListNew" resultType="com.cloud.baowang.user.api.vo.notice.user.reponse.UserNoticeRespVO">
+        SELECT *
+        FROM (
+        SELECT t.id AS targetId,
+        CASE WHEN t.notice_type != 4 THEN t.notice_type ELSE t.notice_type END AS notice_type,
+        CASE WHEN t.notice_type != 4 THEN c.notice_title_i18n_code ELSE t.notice_title_i18n_code END AS notice_title_i18n_code,
+        CASE WHEN t.notice_type != 4 THEN c.message_content_i18n_code ELSE t.message_content_i18n_code END AS message_content_i18n_code,
+        t.read_state,
+        t.created_time,
+        t.title_convert_value,
+        t.content_convert_value,
+        t.system_message_code,
+        c.pic_icon_i18n_code
+        FROM user_notice_target t
+        LEFT JOIN user_notice_config c ON c.id = t.notice_id
+        WHERE t.user_id = #{vo.userId}
+        AND t.read_state = 0
+        AND t.revoke_state = 1
+        AND t.delete_state = 1
+        AND t.platform = 1
+        AND (c.status = 1 OR t.notice_type = 4)
+        <if test="vo.noticeType==2 ">
+            AND t.notice_type = 2
+        </if>
+        <if test="vo.noticeType==1 ">
+            AND t.notice_type in (1,3,4)
+        </if>
+        AND (c.terminal IS NULL OR c.terminal = '' OR FIND_IN_SET(#{vo.deviceTerminal}, c.terminal))
+
+        UNION ALL
+
+        SELECT t.id,
+        t.notice_type,
+        c.notice_title_i18n_code,
+        c.message_content_i18n_code,
+        t.read_state,
+        t.created_time,
+        t.title_convert_value,
+        t.content_convert_value,
+        t.system_message_code,
+        c.pic_icon_i18n_code
+        FROM user_notice_target t
+        INNER JOIN user_notice_config c ON c.id = t.notice_id
+        WHERE t.user_id = #{vo.userId}
+        AND t.delete_state = 1
+        AND t.read_state = 1
+        AND t.platform = 1
+        AND (c.status = 1 OR t.notice_type = 4)
+        <if test="vo.noticeType==2 ">
+            AND t.notice_type = 2
+        </if>
+        <if test="vo.noticeType==1 ">
+            AND t.notice_type in (1,3,4)
+        </if>
+        AND (c.terminal IS NULL OR c.terminal = '' OR FIND_IN_SET(#{vo.deviceTerminal}, c.terminal))
+
+        UNION ALL
+
+        SELECT t.id,
+        t.notice_type,
+        t.notice_title_i18n_code,
+        t.message_content_i18n_code,
+        t.read_state,
+        t.created_time,
+        t.title_convert_value,
+        t.content_convert_value,
+        t.system_message_code,
+        NULL AS pic_icon
+        FROM user_notice_target t
+        WHERE t.user_id = #{vo.userId}
+        AND t.delete_state = 1
+        AND t.read_state = 1
+        <if test="vo.noticeType==2 ">
+            AND t.notice_type = 2
+        </if>
+        <if test="vo.noticeType==1 ">
+            AND t.notice_type in (1,3,4)
+        </if>
+        AND t.platform = 1
+        AND t.notice_id IS NULL
+        ) AS temp_results
+        ORDER BY read_state ASC, created_time DESC
+
+
+    </select>
+
+
+    <select id="getForceUserNoticeHeadList"
+            resultType="com.cloud.baowang.user.api.vo.notice.user.reponse.UserNoticeRespVO">
+        select noticeId,
+               targetId,
+               noticeType,
+               noticeTitle,
+               messageContent,
+               targetType,
+               status,
+               createdTime,
+               readState,
+               carouselStartTime,
+               carouselEndTime,
+               popUpType
+        from (select c.id                  as noticeId,
+                     0                     as targetId,
+                     c.notice_type         as noticeType,
+                     c.notice_title        as noticeTitle,
+                     c.message_content     as messageContent,
+                     c.target_type         as targetType,
+                     c.status,
+                     c.created_time        as createdTime,
+                     0                     as readState,
+                     c.carousel_start_time as carouselStartTime,
+                     c.carousel_end_time   as carouselEndTime,
+                     c.pop_up_type         as popUpType,
+                     c.sort
+              from user_notice_config c,
+                   user_info u
+              where c.target_type = 1
+                and c.status = 0
+                and c.pop_up_type = 2
+                and c.carousel_start_time <![CDATA[  <= ]]> #{vo.currentTime}
+                and c.carousel_end_time <![CDATA[  >= ]]> #{vo.currentTime}
+                and u.user_account = #{vo.userAccount}
+                and c.notice_type = #{vo.noticeType}
+              union
+              select c.id                  as noticeId,
+                     0                     as targetId,
+                     c.notice_type         as noticeType,
+                     c.notice_title        as noticeTitle,
+                     c.message_content     as messageContent,
+                     c.target_type         as targetType,
+                     c.status,
+                     c.created_time        as createdTime,
+                     0                     as readState,
+                     c.carousel_start_time as carouselStartTime,
+                     c.carousel_end_time   as carouselEndTime,
+                     c.pop_up_type         as popUpType,
+                     c.sort
+              from user_notice_config c,
+                   user_info u
+              where c.target_type = 3
+                and c.status = 0
+                and c.pop_up_type = 2
+                and c.carousel_start_time <![CDATA[  <= ]]> #{vo.currentTime}
+                and c.carousel_end_time <![CDATA[  >= ]]> #{vo.currentTime}
+                and u.user_account = #{vo.userAccount}
+                and c.notice_type = #{vo.noticeType}
+                and find_in_set(#{vo.deviceTerminal}, c.send_object)
+              union
+              select c.id                  as noticeId,
+                     0                     as targetId,
+                     c.notice_type         as noticeType,
+                     c.notice_title        as noticeTitle,
+                     c.message_content     as messageContent,
+                     c.target_type         as targetType,
+                     c.status,
+                     c.created_time        as createdTime,
+                     0                     as readState,
+                     c.carousel_start_time as carouselStartTime,
+                     c.carousel_end_time   as carouselEndTime,
+                     c.pop_up_type         as popUpType,
+                     c.sort
+              from user_notice_config c,
+                   user_info u
+              where c.target_type = 2
+                and c.status = 0
+                and c.pop_up_type = 2
+                and c.carousel_start_time <![CDATA[  <= ]]> #{vo.currentTime}
+                and c.carousel_end_time <![CDATA[  >= ]]> #{vo.currentTime}
+                and u.user_account = #{vo.userAccount}
+                and c.notice_type = #{vo.noticeType}
+                and find_in_set(#{vo.userAccount}, c.send_object)
+              order by sort asc, createdTime desc, readState asc limit 5) t3
+    </select>
+
+
+    <select id="getUserNoticeListForNoUser"
+            resultType="com.cloud.baowang.user.api.vo.notice.user.reponse.UserNoticeRespVO">
+        select c.id           as noticeId
+             , c.notice_type
+             , c.notice_title_i18n_code
+             , c.message_content_i18n_code
+             , c.target_type
+             , c.status
+             , c.created_time as createdTime
+             , 0              as readState
+        from user_notice_config c
+        where c.target_type = 1
+          and c.status = 0
+          and c.notice_type = #{vo.noticeType}
+        union
+        select c.id           as noticeId
+             , c.notice_type
+             , c.notice_title
+             , c.message_content
+             , c.target_type
+             , c.status
+             , c.created_time as createdTime
+             , 0              as readState
+        from user_notice_config c
+        where c.target_type = 3
+          and c.status = 0
+
+          and c.notice_type = #{vo.noticeType}
+          and find_in_set(#{vo.deviceTerminal}, c.send_object)
+    </select>
+
+
+    <select id="getUserNoticeList" resultType="com.cloud.baowang.user.api.vo.notice.user.reponse.UserNoticeRespVO">
+        select
+        c.id as noticeId,
+        t.id as targetId,
+        c.notice_type,
+        c.notice_title_i18n_code,
+        c.message_content_i18n_code,
+        c.target_type,
+        c.status ,
+        c.created_time as createdTime ,
+        t.read_state as readState
+
+        from user_notice_target t left join
+        user_notice_config c on t.notice_id = c.id
+        where 1 = 1
+
+        and t.user_id = #{vo.userId}
+        AND t.revoke_state = 1
+        AND t.delete_state = 1
+        <!--<if test="vo.noticeType==1  ">
+            and c.carousel_start_time <![CDATA[  <= ]]> #{vo.currentTime}
+            and c.carousel_end_time <![CDATA[   >= ]]> #{vo.currentTime}
+        </if>-->
+        <if test="vo.deviceTerminal != null ">
+            AND (t.terminal IS NULL OR t.terminal = '' OR FIND_IN_SET(#{vo.deviceTerminal},
+            t.terminal))
+        </if>
+        <if test="vo.noticeType==1 ">
+            and t.notice_type in (1,3)
+        </if>
+        <if test="vo.noticeType==2 ">
+            AND t.notice_type = 2
+        </if>
+
+        union
+
+
+        SELECT
+        t2.notice_id AS noticeId,
+        t2.id AS targetId,
+        CASE
+        WHEN t2.notice_type = 4 THEN 3
+        ELSE t2.notice_type
+        END AS noticeType,
+        t2.notice_title_i18n_code,
+        t2.message_content_i18n_code,
+        t2.target_type,
+        1 as status,
+        t2.created_time AS createdTime,
+        t2.read_state AS readState
+        FROM
+        user_notice_target t2
+        WHERE t2.user_id = #{vo.userId}
+        AND t2.revoke_state = 1
+        AND t2.delete_state = 1
+
+        <if test="vo.noticeType==1 ">
+            AND t2.notice_type = 4
+        </if>
+        <if test="vo.noticeType==2 ">
+            AND t2.notice_type = 2
+        </if>
+        order by readState asc, createdTime desc
+    </select>
+
+
+    <select id="getUserNoticeNoReadList"
+            resultType="com.cloud.baowang.user.api.vo.notice.user.reponse.UserNoticeRespVO">
+        SELECT
+        c.id AS noticeId,
+        0 AS targetId,
+        c.notice_type,
+        c.notice_title,
+        c.message_content,
+        c.target_type,
+        c.status,
+        c.created_time AS createdTime,
+        0 AS readState
+        FROM
+        user_notice_config c,
+        user_info u
+        WHERE
+        c.target_type = 1
+        AND c.status = 0
+        AND u.user_account = #{vo.userAccount}
+        AND NOT EXISTS (
+        SELECT t.notice_id
+        FROM user_notice_target t
+        WHERE t.notice_id = c.id
+        AND t.user_account = #{vo.userAccount}
+        )
+        AND c.notice_type = #{vo.noticeType}
+
+        <if test="vo.noticeType==2 or vo.noticeType==3">
+            AND c.created_time >= u.register_time
+        </if>
+        <if test="vo.noticeType==1  ">
+            and c.carousel_start_time <![CDATA[  <= ]]> #{vo.currentTime}
+            and c.carousel_end_time <![CDATA[   >= ]]> #{vo.currentTime}
+        </if>
+
+        UNION
+
+        SELECT
+        c.id AS noticeId,
+        0 AS targetId,
+        c.notice_type,
+        c.notice_title,
+        c.message_content,
+        c.target_type,
+        c.status,
+        c.created_time AS createdTime,
+        0 AS readState
+        FROM
+        user_notice_config c,
+        user_info u
+        WHERE
+        c.target_type = 3
+        AND c.status = 0
+        AND u.user_account = #{vo.userAccount}
+        AND NOT EXISTS (
+        SELECT t.notice_id
+        FROM user_notice_target t
+        WHERE t.notice_id = c.id
+        AND t.user_account = #{vo.userAccount}
+        )
+        AND c.notice_type = #{vo.noticeType}
+        AND FIND_IN_SET(#{vo.deviceTerminal}, c.send_object)
+        <if test="vo.noticeType==2 or vo.noticeType==3">
+            AND c.created_time >= u.register_time
+        </if>
+        <if test="vo.noticeType==1  ">
+            and c.carousel_start_time <![CDATA[  <= ]]> #{vo.currentTime}
+            and c.carousel_end_time <![CDATA[  >= ]]> #{vo.currentTime}
+        </if>
+
+
+    </select>
+
+
+    <select id="getUnreadCountForUserNotice1" resultType="integer">
+        select
+        count(c.id)
+
+        from user_notice_config c, user_info u
+
+        where c.target_type = 1 and c.status=0 and u.user_account = #{userAccount}
+        and not exists (
+        select t.notice_id
+        from user_notice_target t
+        where t.notice_id = c.id and t.user_account = #{userAccount}
+        )
+        and c.notice_type = #{noticeType}
+
+
+        <if test="noticeType==2 or noticeType==3">
+            and c.created_time <![CDATA[ >= ]]> u.register_time
+        </if>
+        <if test="noticeType==1  ">
+            and c.carousel_start_time <![CDATA[  <= ]]> #{currentTime}
+            and c.carousel_end_time <![CDATA[  >= ]]> #{currentTime}
+        </if>
+    </select>
+
+
+    <select id="getUnreadCountForUserNotice3" resultType="integer">
+        select
+        count(t.id)
+
+        from user_notice_target t
+
+        where 1 = 1
+
+        and user_id = #{userId}
+        AND t.revoke_state = 1
+        AND t.delete_state = 1
+        <if test="deviceTerminal != null ">
+            AND (t.device_terminal_code IS NULL OR t.device_terminal_code = '' OR FIND_IN_SET(#{deviceTerminal},
+            t.device_terminal_code))
+        </if>
+        <if test="noticeType==1 ">
+            and t.notice_type in (1,3,4)
+        </if>
+        <if test="noticeType==2 ">
+            AND t.notice_type = 2
+        </if>
+    </select>
+
+
+    <select id="getUnreadCountForUserNotice2" resultType="integer">
+        select
+        count(c2.id)
+
+        from user_notice_target t2
+        left join user_notice_config c2 on c2.id = t2.notice_id
+
+        where t2.user_account = #{userAccount} and t2.revoke_state = 1 and t2.read_state = 0
+        and c2.notice_type = #{noticeType}
+
+        and t2.delete_state=1
+        <if test="noticeType==1">
+            and c2.carousel_start_time <![CDATA[  <= ]]> #{currentTime}
+            and c2.carousel_end_time <![CDATA[  >= ]]> #{currentTime}
+        </if>
+
+    </select>
+
+
+    <select id="getUnreadCountForUserNotice4" resultType="integer">
+        select count(t2.id)
+        from user_notice_target t2
+
+        where t2.user_id = #{userId}
+          and t2.revoke_state = 1
+          and t2.read_state = 0
+          and t2.notice_type = #{noticeType}
+          and t2.delete_state = 1
+    </select>
+
+    <select id="getUnreadCountForUserNotice" resultType="Integer">
+        SELECT
+        sum( total_count ) AS total_count
+        FROM
+        (
+        SELECT
+        count( c.id ) AS total_count
+        FROM
+        user_notice_config c,
+        user_info u
+        WHERE
+        c.target_type = 1
+        AND c.STATUS = 0
+        AND u.user_account = #{userAccount}
+        AND NOT EXISTS ( SELECT t.notice_id FROM user_notice_target t WHERE t.notice_id = c.id AND t.user_account =
+        #{userAccount} )
+        AND c.notice_type = #{noticeType}
+        <if test="noticeType==2 or noticeType==3">
+            and c.created_time <![CDATA[ >= ]]> u.register_time
+        </if>
+        <if test="noticeType==1">
+            and c.carousel_start_time <![CDATA[  <= ]]> #{currentTime}
+            and c.carousel_end_time <![CDATA[  >= ]]> #{currentTime}
+        </if>
+        UNION ALL
+
+        SELECT
+        count( c2.id ) AS total_count
+        FROM
+        user_notice_target t2
+        LEFT JOIN user_notice_config c2 ON c2.id = t2.notice_id
+        WHERE
+        t2.user_account = #{userAccount}
+        AND t2.revoke_state = 1
+        AND t2.read_state = 0
+        AND c2.notice_type = #{noticeType}
+        AND t2.delete_state = 1
+        <if test="noticeType==1">
+            and c2.carousel_start_time <![CDATA[  <= ]]> #{currentTime}
+            and c2.carousel_end_time <![CDATA[  >= ]]> #{currentTime}
+        </if>
+        UNION ALL
+
+        SELECT
+        count( c.id ) AS total_count
+        FROM
+        user_notice_config c,
+        user_info u
+        WHERE
+        c.target_type = 3
+        AND c.STATUS = 0
+        AND u.user_account = #{userAccount}
+        AND NOT EXISTS ( SELECT t.notice_id FROM user_notice_target t WHERE t.notice_id = c.id AND t.user_account =
+        #{userAccount} )
+        AND c.notice_type = #{noticeType}
+        AND find_in_set(#{deviceTerminal}, c.send_object )
+        <if test="noticeType==2 or noticeType==3">
+            and c.created_time <![CDATA[ >= ]]> u.register_time
+        </if>
+        <if test="noticeType==1">
+            and c.carousel_start_time <![CDATA[  <= ]]> #{currentTime}
+            and c.carousel_end_time <![CDATA[  >= ]]> #{currentTime}
+        </if>
+        ) AS totalQuery
+    </select>
+
+
+    <select id="getUnreadNoticeNums" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM user_notice_target t LEFT JOIN user_notice_config c ON c.id = t.notice_id
+        WHERE t.user_id =#{userId}
+          AND t.read_state = 0
+          AND t.revoke_state = 1
+          AND t.delete_state = 1
+          AND t.platform = 1
+          AND (c.status = 1 OR t.notice_type = 4)
+          AND (c.terminal IS NULL OR c.terminal = '' OR FIND_IN_SET(#{terminal}, c.terminal))
+    </select>
+
+    <select id="getUnreadNoticeNumSplit" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM user_notice_target t LEFT JOIN user_notice_config c ON c.id = t.notice_id
+        WHERE t.user_id =#{userId}
+          AND t.read_state = 0
+          AND t.revoke_state = 1
+          AND t.delete_state = 1
+          AND t.platform = 1
+          AND (c.status = 1 OR t.notice_type = 4)
+          AND (t.notice_id is null or c.terminal IS NULL OR c.terminal = '' OR FIND_IN_SET(#{terminal}, c.terminal))
+          AND t.notice_type in (1,3,4)
+    </select>
+
+    <select id="getUnreadActivityNumSplit" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM user_notice_target t LEFT JOIN user_notice_config c ON c.id = t.notice_id
+        WHERE t.user_id =#{userId}
+          AND t.read_state = 0
+          AND t.revoke_state = 1
+          AND t.delete_state = 1
+          AND t.platform = 1
+          AND (c.status = 1 OR t.notice_type = 4)
+          AND (c.terminal IS NULL OR c.terminal = '' OR FIND_IN_SET(#{terminal}, c.terminal))
+          AND t.notice_type =2
+    </select>
+
+
+    <select id="getMaxSortBySiteCode" resultType="Integer">
+        SELECT max(sort) AS total_count
+        FROM user_notice_config
+        where site_code = #{siteCode}
+    </select>
+
+</mapper>

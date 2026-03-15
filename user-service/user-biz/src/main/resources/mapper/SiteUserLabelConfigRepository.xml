@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.user.repositories.SiteUserLabelConfigRepository">
+
+    <select id="getLabelConfigPage" resultType="com.cloud.baowang.user.api.vo.userlabel.UserLabelConfigPageResponseVO">
+        SELECT
+            a.id,
+            a.label_id as labelId,
+            a.label_name as labelName,
+            a.label_describe as labelDescribe,
+            a.create_name as creatorName,
+            a.created_time as createdTime,
+            a.last_operator as updaterName,
+            a.updated_time as updatedTime,
+            a.color,
+            a.status,
+            a.customize_status as customizeStatus
+        FROM site_user_label_config a
+        <where>
+            a.deleted = 1
+            <if test="vo.labelName != '' and vo.labelName != null">
+                AND a.label_name like CONCAT('%',#{vo.labelName}, '%')
+            </if>
+            <if test="vo.labelId != '' and vo.labelId != null">
+                AND a.label_id = #{vo.labelId}
+            </if>
+            <if test="vo.status != '' and vo.status != null">
+                AND a.status = #{vo.status}
+            </if>
+            <if test="siteCodes != null and siteCodes.size() > 0">
+                AND a.site_code  IN
+                <foreach collection="siteCodes" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+        </where>
+        <choose>
+
+            <when test="vo.orderField == 'createdTime' and vo.orderType == 'asc'">
+                ORDER BY created_time asc
+            </when>
+            <when test="vo.orderField == 'createdTime' and vo.orderType == 'desc'">
+                ORDER BY created_time desc
+            </when>
+
+            <when test="vo.orderField == 'updatedTime' and vo.orderType == 'asc'">
+                ORDER BY updated_time asc
+            </when>
+            <when test="vo.orderField == 'updatedTime' and vo.orderType == 'desc'">
+                ORDER BY updated_time desc
+            </when>
+            <otherwise>
+                ORDER BY a.created_time DESC
+            </otherwise>
+        </choose>
+
+    </select>
+
+</mapper>

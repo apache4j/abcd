@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentCommissionGrantRecordRepository">
+
+    <select id="getGrantRecordPageCount" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM agent_commission_grant_record a
+        <where>
+            <if test="vo.grantStartTime != null">
+                AND a.grant_time <![CDATA[ >= ]]> #{vo.grantStartTime}
+            </if>
+            <if test="vo.grantEndTime != null">
+                AND a.grant_time <![CDATA[ <= ]]> #{vo.grantEndTime}
+            </if>
+            <if test="vo.agentAccount != '' and vo.agentAccount != null">
+                AND  a.agent_account =  #{vo.agentAccount}
+            </if>
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND  a.site_code =  #{vo.siteCode}
+            </if>
+            <if test="vo.agentType != '' and vo.agentType != null">
+                AND  a.agent_type =  #{vo.agentType}
+            </if>
+            <if test="vo.agentCategory != '' and vo.agentCategory != null">
+                AND  a.agent_category =  #{vo.agentCategory}
+            </if>
+            <if test="vo.commissionType != '' and vo.commissionType != null">
+                AND  a.commission_type =  #{commissionType}
+            </if>
+        </where>
+    </select>
+
+    <select id="getTotalCommissionByAgentId" resultType="java.math.BigDecimal">
+        select sum(commission_amount) from agent_commission_review_record
+        where agent_id = #{agentId}
+         and order_status = 3
+    </select>
+
+</mapper>

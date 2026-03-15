@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentCommissionLadderRepository">
+    <delete id="deleteByPlanId" >
+        delete from agent_commission_ladder where plan_id = #{planId}
+    </delete>
+
+    <select id="getPlanCodeListByCycle" resultType="java.lang.String">
+        SELECT DISTINCT t1.plan_code
+        FROM
+            `agent_commission_plan` t1,
+            agent_commission_ladder t2
+        WHERE
+            t2.settle_cycle = #{settleCycle}
+          and t1.site_code = #{siteCode}
+          AND t1.id = t2.plan_id
+    </select>
+
+</mapper>

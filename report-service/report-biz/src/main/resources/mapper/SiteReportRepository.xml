@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloud.baowang.report.repositories.SiteReportRepository">
+    <select id="getSiteReportPage" resultType="com.cloud.baowang.report.api.vo.site.SiteStatisticsVO">
+        SELECT
+        DATE(FROM_UNIXTIME(ss.created_time / 1000)) AS dateStr,
+        ss.site_code AS siteCode,
+        ss.site_name AS siteName,
+        ss.company_name AS companyName,
+        ss.site_type AS siteType,
+        ss.currency_code AS currencyCode,
+        SUM(ss.new_members) AS newMembers,
+        SUM(ss.first_deposit_count) AS firstDepositCount,
+        SUM(ss.first_deposit_amount) AS firstDepositAmount,
+        SUM(ss.deposit_amount) AS depositAmount,
+        SUM(ss.deposit_count) AS depositCount,
+        SUM(ss.withdrawal_amount) AS withdrawalAmount,
+        SUM(ss.withdrawal_count) AS withdrawalCount,
+        SUM(ss.large_withdrawal_count) AS largeWithdrawalCount,
+        SUM(ss.deposit_withdrawal_difference) AS depositWithdrawalDifference,
+        SUM(ss.site_vip_benefits) AS siteVipBenefits,
+        SUM(ss.site_promotional_offers) AS sitePromotionalOffers,
+        SUM(ss.site_used_offers) AS siteUsedOffers,
+        SUM(ss.site_other_adjustments) AS siteOtherAdjustments,
+        SUM(ss.bet_count) AS betCount,
+        SUM(ss.betting_amount) AS bettingAmount,
+        SUM(ss.valid_betting) AS validBetting,
+        SUM(ss.member_profit_loss) AS memberProfitLoss,
+        SUM(ss.net_profit) AS netProfit,
+        SUM(ss.plat_adjust_amount) AS platAdjustAmount,
+        SUM(ss.tips_amount) AS tipsAmount,
+        SUM(ss.risk_amount) AS riskAmount
+        FROM
+        report_site_statistics ss
+        WHERE
+        ss.created_time BETWEEN #{vo.startTime} AND #{vo.endTime}
+
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            AND ss.site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.siteName != null and vo.siteName != ''">
+            AND ss.site_name = #{vo.siteName}
+        </if>
+        <if test="vo.siteType != null">
+            AND ss.site_type = #{vo.siteType}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode != ''">
+            AND ss.currency_code = #{vo.currencyCode}
+        </if>
+
+        GROUP BY
+        DATE(FROM_UNIXTIME(ss.created_time / 1000)),
+        ss.site_code,
+        ss.site_name,
+        ss.company_name,
+        ss.site_type,
+        ss.currency_code
+
+        HAVING
+        (#{vo.memberWinLossMin} IS NULL OR SUM(ss.member_profit_loss) &gt;= #{vo.memberWinLossMin}) AND
+        (#{vo.memberWinLossMax} IS NULL OR SUM(ss.member_profit_loss) &lt;= #{vo.memberWinLossMax}) AND
+        (#{vo.orderCountMin} IS NULL OR SUM(ss.bet_count) &gt;= #{vo.orderCountMin}) AND
+        (#{vo.orderCountMax} IS NULL OR SUM(ss.bet_count) &lt;= #{vo.orderCountMax}) AND
+        (#{vo.betAmountMin} IS NULL OR SUM(ss.betting_amount) &gt;= #{vo.betAmountMin}) AND
+        (#{vo.betAmountMax} IS NULL OR SUM(ss.betting_amount) &lt;= #{vo.betAmountMax}) AND
+        (#{vo.validBetMin} IS NULL OR SUM(ss.valid_betting) &gt;= #{vo.validBetMin}) AND
+        (#{vo.validBetMax} IS NULL OR SUM(ss.valid_betting) &lt;= #{vo.validBetMax}) AND
+        (#{vo.depositAmountMin} IS NULL OR SUM(ss.deposit_amount) &gt;= #{vo.depositAmountMin}) AND
+        (#{vo.depositAmountMax} IS NULL OR SUM(ss.deposit_amount) &lt;= #{vo.depositAmountMax}) AND
+        (#{vo.withdrawalAmountMin} IS NULL OR SUM(ss.withdrawal_amount) &gt;= #{vo.withdrawalAmountMin}) AND
+        (#{vo.withdrawalAmountMax} IS NULL OR SUM(ss.withdrawal_amount) &lt;= #{vo.withdrawalAmountMax})
+        <choose>
+            <!--平台报表：首存金额、存款金额、取款金额、有效投注、平台输赢、平台净盈利-->
+            <when test="vo.orderField == 'firstDepositAmount' and vo.orderType == 'asc'">
+                ORDER BY firstDepositAmount asc, dateStr,siteCode,currencyCode
+            </when>
+            <when test="vo.orderField == 'firstDepositAmount' and vo.orderType == 'desc'">
+                ORDER BY firstDepositAmount desc, dateStr,siteCode,currencyCode
+            </when>
+
+            <when test="vo.orderField == 'depositAmount' and vo.orderType == 'asc'">
+                ORDER BY depositAmount asc, dateStr,siteCode,currencyCode
+            </when>
+            <when test="vo.orderField == 'depositAmount' and vo.orderType == 'desc'">
+                ORDER BY depositAmount desc, dateStr,siteCode,currencyCode
+            </when>
+
+            <when test="vo.orderField == 'withdrawalAmount' and vo.orderType == 'asc'">
+                ORDER BY withdrawalAmount asc, dateStr,siteCode,currencyCode
+            </when>
+            <when test="vo.orderField == 'withdrawalAmount' and vo.orderType == 'desc'">
+                ORDER BY withdrawalAmount desc, dateStr,siteCode,currencyCode
+            </when>
+
+            <when test="vo.orderField == 'validBetting' and vo.orderType == 'asc'">
+                ORDER BY validBetting asc, dateStr,siteCode,currencyCode
+            </when>
+            <when test="vo.orderField == 'validBetting' and vo.orderType == 'desc'">
+                ORDER BY validBetting desc, dateStr,siteCode,currencyCode
+            </when>
+
+            <when test="vo.orderField == 'memberProfitLoss' and vo.orderType == 'asc'">
+                ORDER BY memberProfitLoss asc, dateStr,siteCode,currencyCode
+            </when>
+            <when test="vo.orderField == 'memberProfitLoss' and vo.orderType == 'desc'">
+                ORDER BY memberProfitLoss desc, dateStr,siteCode,currencyCode
+            </when>
+
+            <when test="vo.orderField == 'netProfit' and vo.orderType == 'asc'">
+                ORDER BY netProfit asc, dateStr,siteCode,currencyCode
+            </when>
+            <when test="vo.orderField == 'netProfit' and vo.orderType == 'desc'">
+                ORDER BY netProfit desc, dateStr,siteCode,currencyCode
+            </when>
+            <when test="vo.orderField == 'tipsAmount' and vo.orderType == 'asc'">
+                ORDER BY tipsAmount asc, dateStr,siteCode,currencyCode
+            </when>
+            <when test="vo.orderField == 'tipsAmount' and vo.orderType == 'desc'">
+                ORDER BY tipsAmount desc, dateStr,siteCode,currencyCode
+            </when>
+            <otherwise>
+                ORDER BY dateStr desc,siteCode,currencyCode
+            </otherwise>
+        </choose>
+
+    </select>
+    <select id="getSiteReportList" resultType="com.cloud.baowang.report.api.vo.site.SiteStatisticsVO">
+        SELECT
+        DATE(FROM_UNIXTIME(ss.created_time / 1000)) AS dateStr,
+        ss.site_code AS siteCode,
+        ss.site_name AS siteName,
+        ss.company_name AS companyName,
+        ss.site_type AS siteType,
+        ss.currency_code AS currencyCode,
+        SUM(ss.new_members) AS newMembers,
+        SUM(ss.first_deposit_count) AS firstDepositCount,
+        SUM(ss.first_deposit_amount) AS firstDepositAmount,
+        SUM(ss.deposit_amount) AS depositAmount,
+        SUM(ss.deposit_count) AS depositCount,
+        SUM(ss.withdrawal_amount) AS withdrawalAmount,
+        SUM(ss.withdrawal_count) AS withdrawalCount,
+        SUM(ss.large_withdrawal_count) AS largeWithdrawalCount,
+        SUM(ss.deposit_withdrawal_difference) AS depositWithdrawalDifference,
+        SUM(ss.site_vip_benefits) AS siteVipBenefits,
+        SUM(ss.site_promotional_offers) AS sitePromotionalOffers,
+        SUM(ss.site_used_offers) AS siteUsedOffers,
+        SUM(ss.site_other_adjustments) AS siteOtherAdjustments,
+        SUM(ss.bet_count) AS betCount,
+        SUM(ss.betting_amount) AS bettingAmount,
+        SUM(ss.valid_betting) AS validBetting,
+        SUM(ss.member_profit_loss) AS memberProfitLoss,
+        SUM(ss.net_profit) AS netProfit,
+        SUM(ss.plat_adjust_amount) AS platAdjustAmount,
+        SUM(ss.tips_amount) AS tipsAmount,
+        SUM(ss.risk_amount) AS riskAmount
+        FROM
+        report_site_statistics ss
+        WHERE
+        ss.created_time BETWEEN #{vo.startTime} AND #{vo.endTime}
+
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            AND ss.site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.siteName != null and vo.siteName != ''">
+            AND ss.site_name = #{vo.siteName}
+        </if>
+        <if test="vo.siteType != null">
+            AND ss.site_type = #{vo.siteType}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode != ''">
+            AND ss.currency_code = #{vo.currencyCode}
+        </if>
+
+        GROUP BY
+        DATE(FROM_UNIXTIME(ss.created_time / 1000)),
+        ss.site_code,
+        ss.site_name,
+        ss.company_name,
+        ss.site_type,
+        ss.currency_code
+
+        HAVING
+        (#{vo.memberWinLossMin} IS NULL OR SUM(ss.member_profit_loss) &gt;= #{vo.memberWinLossMin}) AND
+        (#{vo.memberWinLossMax} IS NULL OR SUM(ss.member_profit_loss) &lt;= #{vo.memberWinLossMax}) AND
+        (#{vo.orderCountMin} IS NULL OR SUM(ss.bet_count) &gt;= #{vo.orderCountMin}) AND
+        (#{vo.orderCountMax} IS NULL OR SUM(ss.bet_count) &lt;= #{vo.orderCountMax}) AND
+        (#{vo.betAmountMin} IS NULL OR SUM(ss.betting_amount) &gt;= #{vo.betAmountMin}) AND
+        (#{vo.betAmountMax} IS NULL OR SUM(ss.betting_amount) &lt;= #{vo.betAmountMax}) AND
+        (#{vo.validBetMin} IS NULL OR SUM(ss.valid_betting) &gt;= #{vo.validBetMin}) AND
+        (#{vo.validBetMax} IS NULL OR SUM(ss.valid_betting) &lt;= #{vo.validBetMax}) AND
+        (#{vo.depositAmountMin} IS NULL OR SUM(ss.deposit_amount) &gt;= #{vo.depositAmountMin}) AND
+        (#{vo.depositAmountMax} IS NULL OR SUM(ss.deposit_amount) &lt;= #{vo.depositAmountMax}) AND
+        (#{vo.withdrawalAmountMin} IS NULL OR SUM(ss.withdrawal_amount) &gt;= #{vo.withdrawalAmountMin}) AND
+        (#{vo.withdrawalAmountMax} IS NULL OR SUM(ss.withdrawal_amount) &lt;= #{vo.withdrawalAmountMax})
+        <choose>
+            <!--平台报表：首存金额、存款金额、取款金额、有效投注、平台输赢、平台净盈利-->
+            <when test="vo.orderField == 'firstDepositAmount' and vo.orderType == 'asc'">
+                ORDER BY firstDepositAmount asc, dateStr,siteCode,currencyCode
+            </when>
+            <when test="vo.orderField == 'firstDepositAmount' and vo.orderType == 'desc'">
+                ORDER BY firstDepositAmount desc, dateStr,siteCode,currencyCode
+            </when>
+
+            <when test="vo.orderField == 'depositAmount' and vo.orderType == 'asc'">
+                ORDER BY depositAmount asc, dateStr,siteCode,currencyCode
+            </when>
+            <when test="vo.orderField == 'depositAmount' and vo.orderType == 'desc'">
+                ORDER BY depositAmount desc, dateStr,siteCode,currencyCode
+            </when>
+
+            <when test="vo.orderField == 'withdrawalAmount' and vo.orderType == 'asc'">
+                ORDER BY withdrawalAmount asc, dateStr,siteCode,currencyCode
+            </when>
+            <when test="vo.orderField == 'withdrawalAmount' and vo.orderType == 'desc'">
+                ORDER BY withdrawalAmount desc, dateStr,siteCode,currencyCode
+            </when>
+
+            <when test="vo.orderField == 'validBetting' and vo.orderType == 'asc'">
+                ORDER BY validBetting asc, dateStr,siteCode,currencyCode
+            </when>
+            <when test="vo.orderField == 'validBetting' and vo.orderType == 'desc'">
+                ORDER BY validBetting desc, dateStr,siteCode,currencyCode
+            </when>
+
+            <when test="vo.orderField == 'memberProfitLoss' and vo.orderType == 'asc'">
+                ORDER BY memberProfitLoss asc, dateStr,siteCode,currencyCode
+            </when>
+            <when test="vo.orderField == 'memberProfitLoss' and vo.orderType == 'desc'">
+                ORDER BY memberProfitLoss desc, dateStr,siteCode,currencyCode
+            </when>
+
+            <when test="vo.orderField == 'netProfit' and vo.orderType == 'asc'">
+                ORDER BY netProfit asc, dateStr,siteCode,currencyCode
+            </when>
+            <when test="vo.orderField == 'netProfit' and vo.orderType == 'desc'">
+                ORDER BY netProfit desc, dateStr,siteCode,currencyCode
+            </when>
+            <otherwise>
+                ORDER BY dateStr desc,siteCode,currencyCode
+            </otherwise>
+        </choose>
+    </select>
+    <select id="getTotal" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM (
+        SELECT
+        MAX(id) AS id,  <!-- 获取最大 id -->
+        DATE(FROM_UNIXTIME(ss.created_time / 1000)) AS dateStr,
+        ss.site_code AS siteCode,
+        ss.site_name AS siteName,
+        ss.company_name AS companyName,
+        ss.site_type AS siteType,
+        ss.currency_code AS currencyCode,
+        SUM(ss.new_members) AS newMembers,
+        SUM(ss.first_deposit_count) AS firstDepositCount,
+        SUM(ss.first_deposit_amount) AS firstDepositAmount,
+        SUM(ss.deposit_amount) AS depositAmount,
+        SUM(ss.deposit_count) AS depositCount,
+        SUM(ss.withdrawal_amount) AS withdrawalAmount,
+        SUM(ss.withdrawal_count) AS withdrawalCount,
+        SUM(ss.large_withdrawal_count) AS largeWithdrawalCount,
+        SUM(ss.deposit_withdrawal_difference) AS depositWithdrawalDifference,
+        SUM(ss.site_vip_benefits) AS siteVipBenefits,
+        SUM(ss.site_promotional_offers) AS sitePromotionalOffers,
+        SUM(ss.site_used_offers) AS siteUsedOffers,
+        SUM(ss.site_other_adjustments) AS siteOtherAdjustments,
+        SUM(ss.bet_count) AS betCount,
+        SUM(ss.betting_amount) AS bettingAmount,
+        SUM(ss.valid_betting) AS validBetting,
+        SUM(ss.member_profit_loss) AS memberProfitLoss,
+        SUM(ss.net_profit) AS netProfit
+        FROM
+        report_site_statistics ss
+        WHERE
+        ss.created_time BETWEEN #{vo.startTime} AND #{vo.endTime}
+
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            AND ss.site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.siteName != null and vo.siteName != ''">
+            AND ss.site_name = #{vo.siteName}
+        </if>
+        <if test="vo.siteType != null">
+            AND ss.site_type = #{vo.siteType}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode != ''">
+            AND ss.currency_code = #{vo.currencyCode}
+        </if>
+
+        GROUP BY
+        DATE(FROM_UNIXTIME(ss.created_time / 1000)),
+        ss.site_code,
+        ss.site_name,
+        ss.company_name,
+        ss.site_type,
+        ss.currency_code
+        ) t
+    </select>
+
+
+</mapper>

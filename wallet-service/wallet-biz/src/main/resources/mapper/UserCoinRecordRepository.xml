@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.wallet.repositories.UserCoinRecordRepository">
+
+    <select id="sumUserCoinRecord" resultType="com.cloud.baowang.wallet.api.vo.userCoinRecord.UserCoinRecordVO">
+        SELECT
+            "总计" AS orderNo,
+            IFNULL(SUM(a.coin_from),0) AS coinFrom,
+            IFNULL(SUM(a.coin_value),0) AS coinValue,
+            IFNULL(SUM(a.coin_to),0) AS coinTo
+        FROM
+            user_coin_record a
+        WHERE
+        a.site_code = #{vo.siteCode}
+        <if test="vo.coinRecordStartTime != null">
+            AND a.created_time &gt;= #{vo.coinRecordStartTime}
+        </if>
+        <if test="vo.coinRecordEndTime != null">
+            AND a.created_time &lt;= #{vo.coinRecordEndTime}
+        </if>
+        <if test="vo.orderNo != null and vo.orderNo !=''">
+            AND a.order_no = #{vo.orderNo}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode !=''">
+            AND a.currency = #{vo.currencyCode}
+        </if>
+        <if test="vo.userAccount != null and vo.userAccount !=''">
+            AND a.user_account = #{vo.userAccount}
+        </if>
+        <if test="vo.accountStatus != null and vo.accountStatus !=''">
+            AND a.account_status = #{vo.accountStatus}
+        </if>
+        <if test="vo.riskLevelId != null and vo.riskLevelId !=''">
+            AND a.risk_control_level_id = #{vo.riskLevelId}
+        </if>
+        <if test="vo.minVipRank != null and vo.minVipRank !=''">
+            AND a.vip_rank &gt;= #{vo.minVipRank}
+        </if>
+        <if test="vo.maxVipRank != null and vo.maxVipRank !=''">
+            AND a.vip_rank &lt;= #{vo.maxVipRank}
+        </if>
+        <if test="vo.minVipGradeCode != null and vo.minVipGradeCode !=''">
+            AND a.vip_grade_code &gt;= #{vo.minVipGradeCode}
+        </if>
+        <if test="vo.maxVipGradeCode != null and vo.maxVipGradeCode !=''">
+            AND a.vip_grade_code &lt;= #{vo.maxVipGradeCode}
+        </if>
+        <if test="vo.businessCoinType != null and vo.businessCoinType !=''">
+            AND a.business_coin_type = #{vo.businessCoinType}
+        </if>
+        <if test="vo.coinType != null and vo.coinType !='' ">
+            AND a.coin_type = #{vo.coinType}
+        </if>
+        <if test="vo.balanceType != null and vo.balanceType !=''">
+            AND a.balance_type = #{vo.balanceType}
+        </if>
+        <if test="vo.businessCoinTypeList != null and vo.businessCoinTypeList.size > 0">
+            AND a.business_coin_type IN
+            <foreach collection="vo.businessCoinTypeList" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.coinTypeList != null  and vo.coinTypeList.size > 0">
+            AND a.coin_type IN
+            <foreach collection="vo.coinTypeList" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+
+        <if test="vo.minCoinValue != null ">
+            AND a.coin_value &gt;= #{vo.minCoinValue}
+        </if>
+        <if test="vo.maxCoinValue != null ">
+            AND a.coin_value &lt;= #{vo.maxCoinValue}
+        </if>
+
+    </select>
+    <!--<select id="listUserCoinDetail" resultType="com.cloud.baowang.wallet.api.vo.userCoinRecord.UserCoinRecordDetailVO">
+        SELECT
+        coinRecordDetail.orderNo,
+        coinRecordDetail.customerCoinType,
+        coinRecordDetail.coinRealAmount,
+        coinRecordDetail.orderAmount,
+        coinRecordDetail.coinTime,
+        coinRecordDetail.remark,
+        coinRecordDetail.exchangeRate AS exchangeRate,
+        coinRecordDetail.paymentMethod AS paymentMethod,
+        coinRecordDetail.handleStatus AS handleStatus
+        FROM
+        (
+            SELECT
+                udw.order_no AS orderNo,
+                IF(udw.type = '1','1','3') AS customerCoinType,
+                udw.arrive_amount AS coinRealAmount,
+                udw.apply_amount AS orderAmount,
+                udw.updated_time AS coinTime,
+                IF(udw.STATUS = '101','1',IF(udw.STATUS IN ('3','6','9','96','97','98','100'),'3','2')) AS handleStatus,
+                udw.remark AS remark,
+                IFNULL( udw.exchange_rate, '1' ) AS exchangeRate,
+                IF(udw.type = '1',udw.payment_method,udw.wallet_type) AS paymentMethod
+            FROM
+                user_deposit_withdrawal udw
+            WHERE
+                udw.user_account = #{vo.userAccount}
+                AND udw.updated_time &gt;= #{startTime}
+                AND udw.updated_time &lt;= #{endTime} UNION
+            SELECT
+            uci.order_no AS orderNo,
+            uci.customer_coin_type AS customerCoinType,
+            uci.coin_value AS coinRealAmount,
+            IFNULL(uci.order_amount,uci.coin_value) AS orderAmount,
+            uci.created_time AS coinTime,
+            '1' AS handleStatus,
+            uci.remark AS remark,
+            IFNULL(uci.exchange_rate,'1') AS exchangeRate,
+            uci.payment_method AS paymentMethod
+            FROM
+            user_coin_record uci
+            WHERE
+            uci.user_account = #{vo.userAccount}
+            AND (uci.customer_coin_type is null or uci.customer_coin_type != '5')
+            AND uci.coin_type not in ('1','7','21','22','25','26','27')
+            AND uci.balance_type not in ('3','4')
+            AND uci.created_time &gt;= #{startTime}
+            AND uci.created_time &lt;= #{endTime} UNION
+            SELECT
+            tr.order_id AS orderNo,
+            '5' AS customerCoinType,
+            tr.amount AS coinRealAmount,
+            tr.amount AS orderAmount,
+            tr.created_time AS coinTime,
+            ( CASE tr.order_status WHEN '0' THEN '1' WHEN '1' THEN '3' WHEN '2' THEN '2' ELSE '3' END ) AS handleStatus,
+            tr.remark AS remark,
+            '1' AS exchangeRate,
+            '' AS paymentMethod
+            FROM
+            transfer_record tr
+            WHERE
+            tr.user_account = #{vo.userAccount}
+            AND tr.created_time &gt;= #{startTime}
+            AND tr.created_time &lt;= #{endTime}
+            ) coinRecordDetail
+        WHERE
+            1=1
+            <if test="vo.coinRecordStatus != null and vo.coinRecordStatus !=''">
+              AND  coinRecordDetail.handleStatus = #{vo.coinRecordStatus}
+            </if>
+            <if test="vo.customerCoinType != null and vo.customerCoinType !=''">
+                AND  coinRecordDetail.customerCoinType = #{vo.customerCoinType}
+            </if>
+        ORDER BY coinRecordDetail.coinTime DESC
+
+    </select>-->
+    <select id="userDividendPage" resultType="com.cloud.baowang.wallet.api.vo.userDividend.UserDividendPageVO">
+        SELECT
+        tab.id,
+        tab.userAccount,
+        tab.orderNo,
+        tab.dividendType,
+        tab.dividendStatus,
+        tab.currencyCode,
+        tab.dividendAmount,
+        tab.applyTime,
+        tab.receiveTime
+        FROM
+        (
+        <!--活动类型为2,对应system_param welfare_center_reward_type-->
+        SELECT
+        id,
+        user_account AS userAccount,
+        order_no as orderNo,
+        2 AS dividendType,
+        (case when receive_status = 0 then 4
+            when receive_status = 1 then 1
+            when receive_status = 2 then 5
+            else 0 end) AS dividendStatus,
+        currency_code AS currencyCode,
+        activity_amount AS dividendAmount,
+        created_time AS applyTime,
+        receive_end_time as receiveTime
+        FROM
+        site_activity_order_record
+        WHERE
+        site_code = #{vo.siteCode}
+        <if test = "vo.agentIds != null and vo.agentIds.size > 0">
+            AND super_agent_id in
+            <foreach collection="vo.agentIds" item="value" open="(" separator="," close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.userAccount != null and vo.userAccount !=''">
+            AND user_account = #{vo.userAccount}
+        </if>
+        AND receive_start_time BETWEEN #{vo.beginTime} AND #{vo.endTime}
+        <!--vip福利为1,对应welfare_center_reward_type-->
+
+        UNION ALL
+        SELECT
+        id,
+        user_account AS userAccount,
+        order_id as orderNo,
+        1 AS dividendType,
+        (case
+        when receive_status = 0 AND expired_time &lt; #{vo.systemTime} THEN 5
+        when receive_status = 0 then 4
+        when receive_status = 1 then 1
+        when receive_status = 2 then 5
+        else 3 end) AS dividendStatus,
+        'WTC' AS currencyCode,
+        award_amount AS dividendAmount,
+        created_time AS applyTime,
+        expired_time as receiveTime
+        FROM
+        site_vip_award_record
+        WHERE
+        site_code = #{vo.siteCode}
+        <if test = "vo.agentIds != null and vo.agentIds.size > 0">
+            AND agent_id in
+            <foreach collection="vo.agentIds" item="value" open="(" separator="," close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.userAccount != null and vo.userAccount !=''">
+            AND user_account = #{vo.userAccount}
+        </if>
+        AND record_start_time BETWEEN #{vo.beginTime} AND #{vo.endTime}
+
+        <!--新人任务类型为3,对应system_param welfare_center_reward_type-->
+        UNION ALL
+        SELECT
+        id,
+        user_account AS userAccount,
+        order_no as orderNo,
+        3 AS dividendType,
+        (case when receive_status = 0 then 4
+        when receive_status = 1 then 1
+        when receive_status = 2 then 5
+        when receive_status = 3 then 3
+        else 3 end) AS dividendStatus,
+        currency_code AS currencyCode,
+        task_amount AS dividendAmount,
+        created_time AS applyTime,
+        receive_end_time as receiveTime
+        FROM
+        site_task_order_record
+        WHERE
+        site_code = #{vo.siteCode}
+        and task_type = 'novice'
+        <if test = "vo.agentIds != null and vo.agentIds.size > 0">
+            AND super_agent_id in
+            <foreach collection="vo.agentIds" item="value" open="(" separator="," close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.userAccount != null and vo.userAccount !=''">
+            AND user_account = #{vo.userAccount}
+        </if>
+        AND receive_start_time BETWEEN #{vo.beginTime} AND #{vo.endTime}
+
+        <!--每日任务 类型为4-->
+        UNION ALL
+        SELECT
+        id,
+        user_account AS userAccount,
+        order_no as orderNo,
+        4 AS dividendType,
+        (case when receive_status = 0 then 4
+        when receive_status = 1 then 1
+        when receive_status = 2 then 5
+        when receive_status = 3 then 3
+        else 3 end) AS dividendStatus,
+        currency_code AS currencyCode,
+        task_amount AS dividendAmount,
+        created_time AS applyTime,
+        receive_end_time as receiveTime
+        FROM
+        site_task_order_record
+        WHERE
+        site_code = #{vo.siteCode}
+        and task_type = 'daily'
+        <if test = "vo.agentIds != null and vo.agentIds.size > 0">
+            AND super_agent_id in
+            <foreach collection="vo.agentIds" item="value" open="(" separator="," close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.userAccount != null and vo.userAccount !=''">
+            AND user_account = #{vo.userAccount}
+        </if>
+        AND receive_start_time BETWEEN #{vo.beginTime} AND #{vo.endTime}
+
+        <!--每周任务 类型为5-->
+        UNION ALL
+        SELECT
+        id,
+        user_account AS userAccount,
+        order_no as orderNo,
+        5 AS dividendType,
+        (case when receive_status = 0 then 4
+        when receive_status = 1 then 1
+        when receive_status = 2 then 5
+        when receive_status = 3 then 3
+        else 3 end) AS dividendStatus,
+        currency_code AS currencyCode,
+        task_amount AS dividendAmount,
+        created_time AS applyTime,
+        receive_end_time as receiveTime
+        FROM
+        site_task_order_record
+        WHERE
+        site_code = #{vo.siteCode}
+        and task_type = 'week'
+        <if test = "vo.agentIds != null and vo.agentIds.size > 0">
+            AND super_agent_id in
+            <foreach collection="vo.agentIds" item="value" open="(" separator="," close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.userAccount != null and vo.userAccount !=''">
+            AND user_account = #{vo.userAccount}
+        </if>
+        AND receive_start_time BETWEEN #{vo.beginTime} AND #{vo.endTime}
+
+        <!--勋章宝箱-->
+        UNION ALL
+        SELECT
+        id,
+        user_account AS userAccount,
+        order_no as orderNo,
+        7 AS dividendType,
+        (case when open_status = 0 then 4
+        when open_status = 1 then 1
+        else 3 end) AS dividendStatus,
+        'WTC' AS currencyCode,
+        reward_amount AS dividendAmount,
+        created_time AS applyTime,
+        open_time as receiveTime
+
+        FROM
+        medal_reward_record
+        WHERE
+        site_code = #{vo.siteCode}
+        <if test = "vo.agentIds != null and vo.agentIds.size > 0">
+            AND super_agent_id in
+            <foreach collection="vo.agentIds" item="value" open="(" separator="," close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.userAccount != null and vo.userAccount !=''">
+            AND user_account = #{vo.userAccount}
+        </if>
+        AND open_status = 1
+        AND complete_time BETWEEN #{vo.beginTime} AND #{vo.endTime}
+
+        <!--勋章奖励-->
+        UNION ALL
+        SELECT
+        id,
+        user_account AS userAccount,
+        order_no as orderNo,
+        6 AS dividendType,
+        (case when lock_status = 0 then 4
+        when lock_status = 1 then 1
+        else 3 end) AS dividendStatus,
+        'WTC' AS currencyCode,
+        reward_amount AS dividendAmount,
+        created_time AS applyTime,
+        unlock_time as receiveTime
+        FROM
+        medal_acquire_record
+        WHERE
+        site_code = #{vo.siteCode}
+        <if test = "vo.agentIds != null and vo.agentIds.size > 0">
+            AND super_agent_id in
+            <foreach collection="vo.agentIds" item="value" open="(" separator="," close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.userAccount != null and vo.userAccount !=''">
+            AND user_account = #{vo.userAccount}
+        </if>
+        AND complete_time BETWEEN #{vo.beginTime} AND #{vo.endTime}
+
+        <!--返水-->
+        UNION ALL
+            select t.id as id,
+            u.user_account as userAccount,
+            t.order_no as orderNo,
+            8 AS dividendType,
+            ( CASE WHEN t.open_status = 0 THEN 4 WHEN open_status = 1 THEN 1 WHEN open_status = 2 THEN 5 ELSE 0 END ) AS dividendStatus,
+            'WTC' AS currencyCode,
+            t.reward_amount AS dividendAmount,
+            t.created_time AS applyTime,
+            t.invalid_time AS receiveTime
+            from site_rebate_reward_record t
+            join user_info u on t.user_id =u.user_id and u.site_code = #{vo.siteCode}
+            WHERE
+            1 = 1
+            <if test = "vo.agentIds != null and vo.agentIds.size > 0">
+                AND t.super_agent_id in
+                <foreach collection="vo.agentIds" item="value" open="(" separator="," close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.userAccount != null and vo.userAccount !=''">
+                AND u.user_account = #{vo.userAccount}
+            </if>
+            AND t.created_time BETWEEN #{vo.beginTime} AND #{vo.endTime}
+        ) tab
+        <where>
+            <if test="vo.dividendType!=null and vo.dividendType!=''">
+                and tab.dividendType = #{vo.dividendType}
+            </if>
+            <if test="vo.dividendStatus!=null and vo.dividendStatus!=''">
+                and tab.dividendStatus = #{vo.dividendStatus}
+            </if>
+        </where>
+        ORDER BY
+        dividendStatus ASC,
+        applyTime DESC
+    </select>
+
+    <select id="callFriendRechargeCount" resultType="java.lang.Long">
+        SELECT count(1) FROM (
+        SELECT
+            user_id
+        FROM
+        user_coin_record a
+        where  1 = 1
+        <if test="vo.inviteeUserIds != null and vo.inviteeUserIds.size > 0">
+            AND a.user_id IN
+            <foreach collection="vo.inviteeUserIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.coinTypes != null  and vo.coinTypes.size > 0">
+            AND a.coin_type IN
+            <foreach collection="vo.coinTypes" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        GROUP BY a.user_id
+        )t1
+    </select>
+    <select id="getOrderNoByOrders" resultType="java.lang.String">
+        SELECT
+        order_no
+        FROM
+        user_coin_record a
+        where 1 = 1
+        <if test="orders != null and !orders.isEmpty()">
+            AND a.order_no IN
+            <foreach collection="orders" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+
+
+    </select>
+
+    <select id="winLoseRecalculateMainPage"
+            resultType="com.cloud.baowang.wallet.api.vo.report.WinLoseRecalculateWalletVO">
+        select
+        a.site_code as siteCode,
+        a.user_id as userId,
+        a.user_account as userAccount,
+        a.agent_id as agentId,
+        a.agent_name as superAgentAccount,
+        a.currency as mainCurrency,
+        SUM(case when(a.business_coin_type) in( '3','4','8','10' )then a.coin_to-a.coin_from    end) as alreadyUseAmount,
+        SUM(case when(a.business_coin_type) ='10' then a.coin_to-a.coin_from    end) as rebateAmount,
+        sum(case when(a.business_coin_type) = '9' then a.coin_to-a.coin_from    end) as adjustAmount,
+        sum(case when(a.business_coin_type) = '11' then a.coin_to-a.coin_from    end) as riskAmount,
+        ANY_VALUE(b.account_type) AS accountType
+        from user_coin_record a LEFT JOIN user_info b on a.user_id=b.user_id
+        where a.created_time <![CDATA[ >= ]]> #{vo.startTime}
+        and a.created_time <![CDATA[ <= ]]> #{vo.endTime}
+        <if test="vo.siteCode != null and vo.siteCode !=''">
+            and a.site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.businessType != null and !vo.businessType.isEmpty()">
+            AND a.business_coin_type IN
+            <foreach collection="vo.businessType" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        group by
+        a.site_code,a.user_id,a.user_account,a.currency,a.agent_id,a.agent_name
+        order by
+        a.site_code,a.user_id,a.user_account,a.currency,a.agent_id,a.agent_name
+    </select>
+
+</mapper>

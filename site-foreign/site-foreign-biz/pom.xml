@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.cloud.baowang</groupId>
+        <artifactId>site-foreign</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>site-foreign-biz</artifactId>
+    <packaging>jar</packaging>
+
+    <description>站点后台管理系统业务处理模块</description>
+
+    <properties>
+        <maven.deploy.skip>false</maven.deploy.skip>
+    </properties>
+
+    <dependencies>
+        <!--feign 模块-->
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>common-feign</artifactId>
+        </dependency>
+        <!--redis 模块-->
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>common-redis</artifactId>
+        </dependency>
+        <!--注册中心客户端-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <!--配置中心客户端-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+        <!--核心工具包-->
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>common-core</artifactId>
+        </dependency>
+        <!--system-business-Api-->
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>system-business-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <!--user-Api-->
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>user-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <!--common-excel-->
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>common-excel</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>play-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>wallet-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>agent-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>report-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>activity-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>common-auth</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

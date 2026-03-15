@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.report.repositories.ReportAgentDepositWithdrawUserRepository">
+
+
+    <select id="selectUserCount" resultType="java.lang.Long">
+        SELECT
+        COUNT(DISTINCT static_user_id) AS totalUserCount
+        from
+        report_agent_deposit_withdraw_user
+        report_agent_deposit_withdraw_user
+        ${ew.customSqlSegment}
+    </select>
+
+
+</mapper>

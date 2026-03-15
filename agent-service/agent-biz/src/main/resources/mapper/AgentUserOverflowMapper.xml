@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentUserOverflowRepository">
+
+    <select id="getReviewPage" resultType="com.cloud.baowang.agent.po.AgentUserOverflowPO">
+        SELECT
+            a.*,
+            a.created_time as createdTime,
+            a.audit_datetime as auditDatetime,
+            IF(a.lock_name = #{adminName}, -1, 5) reviewOperation1
+        FROM agent_user_overflow a
+        <where>
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                AND a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.applyTimeStart != null">
+                AND a.created_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.created_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.auditTimeStart != null">
+                AND a.audit_datetime <![CDATA[ >= ]]> #{vo.auditTimeStart}
+            </if>
+            <if test="vo.auditTimeEnd != null">
+                AND a.audit_datetime <![CDATA[ <= ]]> #{vo.auditTimeEnd}
+            </if>
+            <if test="vo.transferAgentName != null and vo.transferAgentName != ''">
+                AND a.transfer_agent_name = #{vo.transferAgentName}
+            </if>
+            <if test="vo.eventId != null and vo.eventId != ''">
+                AND a.event_id = #{vo.eventId}
+            </if>
+            <if test="vo.auditStep != null and vo.auditStep != ''">
+                AND a.audit_step = #{vo.auditStep}
+            </if>
+            <if test="vo.auditStatus != null and vo.auditStatus != ''">
+                AND a.audit_status = #{vo.auditStatus}
+            </if>
+            <if test="vo.applyName != null and vo.applyName != ''">
+                AND a.apply_name = #{vo.applyName}
+            </if>
+            <if test="vo.auditName != null and vo.auditName != ''">
+                AND a.audit_name = #{vo.auditName}
+            </if>
+            <if test="vo.lockStatus != null and vo.lockStatus != ''">
+                AND a.lock_status = #{vo.lockStatus}
+            </if>
+            <if test="vo.memberName != null and vo.memberName != ''">
+                AND a.member_name = #{vo.memberName}
+            </if>
+            <if test="vo.userRegister != null and vo.userRegister != ''">
+                AND a.user_register = #{vo.userRegister}
+            </if>
+            <if test="vo.agentType != null and vo.agentType != ''">
+                AND a.agent_type = #{vo.agentType}
+            </if>
+        </where>
+
+        <choose>
+            <when test="vo.orderField == 'createdTime' and vo.orderType == 'asc'">
+                ORDER BY createdTime asc
+            </when>
+            <when test="vo.orderField == 'createdTime' and vo.orderType == 'desc'">
+                ORDER BY createdTime desc
+            </when>
+
+            <when test="vo.orderField == 'auditDatetime' and vo.orderType == 'asc'">
+                ORDER BY auditDatetime asc
+            </when>
+            <when test="vo.orderField == 'auditDatetime' and vo.orderType == 'desc'">
+                ORDER BY auditDatetime desc
+            </when>
+
+            <otherwise>
+                ORDER BY reviewOperation1 ASC, a.audit_step DESC, a.audit_status ASC, a.created_time ASC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="selectOverFlowAgent" resultType="String">
+        select
+           member_name
+        from agent_user_overflow
+        where 1 = 1
+        and site_code =#{siteCode}
+        <if test="agentAccounts != null and agentAccounts.size() > 0">
+            AND transfer_agent_name in
+            <foreach collection="agentAccounts" item="value" separator=" , " open=" (" close=")">
+                #{value}
+            </foreach>
+        </if>
+        and audit_status = 2
+        <if test="startTime != null and startTime != ''">
+            AND audit_datetime <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND audit_datetime <![CDATA[ <= ]]> #{endTime}
+        </if>
+    </select>
+</mapper>

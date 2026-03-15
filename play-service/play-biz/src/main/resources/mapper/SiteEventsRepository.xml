@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.play.repositories.SiteEventsRepository">
+
+    <select id="getSiteEvents" resultType="java.lang.String">
+        SELECT ev.league_id from site_events ev
+        INNER JOIN sport_events_info info ON info.id = ev.events_info_id
+        where ev.site_code = #{siteCode}
+        <if test="venueCode != null and venueCode != ''">
+            and ev.venue_code = #{venueCode}
+        </if>
+
+        <if test="sportType != null">
+            and ev.sport_type = #{sportType}
+        </if>
+
+        limit 50
+    </select>
+</mapper>

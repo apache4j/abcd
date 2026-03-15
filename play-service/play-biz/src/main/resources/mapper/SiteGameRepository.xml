@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.play.repositories.SiteGameRepository">
+
+
+    <select id="queryGameBySiteCodeVenueCode"
+            resultType="com.cloud.baowang.play.api.vo.venue.siteDetail.SiteGameQueryVO">
+        SELECT
+        sg.id,
+        sg.venue_code as venueCode,
+        gi.game_id as gameId,
+        gi.game_i18n_code as gameI18nCode,
+        gi.status
+        FROM
+        site_game sg left join game_info gi on sg.game_info_id = gi.id
+        WHERE sg.site_code = #{siteCode}
+        AND sg.venue_code IN
+        <foreach item="venueCode" collection="venueCodes" open="(" separator="," close=")">
+            #{venueCode}
+        </foreach>
+    </select>
+
+</mapper>

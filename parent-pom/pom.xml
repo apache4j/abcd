@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.cloud.baowang</groupId>
+    <artifactId>parent-pom</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+
+
+
+    <properties>
+        <!--<gitlab.path>code.mogm.top/oversea-baowang/parent-pom.git</gitlab.path>-->
+        <gitlab.host>code.mogm.top</gitlab.host>
+        <gitlab.repo>oversea-baowang/parent-pom</gitlab.repo>
+        <dotgit>.git</dotgit>
+        <!--suppress UnresolvedMavenProperty -->
+        <gitlab.token><![CDATA[${env.GITLAB_TOKEN}]]></gitlab.token>
+        <netty-all.version>4.1.78.Final</netty-all.version>
+        <!--        <net.sf.version>2.4</net.sf.version>-->
+        <revision>1.0.0-SNAPSHOT</revision>
+        <common-version>2025.10.0-SNAPSHOT</common-version>
+        <com.auth0>3.8.1</com.auth0>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven-compiler.version>3.8.1</maven-compiler.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring-boot.version>3.0.2</spring-boot.version>
+        <spring-cloud.version>2022.0.5</spring-cloud.version>
+        <spring-cloud-alibaba.version>2022.0.0.0</spring-cloud-alibaba.version>
+        <!--<spring-boot.version>2.5.4</spring-boot.version>-->
+        <!--<spring-cloud.version>2020.0.3</spring-cloud.version>-->
+        <!--<spring-cloud-alibaba.version>2021.1</spring-cloud-alibaba.version>-->
+        <spring.checkstyle.plugin>0.0.28</spring.checkstyle.plugin>
+        <nacos.version>2.3.1</nacos.version>
+        <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
+        <spring-boot-redisson.version>3.18.1</spring-boot-redisson.version>
+        <redisson.version>3.18.1</redisson.version>
+        <spring-boot-admin.version>3.0.4</spring-boot-admin.version>
+        <hutool.version>5.8.15</hutool.version>
+        <fastjson.version>2.0.41</fastjson.version>
+        <cache2k.version>2.6.1.Final</cache2k.version>
+        <easy-captcha.version>1.6.2</easy-captcha.version>
+        <common-beanutils.version>1.9.4</common-beanutils.version>
+        <easy-excel.version>3.1.1</easy-excel.version>
+        <transmittable-thread-local.version>2.14.2</transmittable-thread-local.version>
+        <jwt.version>0.9.1</jwt.version>
+        <joda-time.version>2.12.5</joda-time.version>
+        <skywalking-apm.version>9.4.0</skywalking-apm.version>
+        <spring-doc.version>2.2.0</spring-doc.version>
+        <knife4j.version>4.5.0</knife4j.version>
+        <minio.version>8.3.3</minio.version>
+        <canal-client.version>1.1.7</canal-client.version>
+        <elasticsearch.version>7.17.2</elasticsearch.version>
+        <easy.es.version>2.0.0-beta7</easy.es.version>
+        <google-guava.version>32.1.2-jre</google-guava.version>
+        <l2cache.version>1.0.39</l2cache.version>
+    </properties>
+
+    <scm>
+        <connection>scm:git:https://${gitlab.host}/${gitlab.repo}${dotgit}</connection>
+        <developerConnection>scm:git:https://oauth2:${gitlab.token}@${gitlab.host}/${gitlab.repo}${dotgit}</developerConnection>
+        <url>https://${gitlab.host}/${gitlab.repo}</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <profiles>
+        <profile>
+            <id>local</id>
+            <properties>
+                <profile.active>local</profile.active>
+                <nexus.repository>http://192.168.27.8:8081/repository/bwhw-dev-snapshots/</nexus.repository>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <profile.active>dev</profile.active>
+                <nexus.repository>http://192.168.27.8:8081/repository/bwhw-dev-snapshots/</nexus.repository>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>sit</id>
+            <properties>
+                <profile.active>sit</profile.active>
+                <nexus.repository>http://192.168.27.8:8081/repository/bwhw-sit-snapshots/</nexus.repository>
+            </properties>
+        </profile>
+        <profile>
+            <id>uat</id>
+            <properties>
+                <profile.active>uat</profile.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <profile.active>prod</profile.active>
+            </properties>
+        </profile>
+    </profiles>
+
+    <!-- 以下依赖 全局所有的模块都会引入  -->
+    <dependencies>
+        <!--bootstrap 启动器-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+        </dependency>
+        <!--Lombok-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.42</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <!--==========================技术组件 ==========================-->
+            <!-- netty -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${netty-all.version}</version>
+            </dependency>
+            <!-- spring boot 依赖 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- spring cloud 依赖 -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- spring cloud alibaba 依赖 -->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!--es-->
+            <dependency>
+                <groupId>com.cloud.baowang</groupId>
+                <artifactId>common-es</artifactId>
+                <version>${common-version}</version>
+            </dependency>
+            <!--kafka-->
+            <dependency>
+                <groupId>com.cloud.baowang</groupId>
+                <artifactId>common-kafka</artifactId>
+                <version>${common-version}</version>
+            </dependency>
+            <!--公共业务数据处理-->
+            <dependency>
+                <groupId>com.cloud.baowang</groupId>
+                <artifactId>data-transfer</artifactId>
+                <version>${common-version}</version>
+            </dependency>
+            <!--常用工具包-->
+            <dependency>
+                <groupId>com.cloud.baowang</groupId>
+                <artifactId>common-core</artifactId>
+                <version>${common-version}</version>
+            </dependency>
+            <!--excel组件-->
+            <dependency>
+                <groupId>com.cloud.baowang</groupId>
+                <artifactId>common-excel</artifactId>
+                <version>${common-version}</version>
+            </dependency>
+            <!--feign-->
+            <dependency>
+                <groupId>com.cloud.baowang</groupId>
+                <artifactId>common-feign</artifactId>
+                <version>${common-version}</version>
+            </dependency>
+            <!-- Sentinel流量控制、熔断降级 -->
+            <dependency>
+                <groupId>com.cloud.baowang</groupId>
+                <artifactId>common-sentinel</artifactId>
+                <version>${common-version}</version>
+            </dependency>
+            <!--controller请求日志-->
+            <dependency>
+                <groupId>com.cloud.baowang</groupId>
+                <artifactId>common-log</artifactId>
+                <version>${common-version}</version>
+            </dependency>
+            <!--mybatis-->
+            <dependency>
+                <groupId>com.cloud.baowang</groupId>
+                <artifactId>common-mybatis</artifactId>
+                <version>${common-version}</version>
+            </dependency>
+            <!--redis-->
+            <dependency>
+                <groupId>com.cloud.baowang</groupId>
+                <artifactId>common-redis</artifactId>
+                <version>${common-version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.cloud.baowang</groupId>
+                <artifactId>common-push</artifactId>
+                <version>${common-version}</version>
+            </dependency>
+            <!--单元测试-->
+            <dependency>
+                <groupId>com.cloud.baowang</groupId>
+                <artifactId>common-test</artifactId>
+                <version>${common-version}</version>
+                <type>pom</type>
+                <scope>test</scope>
+            </dependency>
+            <!--auth-->
+            <dependency>
+                <groupId>com.cloud.baowang</groupId>
+                <artifactId>common-auth</artifactId>
+                <version>${common-version}</version>
+            </dependency>
+            <!-- 适用于webmvc的SpringDoc依赖 -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${spring-doc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+                <version>${knife4j.version}</version>
+            </dependency>
+            <!-- 适用于webflux的SpringDoc依赖 -->
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-gateway-spring-boot-starter</artifactId>
+                <version>${knife4j.version}</version>
+            </dependency>
+            <!--nacos client 2.0 -->
+            <dependency>
+                <groupId>com.alibaba.nacos</groupId>
+                <artifactId>nacos-client</artifactId>
+                <version>${nacos.version}</version>
+            </dependency>
+            <!--mybatis plus-->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-extension</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <!--Redis相關-->
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${spring-boot-redisson.version}</version>
+            </dependency>
+            <dependency>
+                <artifactId>redisson</artifactId>
+                <groupId>org.redisson</groupId>
+                <version>${redisson.version}</version>
+            </dependency>
+            <!--hutool-->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+            <!-- Alibaba Fastjson -->
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+            <!--验证码工具-->
+            <dependency>
+                <groupId>com.github.whvcse</groupId>
+                <artifactId>easy-captcha</artifactId>
+                <version>${easy-captcha.version}</version>
+            </dependency>
+            <!--bean 转换工具-->
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>${common-beanutils.version}</version>
+            </dependency>
+            <!-- easyexcel -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>easyexcel</artifactId>
+                <version>${easy-excel.version}</version>
+            </dependency>
+            <!-- thread-local -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>transmittable-thread-local</artifactId>
+                <version>${transmittable-thread-local.version}</version>
+            </dependency>
+            <!-- JWT -->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${jwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>${joda-time.version}</version>
+            </dependency>
+            <!-- SkyWalking log collection -->
+            <dependency>
+                <groupId>org.apache.skywalking</groupId>
+                <artifactId>apm-toolkit-logback-1.x</artifactId>
+                <version>${skywalking-apm.version}</version>
+            </dependency>
+            <!-- SkyWalking trace collection -->
+            <dependency>
+                <groupId>org.apache.skywalking</groupId>
+                <artifactId>apm-toolkit-trace</artifactId>
+                <version>${skywalking-apm.version}</version>
+            </dependency>
+            <!-- minio -->
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
+            </dependency>
+            <!--canal-client-->
+            <dependency>
+                <groupId>com.alibaba.otter</groupId>
+                <artifactId>canal.client</artifactId>
+                <version>${canal-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.otter</groupId>
+                <artifactId>canal.protocol</artifactId>
+                <version>${canal-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.otter</groupId>
+                <artifactId>canal.common</artifactId>
+                <version>${canal-client.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${google-guava.version}</version>
+            </dependency>
+
+            <!--监控服务端-->
+            <dependency>
+                <groupId>de.codecentric</groupId>
+                <artifactId>spring-boot-admin-starter-server</artifactId>
+                <version>${spring-boot-admin.version}</version>
+            </dependency>
+
+            <!--二级缓存-->
+            <dependency>
+                <groupId>io.github.ck-jesse</groupId>
+                <artifactId>l2cache-spring-boot-starter</artifactId>
+                <version>${l2cache.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <finalName>${project.name}</finalName>
+        <resources>
+            <!-- 配置文本文件过滤 -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering> <!-- 启用过滤 -->
+                <includes>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                    <include>**/*.yml</include>
+                    <include>**/*.txt</include>
+                    <include>META-INF/**</include>
+                </includes>
+            </resource>
+
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>static/**</include>
+                </includes>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring-boot.version}</version>
+                    <configuration>
+                        <excludes>
+                            <exclude>
+                                <groupId>org.project-lombok</groupId>
+                                <artifactId>lombok</artifactId>
+                            </exclude>
+                        </excludes>
+                        <finalName>${project.build.finalName}</finalName>
+                        <layers>
+                            <enabled>true</enabled>
+                        </layers>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler.version}</version>
+                    <configuration>
+                        <source>${maven.compiler.source}</source>
+                        <target>${maven.compiler.target}</target>
+                        <compilerArgs>
+                            <arg>-parameters</arg>
+                        </compilerArgs>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>3.1.1</version>
+                    <configuration>
+                        <pushChanges>true</pushChanges>
+                        <!-- <username>${gitlab.username}</username>-->
+                        <password>${gitlab.token}</password>
+                        <!-- 所有子模块跟随父模块版本号 -->
+                        <autoVersionSubmodules>true</autoVersionSubmodules>
+                        <!-- release 时跳过测试 -->
+                        <useReleaseProfile>false</useReleaseProfile>
+                        <arguments>-DskipTests</arguments>
+                        <!-- tag 命名格式，例如 parent-project-1.0.0 -->
+                        <!--suppress UnresolvedMavenProperty -->
+                        <tagNameFormat><![CDATA[@{project.artifactId}-@{project.version}]]></tagNameFormat>
+                        <!-- 部署时使用 deploy -->
+                        <goals>deploy</goals>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    <distributionManagement>
+        <repository>
+            <id>nexus-releases</id>
+            <name>Nexus Release Repository</name>
+            <!--suppress UnresolvedMavenProperty -->
+            <url>${nexus.repository}</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <name>Nexus Snapshot Repository</name>
+            <!--suppress UnresolvedMavenProperty -->
+            <url>${nexus.repository}</url>
+        </snapshotRepository>
+    </distributionManagement>
+</project>

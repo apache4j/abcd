@@ -1,0 +1,165 @@
+<?xml version="1.0"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+            http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.cloud.baowang</groupId>
+        <artifactId>play-service</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>play-biz</artifactId>
+    <packaging>jar</packaging>
+
+    <description>play 游戏模块</description>
+
+    <properties>
+        <maven.deploy.skip>false</maven.deploy.skip>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>2.0.3</version>
+            <scope>compile</scope>
+        </dependency>
+        <!--mybatis 模块-->
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>common-mybatis</artifactId>
+        </dependency>
+        <!--注册中心客户端-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <!--配置中心客户端-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>play-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>user-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>agent-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>system-business-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>common-kafka</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>common-es</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>common-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>wallet-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>common-test</artifactId>
+            <version>2025.10.0-SNAPSHOT</version>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>websocket-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <!--数据翻译-->
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>data-transfer</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>activity-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>${com.auth0}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>system-business-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cloud.baowang</groupId>
+            <artifactId>account-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>net.sf.json-lib</groupId>-->
+<!--            <artifactId>json-lib</artifactId>-->
+<!--            <version>${net.sf.version}</version>-->
+<!--        </dependency>-->
+
+
+        <!-- Groovy 支持 -->
+        <dependency>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>5.0.0</version>
+            <type>pom</type>
+        </dependency>
+
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.play.repositories.GameOneFloatConfigRepository">
+    <select id="getFloatConfigPage" resultType="com.cloud.baowang.play.api.vo.venue.GameOneFloatConfigVO">
+        SELECT
+        con.game_one_id,
+        con.game_two_id,
+        con.venue_code,
+        con.id,
+        con.status,
+        cla_info.directory_name as gameOneName,
+        con.float_name_i18n_code,
+        con.logo_icon_i18n_code,
+        cla_info.model,
+        con.medium_icon_i18n_code,
+        con.creator,
+        con.created_time,
+        con.updater,
+        con.updated_time
+        FROM game_one_float_config con
+        INNER JOIN game_one_class_info cla_info ON cla_info.id = con.game_one_id
+        WHERE con.site_code = #{siteCode}
+        <if test="gameOneId != null and gameOneId != ''">
+            AND con.game_one_id = #{gameOneId}
+        </if>
+        <if test="status != null and status != ''">
+            AND con.status = #{status}
+           /* AND cla_info.status = #{status}*/
+        </if>
+        /*AND  con.status = 1*/
+        ORDER BY
+        CASE WHEN con.status = 1 THEN 0 ELSE 1 END,    con.created_time DESC
+
+    </select>
+
+    <select id="getLobbyGameOneFloat" resultType="com.cloud.baowang.play.api.vo.lobby.LobbyGameOneFloatVO">
+        SELECT one_f.game_one_id,
+               one_f.venue_code,
+        one_f.game_two_id,
+        one_f.status,
+        one_f.model,
+               one_f.float_name_i18n_code,
+               one_f.logo_icon_i18n_code,
+               one_f.medium_icon_i18n_code,
+               one_v.sort AS venueSort,
+               two.sort   AS twoSort,
+        two.site_label_change_type as siteLabelChangeType
+        FROM game_one_float_config one_f
+                 LEFT JOIN game_one_venue one_v
+                           ON one_v.game_one_id = one_f.game_one_id
+                               AND one_v.venue_code = one_f.venue_code
+                               AND one_v.currency_code = #{currencyCode}
+                               AND one_f.site_code = #{siteCode}
+                 LEFT JOIN game_two_class_info two ON two.id = one_f.game_two_id
+        WHERE one_f.site_code = #{siteCode}
+          AND (one_f.venue_code IS NULL OR one_v.sort IS NOT NULL)
+          AND (one_f.game_two_id IS NULL OR two.sort IS NOT NULL)
+<!--          AND one_f.status =1;-->
+    </select>
+</mapper>

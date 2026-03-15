@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.system.repositories.operations.CustomerChannelRepository">
+
+    <select id="queryCustomerChannelPage" resultType="com.cloud.baowang.system.api.vo.operations.CustomerChannelVO">
+        SELECT
+        c.id as id,
+        c.channel_code as channelCode,
+        c.channel_name as channelName,
+        c.customer_type as customerType,
+        c.channel_addr as channelAddr,
+        COUNT(DISTINCT s.site_code) as authCount,
+        c.status as status,
+        c.updated_time as updatedTime,
+        c.updater_name as updaterName
+        FROM customer_channel c left join site_customer s on c.channel_code = s.channel_code
+        WHERE 1 = 1
+        <if test="requestVO.channelCode != null and requestVO.channelCode != ''">
+            and c.channel_code like concat ('%', #{requestVO.channelCode},'%')
+        </if>
+        <if test="requestVO.channelName != null and requestVO.channelName != ''">
+            and c.channel_name like concat ('%', #{requestVO.channelName},'%')
+        </if>
+        <if test="requestVO.status != null and requestVO.status != ''">
+            and c.status = #{requestVO.status}
+        </if>
+        GROUP BY c.channel_code
+        ORDER BY c.created_time desc
+    </select>
+
+
+    <select id="queryCustomerChannel" resultType="com.cloud.baowang.system.api.vo.operations.SiteCustomerChannelPageVO">
+        select
+        a.id AS id,
+        a.channelCode ,
+        a.channelName ,
+        a.customerType ,
+        a.channelAddr,
+        a.remark ,
+        a.status ,
+        a.updatedTime,
+        a.updaterName,
+        a.chooseFlag,
+        a.channelTotal
+        from
+        (
+        SELECT
+        t.id AS id,
+        t.channel_code AS channelCode,
+        t.channel_name AS channelName,
+        t.customer_type AS customerType,
+        t.channel_addr AS channelAddr,
+        t.remark AS remark,
+        t.status AS status,
+
+        CASE
+        WHEN t1.created_time IS NOT NULL THEN t1.created_time
+        ELSE t.updated_time
+        END AS updatedTime,
+
+        CASE
+        WHEN t1.creator IS NOT NULL THEN t1.creator
+        ELSE t.creator_name
+        END AS updaterName,
+
+        CASE
+        WHEN t.channel_code = t1.channel_code THEN 1
+        ELSE 0
+        END AS chooseFlag,
+        (SELECT COUNT(1) FROM customer_channel cc WHERE cc.channel_code = t1.channel_code) AS channelTotal
+
+        FROM
+        customer_channel t
+        LEFT JOIN site_customer t1
+        ON t.channel_code = t1.channel_code AND t1.site_code = #{vo.siteCode}
+
+        <where>
+            <if test="vo.channelName != null and vo.channelName != ''">
+                AND t.channel_name = #{vo.channelName}
+            </if>
+            <if test="vo.channelCode != null and vo.channelCode != ''">
+                AND t.channel_code = #{vo.channelCode}
+            </if>
+        </where>
+        ) a
+        ORDER BY a.channelTotal desc ,a.status DESC, a.updatedTime DESC
+
+    </select>
+</mapper>

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloud.baowang.system.repositories.verify.ChannelSendingStatisticRepository">
+
+
+    <select id="queryChannelStatistic" resultType="com.cloud.baowang.system.api.vo.verify.ChannelSendingStatisticVO">
+        SELECT channel_name as channelName ,channel_code as channelCode,channel_id as channelId ,COUNT(channel_id) as sendCount
+        from channel_sending_statistic
+
+        WHERE  1=1
+        <if test="vo.siteCode != null">
+            AND `site_code` = #{vo.siteCode}
+        </if>
+        <if test="vo.channelName != null">
+            AND `channel_name` LIKE CONCAT('%', #{vo.channelName}, '%')
+        </if>
+        <if test="vo.channelCode != null">
+            AND `channel_code` LIKE CONCAT('%', #{vo.channelCode}, '%')
+        </if>
+        <if test="vo.channelType != null">
+            AND `channel_type` = #{vo.channelType}
+
+        </if>
+        <if test="vo.startTime != null">
+            AND `created_time` <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND `created_time` <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+
+        <if test="vo.startTime == null and vo.endTime == null">
+            AND DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(created_time/1000),
+            @@session.time_zone,#{vo.timeZoneDb}),'%Y-%m-%d') = CURDATE()
+        </if>
+
+        GROUP BY channel_id,channel_name,channel_code ORDER BY channel_id,channel_name,channel_code
+
+    </select>
+
+
+    <select id="queryChannelStatisticCount" resultType="java.lang.Long">
+        SELECT COUNT(channel_id) as sendCount
+        from channel_sending_statistic
+
+        WHERE  1=1
+        <if test="vo.siteCode != null">
+            AND `site_code` = #{vo.siteCode}
+        </if>
+        <if test="vo.channelName != null">
+            AND `channel_name` LIKE CONCAT('%', #{vo.channelName}, '%')
+        </if>
+        <if test="vo.channelCode != null">
+            AND `channel_code` LIKE CONCAT('%', #{vo.channelCode}, '%')
+        </if>
+        <if test="vo.channelType != null">
+            AND `channel_type` = #{vo.channelType}
+        </if>
+        <if test="vo.startTime != null">
+            AND `created_time` <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND `created_time` <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+
+        <if test="vo.startTime == null and vo.endTime == null">
+            AND DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(created_time/1000),
+            @@session.time_zone,#{vo.timeZoneDb}),'%Y-%m-%d') = CURDATE()
+        </if>
+
+    </select>
+
+
+
+    <select id="getChannelSendDetails" resultType="com.cloud.baowang.system.api.vo.verify.ChannelSendDetailsRspVO">
+        SELECT site_code as siteCode ,site_name as siteName,COUNT(channel_id) as sendCount
+        from channel_sending_statistic
+
+        WHERE  1=1
+        <if test="vo.siteCode != null">
+            AND `site_code` LIKE CONCAT('%', #{vo.siteCode}, '%')
+        </if>
+
+        <if test="vo.siteName != null">
+            AND `site_name` LIKE CONCAT('%', #{vo.siteName}, '%')
+        </if>
+        <if test="vo.channelName != null">
+            AND `channel_name` LIKE CONCAT('%', #{vo.channelName}, '%')
+        </if>
+        <if test="vo.channelCode != null">
+            AND `channel_code` LIKE CONCAT('%', #{vo.channelCode}, '%')
+        </if>
+
+        <if test="vo.channelId != null">
+            AND `channel_id` IN
+            <foreach collection="vo.channelId" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+
+        <if test="vo.channelType != null">
+            AND `channel_type` = #{vo.channelType}
+        </if>
+        <if test="vo.startTime != null">
+            AND `created_time` <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND `created_time` <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+
+        <if test="vo.startTime == null and vo.endTime == null">
+            AND DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(created_time/1000),
+            @@session.time_zone,#{vo.timeZoneDb}),'%Y-%m-%d') = CURDATE()
+        </if>
+
+        GROUP BY site_code,site_name ORDER BY site_code,site_name
+
+    </select>
+
+
+
+    <select id="queryChannelSendCount" resultType="java.lang.Long">
+        SELECT COUNT(1) as sendCount
+        from channel_sending_statistic
+
+        WHERE  1=1
+        <if test="vo.siteCode != null">
+            AND `site_code` LIKE CONCAT('%', #{vo.siteCode}, '%')
+        </if>
+
+        <if test="vo.siteName != null">
+            AND `site_name` LIKE CONCAT('%', #{vo.siteName}, '%')
+        </if>
+        <if test="vo.channelName != null">
+            AND `channel_name` LIKE CONCAT('%', #{vo.channelName}, '%')
+        </if>
+        <if test="vo.channelCode != null">
+            AND `channel_code` LIKE CONCAT('%', #{vo.channelCode}, '%')
+        </if>
+
+        <if test="vo.channelId != null">
+            AND `channel_id` IN
+            <foreach collection="vo.channelId" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+
+        <if test="vo.channelType != null">
+            AND `channel_type` = #{vo.channelType}
+        </if>
+        <if test="vo.startTime != null">
+            AND `created_time` <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND `created_time` <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+
+        <if test="vo.startTime == null and vo.endTime == null">
+            AND DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(created_time/1000),
+            @@session.time_zone,#{vo.timeZoneDb}),'%Y-%m-%d') = CURDATE()
+        </if>
+
+    </select>
+    <select id="queryChannelEmailStatistic"
+            resultType="com.cloud.baowang.system.api.vo.verify.ChannelSendingStatisticVO">
+        SELECT channel_name as channelName ,channel_code as channelCode,channel_id as channelId ,COUNT(channel_id) as sendCount,host
+        from channel_sending_statistic
+
+        WHERE  1=1
+        <if test="vo.siteCode != null">
+            AND `site_code` = #{vo.siteCode}
+        </if>
+        <if test="vo.channelName != null">
+            AND `channel_name` LIKE CONCAT('%', #{vo.channelName}, '%')
+        </if>
+        <if test="vo.channelCode != null">
+            AND `channel_code` LIKE CONCAT('%', #{vo.channelCode}, '%')
+        </if>
+        <if test="vo.channelType != null">
+            AND `channel_type` = #{vo.channelType}
+        </if>
+        <if test="vo.startTime != null">
+            AND `created_time` <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND `created_time` <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+
+        <if test="vo.startTime == null and vo.endTime == null">
+            AND DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(created_time/1000),
+            @@session.time_zone,#{vo.timeZoneDb}),'%Y-%m-%d') = CURDATE()
+        </if>
+
+        GROUP BY channel_id,channel_name,channel_code ,host ORDER BY channel_id,channel_name,channel_code
+    </select>
+
+
+</mapper>

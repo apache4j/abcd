@@ -1,0 +1,994 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.report.repositories.ReportUserInfoStatementRepository">
+
+
+    <select id="findTotalCount" resultType="java.lang.Long">
+        select count(1) from (
+        SELECT
+        abc.userId AS userId,
+        abc.userAccount AS userAccount,
+        abc.userName AS userName,
+        abc.accountType AS accountType,
+        abc.mainCurrency AS mainCurrency,
+        cc.super_agent_id AS superAgentId,
+        cc.super_agent_account AS superAgentAccount,
+        cc.agent_attribution AS agentAttribution,
+        abc.accountStatus AS accountStatus,
+        abc.vipGradeCode AS vipGradeCode,
+        abc.vipRankCode AS vipRankCode,
+        abc.userLabelId AS userLabelId,
+        abc.registerTime AS registerTime,
+        abc.riskLevelId AS riskLevelId,
+        abc.firstDepositAmount AS firstDepositAmount,
+        abc.firstDepositTime AS firstDepositTime,
+        abc.siteCode AS siteCode,
+        abc.registerIp AS registerIp,
+        abc.ipAddress AS ipAddress,
+        abc.registry AS registry,
+        abc.lastLoginTime AS lastLoginTime,
+        abc.totalDeposit AS totalDeposit,
+        abc.numberDeposit AS numberDeposit,
+        abc.advancedTransfer AS advancedTransfer,
+        abc.numberTransfer AS numberTransfer,
+        abc.amountLargeDeposits AS amountLargeDeposits,
+        abc.numberLargeDeposits AS numberLargeDeposits,
+        abc.centralWallet AS centralWallet,
+        abc.numberReversals AS numberReversals,
+        abc.totalWithdrawal AS totalWithdrawal,
+        abc.numberWithdrawal AS numberWithdrawal,
+        abc.amountLargeWithdrawal AS amountLargeWithdrawal,
+        abc.numberLargeWithdrawal AS numberLargeWithdrawal,
+        abc.poorAccess AS poorAccess,
+        abc.totalPreference AS totalPreference,
+        abc.rebateAmount AS rebateAmount,
+        abc.otherAdjustments AS otherAdjustments,
+        abc.placeOrderQuantity AS placeOrderQuantity,
+        abc.betAmount AS betAmount,
+        abc.activityAmount AS activityAmount,
+        abc.vipAmount AS vipAmount,
+        abc.alreadyUseAmount AS alreadyUseAmount,
+        abc.activeBet AS activeBet,
+        abc.bettingProfitLoss AS bettingProfitLoss,
+        abc.transAgentTime AS transAgentTime
+        from
+        (
+        SELECT
+        t.user_id AS userId,
+        u.user_account AS userAccount,
+        u.user_name AS userName,
+        u.account_type AS accountType,
+        u.main_currency as mainCurrency,
+        t.super_agent_id AS superAgentId,
+        t.super_agent_account AS superAgentAccount,
+        u.account_status AS accountStatus,
+        u.vip_grade_code AS vipGradeCode,
+        u.vip_rank AS vipRankCode,
+        u.user_label_id AS userLabelId,
+        u.register_time AS registerTime,
+        u.risk_level_id AS riskLevelId,
+        u.first_deposit_amount AS firstDepositAmount,
+        u.first_deposit_time AS firstDepositTime,
+        ANY_VALUE(u.site_code) as siteCode,
+        ANY_VALUE(u.register_ip) as registerIp,
+        ANY_VALUE(u.ip_address) as ipAddress,
+        ANY_VALUE(u.registry) as registry,
+        ANY_VALUE(u.last_login_time) as lastLoginTime,
+        max(t.id) id,
+        SUM( t.total_deposit ) AS totalDeposit,
+        SUM( t.number_deposit ) AS numberDeposit,
+        SUM( t.advanced_transfer ) AS advancedTransfer,
+        SUM( t.number_transfer ) AS numberTransfer,
+        SUM( t.amount_large_deposits ) AS amountLargeDeposits,
+        SUM( t.number_large_deposits ) AS numberLargeDeposits,
+
+        SUM( t.central_wallet ) AS centralWallet,
+        SUM( t.number_reversals ) AS numberReversals,
+
+        SUM( t.total_withdrawal ) AS totalWithdrawal,
+        SUM( t.number_withdrawal ) AS numberWithdrawal,
+
+        SUM( t.number_large_withdrawal ) AS numberLargeWithdrawal,
+        SUM( t.amount_large_withdrawal ) AS amountLargeWithdrawal,
+        SUM( t.poor_access ) AS poorAccess,
+        SUM( t.betting_profit_loss + t.already_use_amount  ) AS totalPreference,
+        SUM( t.rebate_amount ) AS rebateAmount,
+        SUM( t.other_adjustments ) AS otherAdjustments,
+        SUM( t.place_order_quantity ) AS placeOrderQuantity,
+        SUM( t.bet_amount ) AS betAmount,
+        SUM( t.active_bet ) AS activeBet,
+        SUM( t.activity_amount ) AS activityAmount,
+        SUM( t.vip_amount ) AS vipAmount,
+        SUM( t.already_use_amount ) AS alreadyUseAmount,
+        SUM( t.betting_profit_loss ) AS bettingProfitLoss,
+        SUM( t.trans_agent_time ) AS transAgentTime
+        FROM
+        report_user_info_statement t,user_info u
+        <where>
+            u.user_id = t.user_id
+            <if test="vo.statisticalDateStart !=null and vo.statisticalDateStart !=''">
+                and t.day_hour_millis <![CDATA[ >= ]]> #{vo.statisticalDateStart}
+            </if>
+            <if test="vo.statisticalDateEnd !=null and vo.statisticalDateEnd !=''">
+                and t.day_hour_millis <![CDATA[ <= ]]> #{vo.statisticalDateEnd}
+            </if>
+            <if test="vo.registerTimeStart !=null and vo.registerTimeStart !=''">
+                and u.register_time <![CDATA[ >= ]]> #{vo.registerTimeStart}
+            </if>
+            <if test="vo.registerTimeEnd !=null and vo.registerTimeEnd !=''">
+                and u.register_time <![CDATA[ <= ]]> #{vo.registerTimeEnd}
+            </if>
+            <if test="vo.firstDepositTimeStart !=null and vo.firstDepositTimeStart !=''">
+                and u.first_deposit_time <![CDATA[ >= ]]> #{vo.firstDepositTimeStart}
+            </if>
+            <if test="vo.firstDepositTimeEnd !=null and vo.firstDepositTimeEnd !=''">
+                and u.first_deposit_time <![CDATA[ <= ]]> #{vo.firstDepositTimeEnd}
+            </if>
+            <if test="vo.userAccount !=null and vo.userAccount !=''">
+                and t.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.superAgentAccount !=null and vo.superAgentAccount !=''">
+                and u.super_agent_account = #{vo.superAgentAccount}
+            </if>
+            <if test="vo.accountType !=null and vo.accountType !=''">
+                and u.account_type = #{vo.accountType}
+            </if>
+
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND t.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.agentAttribution !=null">
+                and t.agent_attribution = #{vo.agentAttribution}
+            </if>
+        </where>
+        GROUP BY
+        userId,
+        userAccount,
+        userName,
+        accountType,
+        mainCurrency,
+        superAgentId,
+        superAgentAccount,
+        firstDepositAmount,
+        vipGradeCode,
+        vipRankCode,
+        userLabelId,
+        registerTime,
+        accountStatus,
+        riskLevelId,
+        firstDepositTime
+
+
+        ) abc
+        LEFT JOIN ( SELECT id,super_agent_id,super_agent_account,agent_attribution FROM report_user_info_statement ) cc
+        on abc.id = cc.id
+        <where>
+
+            <if test="vo.betMin !=null and vo.betMin !=''">
+                and abc.placeOrderQuantity <![CDATA[ >= ]]> #{vo.betMin}
+            </if>
+            <if test="vo.betMax !=null and vo.betMax !=''">
+                and abc.placeOrderQuantity <![CDATA[ <= ]]> #{vo.betMax}
+            </if>
+            <if test="vo.betAmountMin !=null and vo.betAmountMin !=''">
+                and abc.betAmount <![CDATA[ >= ]]> #{vo.betAmountMin}
+            </if>
+            <if test="vo.betAmountMax !=null and vo.betAmountMax !=''">
+                and abc.betAmount <![CDATA[ <= ]]> #{vo.betAmountMax}
+            </if>
+
+            <if test="vo.activeBetMin !=null and vo.activeBetMin != ''">
+                and abc.activeBet <![CDATA[ >= ]]> #{vo.activeBetMin}
+            </if>
+            <if test="vo.activeBetMax !=null and vo.activeBetMax != ''">
+                and abc.activeBet <![CDATA[ <= ]]> #{vo.activeBetMax}
+            </if>
+            <if test="vo.bettingProfitLossMin !=null and vo.bettingProfitLossMin != ''">
+                and abc.totalPreference <![CDATA[ >= ]]> #{vo.bettingProfitLossMin}
+            </if>
+            <if test="vo.bettingProfitLossMax !=null and vo.bettingProfitLossMax !=''">
+                and  abc.totalPreference <![CDATA[ <= ]]> #{vo.bettingProfitLossMax}
+            </if>
+            <if test="vo.totalDepositMin !=null and vo.totalDepositMin != ''">
+                and  abc.totalDeposit <![CDATA[ >= ]]> #{vo.totalDepositMin}
+            </if>
+            <if test="vo.totalDepositMax !=null and vo.totalDepositMax != ''">
+                and abc.totalDeposit <![CDATA[ <= ]]> #{vo.totalDepositMax}
+            </if>
+            <if test="vo.totalWithdrawalMin !=null and vo.totalWithdrawalMin != ''">
+                and abc.totalWithdrawal <![CDATA[ >= ]]> #{vo.totalWithdrawalMin}
+            </if>
+            <if test="vo.totalWithdrawalMax !=null and vo.totalWithdrawalMax != ''">
+                and abc.totalWithdrawal <![CDATA[ <= ]]> #{vo.totalWithdrawalMax}
+            </if>
+            <if test="vo.numberDepositMin !=null and vo.numberDepositMin !=''">
+                and abc.numberDeposit <![CDATA[ >= ]]> #{vo.numberDepositMin}
+            </if>
+            <if test="vo.numberDepositMax !=null and vo.numberDepositMax !=''">
+                and abc.numberDeposit <![CDATA[ <= ]]> #{vo.numberDepositMax}
+            </if>
+            <if test="vo.numberWithdrawalMin !=null and vo.numberWithdrawalMin !=''">
+                and abc.numberWithdrawal <![CDATA[ >= ]]> #{vo.numberWithdrawalMin}
+            </if>
+            <if test="vo.numberWithdrawalMax !=null and vo.numberWithdrawalMax !=''">
+                and abc.numberWithdrawal <![CDATA[ <= ]]> #{vo.numberWithdrawalMax}
+            </if>
+
+        </where>
+
+
+        ) total
+    </select>
+
+    <select id="findPageList" resultType="com.cloud.baowang.report.api.vo.ReportUserInfoStatementVO">
+        SELECT
+        abc.userId AS userId,
+        abc.userAccount AS userAccount,
+        abc.userName AS userName,
+        abc.accountType AS accountType,
+        abc.mainCurrency AS mainCurrency,
+        cc.super_agent_id AS superAgentId,
+        cc.super_agent_account AS superAgentAccount,
+        cc.agent_attribution AS agentAttribution,
+        abc.accountStatus AS accountStatus,
+        abc.vipGradeCode AS vipGradeCode,
+        abc.vipRankCode AS vipRankCode,
+        abc.userLabelId AS userLabelId,
+        abc.registerTime AS registerTime,
+        abc.riskLevelId AS riskLevelId,
+        abc.firstDepositAmount AS firstDepositAmount,
+        abc.firstDepositTime AS firstDepositTime,
+        abc.siteCode AS siteCode,
+        abc.registerIp AS registerIp,
+        abc.ipAddress AS ipAddress,
+        abc.registry AS registry,
+        abc.lastLoginTime AS lastLoginTime,
+        abc.totalMainAmount as centerAmount,
+        abc.totalPlatAmount as totalPlatAmount,
+        abc.totalDeposit AS totalDeposit,
+        abc.numberDeposit AS numberDeposit,
+        abc.advancedTransfer AS advancedTransfer,
+        abc.numberTransfer AS numberTransfer,
+        abc.amountLargeDeposits AS amountLargeDeposits,
+        abc.numberLargeDeposits AS numberLargeDeposits,
+        abc.centralWallet AS centralWallet,
+        abc.numberReversals AS numberReversals,
+        abc.totalWithdrawal AS totalWithdrawal,
+        abc.numberWithdrawal AS numberWithdrawal,
+        abc.amountLargeWithdrawal AS amountLargeWithdrawal,
+        abc.numberLargeWithdrawal AS numberLargeWithdrawal,
+        abc.poorAccess AS poorAccess,
+        abc.totalPreference AS totalPreference,
+        abc.rebateAmount AS rebateAmount,
+        abc.otherAdjustments AS otherAdjustments,
+        abc.placeOrderQuantity AS placeOrderQuantity,
+        abc.betAmount AS betAmount,
+        abc.activityAmount AS activityAmount,
+        abc.vipAmount AS vipAmount,
+        abc.alreadyUseAmount AS alreadyUseAmount,
+        abc.activeBet AS activeBet,
+        abc.bettingProfitLoss AS bettingProfitLoss,
+        abc.platAdjustAmount AS platAdjustAmount,
+        abc.tipsAmount AS tipsAmount,
+        abc.riskAmount AS riskAmount,
+        abc.transAgentTime AS transAgentTime
+        from
+        (
+        SELECT
+        t.user_id AS userId,
+        u.user_account AS userAccount,
+        u.user_name AS userName,
+        u.account_type AS accountType,
+        u.main_currency as mainCurrency,
+        t.super_agent_id AS superAgentId,
+        t.super_agent_account AS superAgentAccount,
+        u.account_status AS accountStatus,
+        u.vip_grade_code AS vipGradeCode,
+        u.vip_rank AS vipRankCode,
+        u.user_label_id AS userLabelId,
+        u.register_time AS registerTime,
+        u.risk_level_id AS riskLevelId,
+        u.first_deposit_amount AS firstDepositAmount,
+        u.first_deposit_time AS firstDepositTime,
+        ANY_VALUE(u.site_code) as siteCode,
+        ANY_VALUE(u.register_ip) as registerIp,
+        ANY_VALUE(u.ip_address) as ipAddress,
+        ANY_VALUE(u.registry) as registry,
+        ANY_VALUE(u.last_login_time) as lastLoginTime,
+        ANY_VALUE(c1.available_amount) as totalMainAmount,
+        ANY_VALUE(c2.available_amount) as totalPlatAmount,
+        max(t.id) id,
+        SUM( t.total_deposit ) AS totalDeposit,
+        SUM( t.number_deposit ) AS numberDeposit,
+        SUM( t.advanced_transfer ) AS advancedTransfer,
+        SUM( t.number_transfer ) AS numberTransfer,
+        SUM( t.amount_large_deposits ) AS amountLargeDeposits,
+        SUM( t.number_large_deposits ) AS numberLargeDeposits,
+
+        SUM( t.central_wallet ) AS centralWallet,
+        SUM( t.number_reversals ) AS numberReversals,
+
+        SUM( t.total_withdrawal ) AS totalWithdrawal,
+        SUM( t.number_withdrawal ) AS numberWithdrawal,
+
+        SUM( t.number_large_withdrawal ) AS numberLargeWithdrawal,
+        SUM( t.amount_large_withdrawal ) AS amountLargeWithdrawal,
+        SUM( t.poor_access ) AS poorAccess,
+        SUM( t.betting_profit_loss + t.already_use_amount  + t.other_adjustments - t.tips_amount ) AS totalPreference,
+        SUM( t.rebate_amount ) AS rebateAmount,
+        SUM( t.other_adjustments ) AS otherAdjustments,
+        SUM( t.place_order_quantity ) AS placeOrderQuantity,
+        SUM( t.bet_amount ) AS betAmount,
+        SUM( t.active_bet ) AS activeBet,
+        SUM( t.activity_amount ) AS activityAmount,
+        SUM( t.vip_amount ) AS vipAmount,
+        SUM( t.already_use_amount ) AS alreadyUseAmount,
+        SUM( t.betting_profit_loss ) AS bettingProfitLoss,
+        SUM( t.plat_adjust_amount ) AS platAdjustAmount,
+        SUM( t.tips_amount ) AS tipsAmount,
+        SUM( t.risk_amount ) AS riskAmount,
+        SUM( t.trans_agent_time ) AS transAgentTime
+        FROM
+        report_user_info_statement t  left join
+        user_info u on  u.user_id = t.user_id left join
+        user_coin  c1 on  c1.user_id = t.user_id left join
+        user_platform_coin c2 on c2.user_id = t.user_id
+
+        <where>
+            1 = 1
+            <if test="vo.statisticalDateStart !=null and vo.statisticalDateStart !=''">
+                and t.day_hour_millis <![CDATA[ >= ]]> #{vo.statisticalDateStart}
+            </if>
+            <if test="vo.statisticalDateEnd !=null and vo.statisticalDateEnd !=''">
+                and t.day_hour_millis <![CDATA[ <= ]]> #{vo.statisticalDateEnd}
+            </if>
+            <if test="vo.registerTimeStart !=null and vo.registerTimeStart !=''">
+                and u.register_time <![CDATA[ >= ]]> #{vo.registerTimeStart}
+            </if>
+            <if test="vo.registerTimeEnd !=null and vo.registerTimeEnd !=''">
+                and u.register_time <![CDATA[ <= ]]> #{vo.registerTimeEnd}
+            </if>
+            <if test="vo.firstDepositTimeStart !=null and vo.firstDepositTimeStart !=''">
+                and u.first_deposit_time <![CDATA[ >= ]]> #{vo.firstDepositTimeStart}
+            </if>
+            <if test="vo.firstDepositTimeEnd !=null and vo.firstDepositTimeEnd !=''">
+                and u.first_deposit_time <![CDATA[ <= ]]> #{vo.firstDepositTimeEnd}
+            </if>
+
+            <if test="vo.userAccount !=null and vo.userAccount !=''">
+                and t.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.superAgentAccount !=null and vo.superAgentAccount !=''">
+                and u.super_agent_account = #{vo.superAgentAccount}
+            </if>
+            <if test="vo.accountType !=null and vo.accountType !=''">
+                and u.account_type = #{vo.accountType}
+            </if>
+
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND t.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.mainCurrency != '' and vo.mainCurrency != null">
+                AND t.main_currency = #{vo.mainCurrency}
+            </if>
+            <if test="vo.agentAttribution !=null">
+                and t.agent_attribution = #{vo.agentAttribution}
+            </if>
+        </where>
+        GROUP BY
+        userId,
+        userAccount,
+        userName,
+        accountType,
+        mainCurrency,
+        superAgentId,
+        superAgentAccount,
+        firstDepositAmount,
+        vipGradeCode,
+        vipRankCode,
+        userLabelId,
+        registerTime,
+        accountStatus,
+        riskLevelId,
+        firstDepositTime
+
+
+        ) abc
+        LEFT JOIN ( SELECT id,super_agent_id,super_agent_account,agent_attribution FROM report_user_info_statement ) cc
+        on abc.id = cc.id
+        <where>
+
+            <if test="vo.betMin !=null and vo.betMin !=''">
+                and abc.placeOrderQuantity <![CDATA[ >= ]]> #{vo.betMin}
+            </if>
+            <if test="vo.betMax !=null and vo.betMax !=''">
+                and abc.placeOrderQuantity <![CDATA[ <= ]]> #{vo.betMax}
+            </if>
+            <if test="vo.betAmountMin !=null and vo.betAmountMin !=''">
+                and abc.betAmount <![CDATA[ >= ]]> #{vo.betAmountMin}
+            </if>
+            <if test="vo.betAmountMax !=null and vo.betAmountMax !=''">
+                and abc.betAmount <![CDATA[ <= ]]> #{vo.betAmountMax}
+            </if>
+
+            <if test="vo.activeBetMin !=null and vo.activeBetMin != ''">
+                and abc.activeBet <![CDATA[ >= ]]> #{vo.activeBetMin}
+            </if>
+            <if test="vo.activeBetMax !=null and vo.activeBetMax != ''">
+                and abc.activeBet <![CDATA[ <= ]]> #{vo.activeBetMax}
+            </if>
+            <if test="vo.bettingProfitLossMin !=null and vo.bettingProfitLossMin != ''">
+                and abc.bettingProfitLoss <![CDATA[ >= ]]> #{vo.bettingProfitLossMin}
+            </if>
+            <if test="vo.bettingProfitLossMax !=null and vo.bettingProfitLossMax !=''">
+                and  abc.bettingProfitLoss <![CDATA[ <= ]]> #{vo.bettingProfitLossMax}
+            </if>
+            <if test="vo.totalDepositMin !=null and vo.totalDepositMin != ''">
+                and  abc.totalDeposit <![CDATA[ >= ]]> #{vo.totalDepositMin}
+            </if>
+            <if test="vo.totalDepositMax !=null and vo.totalDepositMax != ''">
+                and abc.totalDeposit <![CDATA[ <= ]]> #{vo.totalDepositMax}
+            </if>
+            <if test="vo.totalWithdrawalMin !=null and vo.totalWithdrawalMin != ''">
+                and abc.totalWithdrawal <![CDATA[ >= ]]> #{vo.totalWithdrawalMin}
+            </if>
+            <if test="vo.totalWithdrawalMax !=null and vo.totalWithdrawalMax != ''">
+                and abc.totalWithdrawal <![CDATA[ <= ]]> #{vo.totalWithdrawalMax}
+            </if>
+
+            <if test="vo.numberDepositMin !=null and vo.numberDepositMin !=''">
+                and abc.numberDeposit <![CDATA[ >= ]]> #{vo.numberDepositMin}
+            </if>
+            <if test="vo.numberDepositMax !=null and vo.numberDepositMax !=''">
+                and abc.numberDeposit <![CDATA[ <= ]]> #{vo.numberDepositMax}
+            </if>
+            <if test="vo.numberWithdrawalMin !=null and vo.numberWithdrawalMin !=''">
+                and abc.numberWithdrawal <![CDATA[ >= ]]> #{vo.numberWithdrawalMin}
+            </if>
+            <if test="vo.numberWithdrawalMax !=null and vo.numberWithdrawalMax !=''">
+                and abc.numberWithdrawal <![CDATA[ <= ]]> #{vo.numberWithdrawalMax}
+            </if>
+
+
+        </where>
+
+        <choose>
+
+            <when test="vo.orderField == 'vipRankCode' and vo.orderType == 'asc'">
+                ORDER BY vipRankCode asc
+            </when>
+            <when test="vo.orderField == 'vipRankCode' and vo.orderType == 'desc'">
+                ORDER BY vipRankCode desc
+            </when>
+            <when test="vo.orderField == 'registerTime' and vo.orderType == 'asc'">
+                ORDER BY registerTime asc
+            </when>
+            <when test="vo.orderField == 'registerTime' and vo.orderType == 'desc'">
+                ORDER BY registerTime desc
+            </when>
+
+            <when test="vo.orderField == 'firstDepositTime' and vo.orderType == 'asc'">
+                ORDER BY firstDepositTime asc
+            </when>
+            <when test="vo.orderField == 'firstDepositTime' and vo.orderType == 'desc'">
+                ORDER BY firstDepositTime desc
+            </when>
+
+            <when test="vo.orderField == 'firstDepositAmount' and vo.orderType == 'asc'">
+                ORDER BY firstDepositAmount asc
+            </when>
+            <when test="vo.orderField == 'firstDepositAmount' and vo.orderType == 'desc'">
+                ORDER BY firstDepositAmount desc
+            </when>
+
+            <when test="vo.orderField == 'totalDeposit' and vo.orderType == 'asc'">
+                ORDER BY totalDeposit asc
+            </when>
+            <when test="vo.orderField == 'totalDeposit' and vo.orderType == 'desc'">
+                ORDER BY totalDeposit desc
+            </when>
+
+            <when test="vo.orderField == 'numberDeposit' and vo.orderType == 'asc'">
+                ORDER BY numberDeposit asc
+            </when>
+            <when test="vo.orderField == 'numberDeposit' and vo.orderType == 'desc'">
+                ORDER BY numberDeposit desc
+            </when>
+
+            <when test="vo.orderField == 'advancedTransfer' and vo.orderType == 'asc'">
+                ORDER BY advancedTransfer asc
+            </when>
+            <when test="vo.orderField == 'advancedTransfer' and vo.orderType == 'desc'">
+                ORDER BY advancedTransfer desc
+            </when>
+
+            <when test="vo.orderField == 'numberTransfer' and vo.orderType == 'asc'">
+                ORDER BY numberTransfer asc
+            </when>
+            <when test="vo.orderField == 'numberTransfer' and vo.orderType == 'desc'">
+                ORDER BY numberTransfer desc
+            </when>
+
+            <when test="vo.orderField == 'centralWallet' and vo.orderType == 'asc'">
+                ORDER BY centralWallet asc
+            </when>
+            <when test="vo.orderField == 'centralWallet' and vo.orderType == 'desc'">
+                ORDER BY centralWallet desc
+            </when>
+
+            <when test="vo.orderField == 'numberReversals' and vo.orderType == 'asc'">
+                ORDER BY numberReversals asc
+            </when>
+            <when test="vo.orderField == 'numberReversals' and vo.orderType == 'desc'">
+                ORDER BY numberReversals desc
+            </when>
+
+            <when test="vo.orderField == 'totalWithdrawal' and vo.orderType == 'asc'">
+                ORDER BY totalWithdrawal asc
+            </when>
+            <when test="vo.orderField == 'totalWithdrawal' and vo.orderType == 'desc'">
+                ORDER BY totalWithdrawal desc
+            </when>
+
+            <when test="vo.orderField == 'numberWithdrawal' and vo.orderType == 'asc'">
+                ORDER BY numberWithdrawal asc
+            </when>
+            <when test="vo.orderField == 'numberWithdrawal' and vo.orderType == 'desc'">
+                ORDER BY numberWithdrawal desc
+            </when>
+
+            <when test="vo.orderField == 'numberLargeDeposits' and vo.orderType == 'asc'">
+                ORDER BY numberLargeDeposits asc
+            </when>
+            <when test="vo.orderField == 'numberLargeDeposits' and vo.orderType == 'desc'">
+                ORDER BY numberLargeDeposits desc
+            </when>
+
+            <when test="vo.orderField == 'poorAccess' and vo.orderType == 'asc'">
+                ORDER BY poorAccess asc
+            </when>
+            <when test="vo.orderField == 'poorAccess' and vo.orderType == 'desc'">
+                ORDER BY poorAccess desc
+            </when>
+
+            <when test="vo.orderField == 'totalPreference' and vo.orderType == 'asc'">
+                ORDER BY totalPreference asc
+            </when>
+            <when test="vo.orderField == 'totalPreference' and vo.orderType == 'desc'">
+                ORDER BY totalPreference desc
+            </when>
+
+            <when test="vo.orderField == 'rebateAmount' and vo.orderType == 'asc'">
+                ORDER BY rebateAmount asc
+            </when>
+            <when test="vo.orderField == 'rebateAmount' and vo.orderType == 'desc'">
+                ORDER BY rebateAmount desc
+            </when>
+
+            <when test="vo.orderField == 'otherAdjustments' and vo.orderType == 'asc'">
+                ORDER BY otherAdjustments asc
+            </when>
+            <when test="vo.orderField == 'otherAdjustments' and vo.orderType == 'desc'">
+                ORDER BY otherAdjustments desc
+            </when>
+
+            <when test="vo.orderField == 'placeOrderQuantity' and vo.orderType == 'asc'">
+                ORDER BY placeOrderQuantity asc
+            </when>
+            <when test="vo.orderField == 'placeOrderQuantity' and vo.orderType == 'desc'">
+                ORDER BY placeOrderQuantity desc
+            </when>
+
+            <when test="vo.orderField == 'betAmount' and vo.orderType == 'asc'">
+                ORDER BY betAmount asc
+            </when>
+            <when test="vo.orderField == 'betAmount' and vo.orderType == 'desc'">
+                ORDER BY betAmount desc
+            </when>
+
+            <when test="vo.orderField == 'activeBet' and vo.orderType == 'asc'">
+                ORDER BY activeBet asc
+            </when>
+            <when test="vo.orderField == 'activeBet' and vo.orderType == 'desc'">
+                ORDER BY activeBet desc
+            </when>
+
+            <when test="vo.orderField == 'bettingProfitLoss' and vo.orderType == 'asc'">
+                ORDER BY bettingProfitLoss asc
+            </when>
+            <when test="vo.orderField == 'bettingProfitLoss' and vo.orderType == 'desc'">
+                ORDER BY bettingProfitLoss desc
+            </when>
+
+            <when test="vo.orderField == 'transAgentTime' and vo.orderType == 'asc'">
+                ORDER BY transAgentTime asc
+            </when>
+            <when test="vo.orderField == 'transAgentTime' and vo.orderType == 'desc'">
+                ORDER BY transAgentTime desc
+            </when>
+
+            <when test="vo.orderField == 'vipAmount' and vo.orderType == 'asc'">
+                ORDER BY vipAmount asc
+            </when>
+            <when test="vo.orderField == 'vipAmount' and vo.orderType == 'desc'">
+                ORDER BY vipAmount desc
+            </when>
+
+            <when test="vo.orderField == 'activityAmount' and vo.orderType == 'asc'">
+                ORDER BY activityAmount asc
+            </when>
+            <when test="vo.orderField == 'activityAmount' and vo.orderType == 'desc'">
+                ORDER BY activityAmount desc
+            </when>
+
+            <when test="vo.orderField == 'alreadyUseAmount' and vo.orderType == 'asc'">
+                ORDER BY alreadyUseAmount asc
+            </when>
+            <when test="vo.orderField == 'alreadyUseAmount' and vo.orderType == 'desc'">
+                ORDER BY alreadyUseAmount desc
+            </when>
+
+            <when test="vo.orderField == 'numberLargeWithdrawal' and vo.orderType == 'asc'">
+                ORDER BY numberLargeWithdrawal asc
+            </when>
+            <when test="vo.orderField == 'numberLargeWithdrawal' and vo.orderType == 'desc'">
+                ORDER BY numberLargeWithdrawal desc
+            </when>
+            <when test="vo.orderField == 'tipsAmount' and vo.orderType == 'asc'">
+                ORDER BY tipsAmount asc
+            </when>
+            <when test="vo.orderField == 'tipsAmount' and vo.orderType == 'desc'">
+                ORDER BY tipsAmount desc
+            </when>
+            <when test="vo.orderField == 'platAdjustAmount' and vo.orderType == 'asc'">
+                ORDER BY platAdjustAmount asc
+            </when>
+            <when test="vo.orderField == 'platAdjustAmount' and vo.orderType == 'desc'">
+                ORDER BY platAdjustAmount desc
+            </when>
+            <when test="vo.orderField == 'riskAmount' and vo.orderType == 'asc'">
+                ORDER BY riskAmount asc
+            </when>
+            <when test="vo.orderField == 'riskAmount' and vo.orderType == 'desc'">
+                ORDER BY riskAmount desc
+            </when>
+
+
+
+
+            <otherwise>
+                ORDER BY registerTime DESC
+            </otherwise>
+        </choose>
+
+
+    </select>
+
+    <select id="getReportUserInfoStatementList"
+            resultType="com.cloud.baowang.report.api.vo.ReportUserInfoStatementVO">
+        SELECT
+        abc.userId AS userId,
+        abc.userAccount AS userAccount,
+        abc.userName AS userName,
+        abc.accountType AS accountType,
+        abc.mainCurrency AS mainCurrency,
+        cc.super_agent_id AS superAgentId,
+        cc.super_agent_account AS superAgentAccount,
+        cc.agent_attribution AS agentAttribution,
+        abc.accountStatus AS accountStatus,
+        abc.vipGradeCode AS vipGradeCode,
+        abc.vipRankCode AS vipRankCode,
+        abc.userLabelId AS userLabelId,
+        abc.registerTime AS registerTime,
+        abc.riskLevelId AS riskLevelId,
+        abc.firstDepositAmount AS firstDepositAmount,
+        abc.firstDepositTime AS firstDepositTime,
+        abc.siteCode AS siteCode,
+        abc.registerIp AS registerIp,
+        abc.ipAddress AS ipAddress,
+        abc.registry AS registry,
+        abc.lastLoginTime AS lastLoginTime,
+        abc.totalMainAmount as centerAmount,
+        abc.totalPlatAmount as totalPlatAmount,
+        abc.totalDeposit AS totalDeposit,
+        abc.numberDeposit AS numberDeposit,
+        abc.advancedTransfer AS advancedTransfer,
+        abc.numberTransfer AS numberTransfer,
+        abc.amountLargeDeposits AS amountLargeDeposits,
+        abc.numberLargeDeposits AS numberLargeDeposits,
+        abc.centralWallet AS centralWallet,
+        abc.numberReversals AS numberReversals,
+        abc.totalWithdrawal AS totalWithdrawal,
+        abc.numberWithdrawal AS numberWithdrawal,
+        abc.amountLargeWithdrawal AS amountLargeWithdrawal,
+        abc.numberLargeWithdrawal AS numberLargeWithdrawal,
+        abc.poorAccess AS poorAccess,
+        abc.totalPreference AS totalPreference,
+        abc.rebateAmount AS rebateAmount,
+        abc.otherAdjustments AS otherAdjustments,
+        abc.placeOrderQuantity AS placeOrderQuantity,
+        abc.betAmount AS betAmount,
+        abc.activityAmount AS activityAmount,
+        abc.vipAmount AS vipAmount,
+        abc.alreadyUseAmount AS alreadyUseAmount,
+        abc.activeBet AS activeBet,
+        abc.bettingProfitLoss AS bettingProfitLoss,
+        abc.platAdjustAmount AS platAdjustAmount,
+        abc.tipsAmount AS tipsAmount,
+        abc.riskAmount AS riskAmount,
+        abc.transAgentTime AS transAgentTime
+        from
+        (
+        SELECT
+        t.user_id AS userId,
+        u.user_account AS userAccount,
+        u.user_name AS userName,
+        u.account_type AS accountType,
+        u.main_currency as mainCurrency,
+        t.super_agent_id AS superAgentId,
+        t.super_agent_account AS superAgentAccount,
+        u.account_status AS accountStatus,
+        u.vip_grade_code AS vipGradeCode,
+        u.vip_rank AS vipRankCode,
+        u.user_label_id AS userLabelId,
+        u.register_time AS registerTime,
+        u.risk_level_id AS riskLevelId,
+        u.first_deposit_amount AS firstDepositAmount,
+        u.first_deposit_time AS firstDepositTime,
+        u.site_code as siteCode,
+        ANY_VALUE(u.register_ip) as registerIp,
+        ANY_VALUE(u.ip_address) as ipAddress,
+        ANY_VALUE(u.registry) as registry,
+        ANY_VALUE(u.last_login_time) as lastLoginTime,
+        ANY_VALUE(c1.available_amount) as totalMainAmount,
+        ANY_VALUE(c2.available_amount) as totalPlatAmount,
+        max(t.id) id,
+        SUM( t.total_deposit ) AS totalDeposit,
+        SUM( t.number_deposit ) AS numberDeposit,
+        SUM( t.advanced_transfer ) AS advancedTransfer,
+        SUM( t.number_transfer ) AS numberTransfer,
+        SUM( t.amount_large_deposits ) AS amountLargeDeposits,
+        SUM( t.number_large_deposits ) AS numberLargeDeposits,
+
+        SUM( t.central_wallet ) AS centralWallet,
+        SUM( t.number_reversals ) AS numberReversals,
+
+        SUM( t.total_withdrawal ) AS totalWithdrawal,
+        SUM( t.number_withdrawal ) AS numberWithdrawal,
+
+        SUM( t.number_large_withdrawal ) AS numberLargeWithdrawal,
+        SUM( t.amount_large_withdrawal ) AS amountLargeWithdrawal,
+        SUM( t.poor_access ) AS poorAccess,
+        SUM( t.betting_profit_loss + t.already_use_amount + t.other_adjustments - t.tips_amount ) AS totalPreference,
+        SUM( t.rebate_amount ) AS rebateAmount,
+        SUM( t.other_adjustments ) AS otherAdjustments,
+        SUM( t.place_order_quantity ) AS placeOrderQuantity,
+        SUM( t.bet_amount ) AS betAmount,
+        SUM( t.active_bet ) AS activeBet,
+        SUM( t.activity_amount ) AS activityAmount,
+        SUM( t.vip_amount ) AS vipAmount,
+        SUM( t.already_use_amount ) AS alreadyUseAmount,
+        SUM( t.betting_profit_loss ) AS bettingProfitLoss,
+        SUM( t.plat_adjust_amount ) AS platAdjustAmount,
+        SUM( t.tips_amount ) AS tipsAmount,
+        SUM( t.risk_amount ) AS riskAmount,
+        SUM( t.trans_agent_time ) AS transAgentTime
+        FROM
+        report_user_info_statement t left join
+        user_info u on u.user_id = t.user_id left join
+        user_coin c1 on c1.user_id = t.user_id left join
+        user_platform_coin c2 on c2.user_id = t.user_id
+        <where>
+            1 = 1
+            <if test="vo.statisticalDateStart !=null and vo.statisticalDateStart !=''">
+                and t.day_hour_millis <![CDATA[ >= ]]> #{vo.statisticalDateStart}
+            </if>
+            <if test="vo.statisticalDateEnd !=null and vo.statisticalDateEnd !=''">
+                and t.day_hour_millis <![CDATA[ <= ]]> #{vo.statisticalDateEnd}
+            </if>
+            <if test="vo.registerTimeStart !=null and vo.registerTimeStart !=''">
+                and u.register_time <![CDATA[ >= ]]> #{vo.registerTimeStart}
+            </if>
+            <if test="vo.registerTimeEnd !=null and vo.registerTimeEnd !=''">
+                and u.register_time <![CDATA[ <= ]]> #{vo.registerTimeEnd}
+            </if>
+            <if test="vo.firstDepositTimeStart !=null and vo.firstDepositTimeStart !=''">
+                and u.first_deposit_time <![CDATA[ >= ]]> #{vo.firstDepositTimeStart}
+            </if>
+            <if test="vo.firstDepositTimeEnd !=null and vo.firstDepositTimeEnd !=''">
+                and u.first_deposit_time <![CDATA[ <= ]]> #{vo.firstDepositTimeEnd}
+            </if>
+
+            <if test="vo.userAccount !=null and vo.userAccount !=''">
+                and t.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.superAgentAccount !=null and vo.superAgentAccount !=''">
+                and u.super_agent_account = #{vo.superAgentAccount}
+            </if>
+            <if test="vo.accountType !=null and vo.accountType !=''">
+                and u.account_type = #{vo.accountType}
+            </if>
+
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND t.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.mainCurrency != '' and vo.mainCurrency != null">
+                AND t.main_currency = #{vo.mainCurrency}
+            </if>
+            <if test="vo.agentAttribution !=null">
+                and t.agent_attribution = #{vo.agentAttribution}
+            </if>
+        </where>
+        GROUP BY
+        userId,
+        userAccount,
+        userName,
+        accountType,
+        mainCurrency,
+        superAgentId,
+        superAgentAccount,
+        firstDepositAmount,
+        vipGradeCode,
+        vipRankCode,
+        userLabelId,
+        registerTime,
+        accountStatus,
+        riskLevelId,
+        firstDepositTime,
+        siteCode
+
+
+        ) abc
+        LEFT JOIN ( SELECT id,super_agent_id,super_agent_account,agent_attribution FROM report_user_info_statement ) cc
+        on abc.id = cc.id
+        <where>
+
+            <if test="vo.betMin !=null and vo.betMin !=''">
+                and abc.placeOrderQuantity <![CDATA[ >= ]]> #{vo.betMin}
+            </if>
+            <if test="vo.betMax !=null and vo.betMax !=''">
+                and abc.placeOrderQuantity <![CDATA[ <= ]]> #{vo.betMax}
+            </if>
+            <if test="vo.betAmountMin !=null and vo.betAmountMin !=''">
+                and abc.betAmount <![CDATA[ >= ]]> #{vo.betAmountMin}
+            </if>
+            <if test="vo.betAmountMax !=null and vo.betAmountMax !=''">
+                and abc.betAmount <![CDATA[ <= ]]> #{vo.betAmountMax}
+            </if>
+
+            <if test="vo.activeBetMin !=null and vo.activeBetMin != ''">
+                and abc.activeBet <![CDATA[ >= ]]> #{vo.activeBetMin}
+            </if>
+            <if test="vo.activeBetMax !=null and vo.activeBetMax != ''">
+                and abc.activeBet <![CDATA[ <= ]]> #{vo.activeBetMax}
+            </if>
+            <if test="vo.bettingProfitLossMin !=null and vo.bettingProfitLossMin != ''">
+                and abc.bettingProfitLoss <![CDATA[ >= ]]> #{vo.bettingProfitLossMin}
+            </if>
+            <if test="vo.bettingProfitLossMax !=null and vo.bettingProfitLossMax !=''">
+                and abc.bettingProfitLoss <![CDATA[ <= ]]> #{vo.bettingProfitLossMax}
+            </if>
+            <if test="vo.totalDepositMin !=null and vo.totalDepositMin != ''">
+                and abc.totalDeposit <![CDATA[ >= ]]> #{vo.totalDepositMin}
+            </if>
+            <if test="vo.totalDepositMax !=null and vo.totalDepositMax != ''">
+                and abc.totalDeposit <![CDATA[ <= ]]> #{vo.totalDepositMax}
+            </if>
+            <if test="vo.totalWithdrawalMin !=null and vo.totalWithdrawalMin != ''">
+                and abc.totalWithdrawal <![CDATA[ >= ]]> #{vo.totalWithdrawalMin}
+            </if>
+            <if test="vo.totalWithdrawalMax !=null and vo.totalWithdrawalMax != ''">
+                and abc.totalWithdrawal <![CDATA[ <= ]]> #{vo.totalWithdrawalMax}
+            </if>
+            <if test="vo.numberDepositMin !=null and vo.numberDepositMin !=''">
+                and abc.numberDeposit <![CDATA[ >= ]]> #{vo.numberDepositMin}
+            </if>
+            <if test="vo.numberDepositMax !=null and vo.numberDepositMax !=''">
+                and abc.numberDeposit <![CDATA[ <= ]]> #{vo.numberDepositMax}
+            </if>
+            <if test="vo.numberWithdrawalMin !=null and vo.numberWithdrawalMin !=''">
+                and abc.numberWithdrawal <![CDATA[ >= ]]> #{vo.numberWithdrawalMin}
+            </if>
+            <if test="vo.numberWithdrawalMax !=null and vo.numberWithdrawalMax !=''">
+                and abc.numberWithdrawal <![CDATA[ <= ]]> #{vo.numberWithdrawalMax}
+            </if>
+
+
+        </where>
+
+
+    </select>
+
+    <select id="findPageListByAgent"
+            resultType="com.cloud.baowang.report.api.vo.UserInfoStatementAgentPageVO">
+        SELECT
+        t.user_account AS userAccount,
+        t.created_time AS createdTime,
+        t.super_agent_id AS superAgentId,
+        t.super_agent_account AS superAgentAccount,
+        SUM( t.total_deposit ) AS totalDeposit,
+        SUM( t.total_withdrawal ) AS totalWithdrawal,
+        SUM( t.betting_profit_loss + t.already_use_amount  ) AS totalPreference,
+        SUM( t.rebate_amount ) AS rebateAmount,
+        SUM( t.other_adjustments ) AS otherAdjustments,
+        SUM( t.place_order_quantity ) AS placeOrderQuantity,
+        SUM( t.bet_amount ) AS betAmount,
+        SUM( t.active_bet ) AS activeBet,
+        SUM( t.betting_profit_loss ) AS bettingProfitLoss
+        FROM
+        report_user_info_statement t
+        <where>
+            <if test="vo.statisticalDateStart !=null and vo.statisticalDateStart !=''">
+                and t.created_time <![CDATA[ >= ]]> #{vo.statisticalDateStart}
+            </if>
+            <if test="vo.statisticalDateEnd !=null and vo.statisticalDateEnd !=''">
+                and t.created_time <![CDATA[ <= ]]> #{vo.statisticalDateEnd}
+            </if>
+            <if test="vo.registerTimeStart !=null and vo.registerTimeStart !=''">
+                and u.register_time <![CDATA[ >= ]]> #{vo.registerTimeStart}
+            </if>
+            <if test="vo.registerTimeEnd !=null and vo.registerTimeEnd !=''">
+                and u.register_time <![CDATA[ <= ]]> #{vo.registerTimeEnd}
+            </if>
+            <if test="vo.userAccount !=null and vo.userAccount !=''">
+                and t.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.siteCode !=null and vo.siteCode !=''">
+                and t.site_code = #{vo.siteCode}
+            </if>
+        </where>
+        GROUP BY
+        createdTime,
+        superAgentAccount,
+        superAgentId,
+        userAccount
+        ORDER BY createdTime DESC
+
+    </select>
+
+    <select id="pageListUserAccount" resultType="com.cloud.baowang.report.api.vo.ReportUserInfoStatementResponseVO">
+
+        select
+        day_Millis AS dayMillis,
+        a.super_agent_account AS superAgentAccount,
+        SUM(a.total_deposit) AS totalDeposit,
+        SUM(a.bet_amount) AS betAmount,
+        SUM(a.number_deposit) AS numberDeposit,
+        SUM(a.advanced_transfer) AS advancedTransfer,
+        SUM(a.number_transfer) AS numberTransfer,
+        SUM(a.central_wallet) AS centralWallet,
+        SUM(a.number_reversals) AS numberReversals,
+        SUM(a.total_withdrawal) AS totalWithdrawal,
+        SUM(a.number_withdrawal) AS numberWithdrawal,
+        SUM(a.number_large_deposits) AS numberLargeDeposits,
+        SUM(a.poor_access) AS poorAccess,
+        SUM(a.member_labour_amount) AS memberLabourAmount,
+        SUM(a.member_vip_labour_amount) AS memberVipLabourAmount,
+        SUM(a.rebate_amount) AS rebateAmount,
+        SUM(a.other_adjustments) AS otherAdjustments,
+        SUM(a.place_order_quantity) AS placeOrderQuantity,
+        SUM(a.active_bet) AS activeBet,
+        SUM(a.betting_profit_loss) AS bettingProfitLoss,
+        SUM(a.trans_agent_time) AS transAgentTime,
+        SUM(a.activity_amount) AS activityAmount,
+        SUM(a.vip_amount) AS vipAmount,
+        SUM(a.already_use_amount) AS alreadyUseAmount
+        FROM report_user_info_statement a
+        <where>
+            <if test="vo.statisticalDateStart != null">
+                AND a.day_hour_millis <![CDATA[ >= ]]> #{vo.statisticalDateStart}
+            </if>
+            <if test="vo.statisticalDateEnd != null">
+                AND a.day_hour_millis <![CDATA[ <= ]]> #{vo.statisticalDateEnd}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND a.site_code = #{vo.siteCode}
+            </if>
+        </where>
+        group by dayMillis,superAgentAccount
+        ORDER BY dayMillis DESC
+    </select>
+</mapper>

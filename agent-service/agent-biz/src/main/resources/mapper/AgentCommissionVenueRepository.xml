@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentCommissionVenueRepository">
+
+
+    <select id="getTeamCommissionReport"
+            resultType="com.cloud.baowang.agent.api.vo.commission.AgentCommissionReportVO">
+        SELECT
+        site_code          AS siteCode,
+        agent_id           AS agentId,
+        plan_rate          AS planRate,
+        venue_type         AS venueType,
+        SUM(valid_amount)  AS validAmount,
+        SUM(commission_amount) AS commissionAmount
+        FROM agent_commission_venue_report
+        WHERE site_code = #{siteCode}
+
+        <if test="childNodes != null and childNodes.size() > 0">
+            AND agent_id IN
+            <foreach collection="agentIds" item="aid" open="(" separator="," close=")">
+                #{aid}
+            </foreach>
+        </if>
+
+        <if test="commissionType != null">
+            AND commission_type = #{commissionType}
+        </if>
+
+        <!-- 这里 start_time/end_time 是 bigint(毫秒)，直接比 -->
+        <if test="startTime != null">
+            AND start_time &gt;= #{startTime}
+        </if>
+
+        <if test="endTime != null">
+            AND end_time &lt;= #{endTime}
+        </if>
+
+        GROUP BY site_code, agent_id, plan_rate, venue_type
+        ORDER BY venue_type
+
+    </select>
+
+    <select id="selectSubAgents" resultType="java.lang.Long">
+        SELECT count(1)  FROM agent_info_relation	 WHERE   site_code = #{siteCode}
+                                                               AND ancestor_agent_id = #{agentId}
+                                                               AND start_time &gt;= #{startTime}
+                                                               AND end_time &lt;= #{endTime}  and agent_depth>0
+    </select>
+
+
+    <select id="selectDirUsers" resultType="java.lang.Long">
+        SELECT count(1) FROM user_info WHERE  site_code = #{siteCode}
+                                         AND super_agent_id= #{agentId}
+                                         AND start_time &gt;= #{startTime}
+                                         AND end_time &lt;= #{endTime}
+    </select>
+
+    <select id="selectTeamCommission"
+            resultType="java.math.BigDecimal">
+
+        SELECT IFNULL(SUM(r.commission_amount), 0) AS commissionAmount
+        FROM agent_info_relation rel
+                 JOIN agent_commission_venue_report r
+                      ON r.agent_id = rel.descendant_agent_id
+        WHERE rel.ancestor_agent_id = #{agentId}
+          AND rel.agent_depth = 1
+          AND r.site_code = #{siteCode}
+          AND r.start_time &gt;= #{startTime}
+          AND r.end_time &lt;= #{endTime}
+
+    </select>
+
+    <select id="selectDirUserCommission" resultType="com.cloud.baowang.agent.po.commission.AgentCommissionVenueReportPO">
+        SELECT *
+        FROM agent_commission_venue_report
+        WHERE site_code = #{siteCode}
+          AND agent_id = #{agentId}
+          AND start_time &gt;= #{startTime}
+          AND end_time &lt;= #{endTime}
+    </select>
+
+
+    <select id="selectOtherLevelCommission"
+            resultType="java.math.BigDecimal">
+
+        SELECT IFNULL(SUM(r.commission_amount), 0) AS commissionAmount
+        FROM agent_info_relation rel
+                 JOIN agent_commission_venue_report r
+                      ON r.agent_id = rel.descendant_agent_id
+        WHERE rel.ancestor_agent_id = #{agentId}
+          AND rel.agent_depth > 1
+          AND r.site_code = #{siteCode}
+          AND r.start_time &gt;= #{startTime}
+          AND r.end_time &lt;= #{endTime}
+
+    </select>
+</mapper>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.system.repositories.exchange.SystemCurrencyInfoRepository">
+
+
+
+    <select id="listPage" resultType="com.cloud.baowang.system.po.exchange.SystemCurrencyInfo">
+        SELECT a.*
+        from system_currency_info a left join i18n_message b on a.currency_name_i18=b.message_key
+        where 1=1
+        and b.language =#{vo.languageCode}
+        <if test="vo.currencyCode!=null and vo.currencyCode!=''">
+           and  a.currency_code  like concat('%',#{vo.currencyCode},'%')
+        </if>
+        <if test="vo.currencyName!=null and vo.currencyName!=''">
+            and b.message like concat('%',#{vo.currencyName},'%')
+        </if>
+        <if test="vo.currencyCodeList!=null ">
+            and  a.currency_code in
+            <foreach collection="vo.currencyCodeList" item="currencyCode" separator="," open="(" close=")">
+                  #{currencyCode}
+             </foreach>
+        </if>
+        <if test="vo.status!=null ">
+            and  a.status =#{vo.status}
+        </if>
+        order by a.created_time
+    </select>
+
+</mapper>

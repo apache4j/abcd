@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.report.repositories.ReportAgentStaticDayRepository">
+
+
+    <select id="selectTotal" resultType="com.cloud.baowang.report.po.ReportAgentStaticDayPO">
+        SELECT
+        currency_code,
+        sum( `team_agent_num` ) AS team_agent_num,
+        sum( `direct_report_num` ) AS direct_report_num,
+        sum( `register_user_num` ) AS register_user_num,
+        sum( `first_deposit_num` ) AS first_deposit_num,
+        sum( `first_deposit_rate` ) AS first_deposit_rate,
+        sum( `bet_user_num` ) AS bet_user_num,
+        sum( `bet_amount` ) AS bet_amount,
+        sum( `valid_amount` ) AS valid_amount,
+        sum( `win_loss_amount_user` ) AS win_loss_amount_user,
+        sum( `win_loss_amount_plat` ) AS win_loss_amount_plat,
+        sum( `adjust_amount` ) AS adjust_amount,
+        sum( `win_loss_rate` ) AS win_loss_rate,
+        sum( `activity_amount` ) AS activity_amount,
+        sum( `vip_amount` ) AS vip_amount,
+        sum( `already_use_amount` ) AS already_use_amount,
+        sum( `rebate_amount` ) AS rebateAmount,
+        sum( `deposit_withdraw_fee_amount` ) AS deposit_withdraw_fee_amount,
+        sum( `risk_amount` ) AS risk_amount,
+        sum( `plat_adjust_amount` ) AS plat_adjust_amount,
+        sum( `tips_amount` ) AS tips_amount,
+        sum( `deposit_total_amount` ) AS depositTotalAmount,
+        sum( `withdraw_total_amount` ) AS withdrawTotalAmount
+        from
+        (
+            select  *
+            FROM
+            report_agent_static_day
+        ${ew.customSqlSegment}
+        ) as t
+        group by currency_code
+    </select>
+</mapper>

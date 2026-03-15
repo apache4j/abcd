@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.report.repositories.ReportUserFixedVenueWinloseRepository">
+    <select id="queryUserWinLossInfo" resultType="com.cloud.baowang.report.api.vo.user.ReportUserVenueBetsTopVO">
+        SELECT
+        user_id AS userId,
+        ANY_VALUE(currency) AS currency,
+        max(user_account) AS userAccount,
+        IFNULL(SUM(bet_amount), 0) AS betAmount,
+        IFNULL(SUM(win_loss_amount), 0) AS winLossAmount,
+        IFNULL(SUM(valid_amount), 0) AS validAmount
+        FROM
+        report_user_venue_win_lose
+        <where>
+            <if test="vo.siteCode != null and vo.siteCode !=''">
+                site_code = #{vo.siteCode}
+            </if>
+
+            <if test="vo.venueCode != null and vo.venueCode !=''">
+                AND venue_code = #{vo.venueCode}
+            </if>
+
+            <if test="vo.venueCodeList != null and vo.venueCodeList.size() > 0">
+                AND venue_code in
+                <foreach item="venueCode" collection="vo.venueCodeList" open="(" separator="," close=")">
+                    #{venueCode}
+                </foreach>
+            </if>
+
+
+            <if test="vo.userId != null and vo.userId !=''">
+                AND user_id = #{vo.userId}
+            </if>
+            <if test="vo.startTime != null">
+                AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+
+            <if test="vo.dayMillisStartTime != null">
+                AND day_millis <![CDATA[ >= ]]> #{vo.dayMillisStartTime}
+            </if>
+            <if test="vo.dayMillisEndTime != null">
+                AND day_millis <![CDATA[ <  ]]> #{vo.dayMillisEndTime}
+            </if>
+
+            <if test="vo.startTotalBetAmount != null">
+                AND bet_amount <![CDATA[ >= ]]> #{vo.startTotalBetAmount}
+            </if>
+            <if test="vo.endTotalBetAmount != null">
+                AND bet_amount <![CDATA[ <= ]]> #{vo.endTotalBetAmount}
+            </if>
+
+            <if test="vo.dayMillis != null">
+                AND day_millis = #{vo.dayMillis}
+            </if>
+        </where>
+        GROUP BY user_id
+    </select>
+
+
+    <select id="queryVenueDayCurrency" resultType="java.lang.String">
+        SELECT tab.currency
+        FROM (
+                 SELECT currency, COUNT(day_millis) AS countDay
+                 FROM report_user_venue_win_lose
+                 WHERE day_millis BETWEEN #{vo.startDayMillisTime} AND #{vo.endDayMillisTime}
+                   AND venue_type = #{vo.venueType}
+                   AND site_code = #{vo.siteCode}
+                 GROUP BY currency
+                 HAVING COUNT(day_millis) >= #{vo.countDay}
+             ) AS tab;
+
+    </select>
+
+
+    <select id="queryUserIdsByVenueDayAmount" resultType="com.cloud.baowang.report.api.vo.user.ReportUserVenueBetsTopVO">
+        select *
+        from (SELECT day_tab.user_id, count(day_tab.user_id) as userCount
+              FROM (SELECT user_id, SUM(valid_amount) AS totalAmount
+                    FROM report_user_venue_win_lose
+                    WHERE day_millis BETWEEN #{vo.startDayMillisTime} AND #{vo.endDayMillisTime} -- 替换为开始和结束的时间戳
+                      and currency = #{vo.currencyCode}
+                      and venue_type = #{vo.venueType}
+                      and site_code = #{vo.siteCode}
+                    GROUP BY user_id, day_millis
+                    HAVING totalAmount >= #{vo.platformDayBetAmount}) day_tab
+              group by day_tab.user_id) cou_tab
+        where cou_tab.userCount >= #{vo.countDay}
+    </select>
+
+
+    <select id="queryAllCurrencyTop" resultType="com.cloud.baowang.report.api.vo.user.ReportUserVenueBetsTopVO">
+        SELECT site_code,user_id,day_millis,venue_code,user_account,currency,
+        SUM(win_loss_amount) as winLossAmount
+        ,SUM(valid_amount) as validAmount,
+        SUM(bet_amount) as betAmount
+        FROM report_user_venue_win_lose
+        WHERE site_code = #{vo.siteCode} and day_millis = #{vo.dayMillis}
+
+        <if test="vo.venueCodeList != null and vo.venueCodeList.size() > 0">
+            AND venue_code in
+            <foreach item="venueCode" collection="vo.venueCodeList" open="(" separator="," close=")">
+                #{venueCode}
+            </foreach>
+        </if>
+
+        <if test="vo.userIdList != null and vo.userIdList.size() > 0">
+            AND user_id in
+            <foreach item="userId" collection="vo.userIdList" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+
+        group by site_code,user_id,day_millis,venue_code,user_account,currency
+    </select>
+
+
+
+    <select id="queryVenueBetsPlatBetAmountTotal" resultType="com.cloud.baowang.report.api.vo.user.ReportUserVenueBetsTopVO">
+        SELECT site_code,day_millis,venue_code,currency,
+        SUM(win_loss_amount) as winLossAmount
+        ,SUM(valid_amount) as validAmount,
+        SUM(bet_amount) as betAmount
+        FROM report_user_venue_win_lose
+        WHERE site_code = #{vo.siteCode} and day_millis = #{vo.dayMillis}
+
+        <if test="vo.venueCodeList != null and vo.venueCodeList.size() > 0">
+            AND venue_code in
+            <foreach item="venueCode" collection="vo.venueCodeList" open="(" separator="," close=")">
+                #{venueCode}
+            </foreach>
+        </if>
+        GROUP BY site_code,day_millis,venue_code,currency
+    </select>
+    <select id="queryUserBetsPlatBetAmountTotal"
+            resultType="com.cloud.baowang.report.api.vo.user.ReportUserVenueBetsTopVO">
+        SELECT site_code,user_id,day_millis,venue_code,user_account,currency,
+        SUM(win_loss_amount) as winLossAmount
+        ,SUM(valid_amount) as validAmount,
+        SUM(bet_amount) as betAmount
+        FROM report_user_venue_win_lose
+        WHERE site_code = #{vo.siteCode} and day_millis = #{vo.dayMillis}
+
+        <if test="vo.venueCodeList != null and vo.venueCodeList.size() > 0">
+            AND venue_code in
+            <foreach item="venueCode" collection="vo.venueCodeList" open="(" separator="," close=")">
+                #{venueCode}
+            </foreach>
+        </if>
+
+        <if test="vo.userId != null">
+            AND user_id = #{vo.userId}
+        </if>
+        GROUP BY user_id,site_code,day_millis,venue_code,user_account,currency
+    </select>
+
+    <select id="queryUserBetsTop" resultType="com.cloud.baowang.report.api.vo.user.ReportUserVenueBetsTopVO">
+        SELECT
+        userId,
+        userAccount,
+        betAmount,
+        winLossAmount,
+        validAmount,currency
+        FROM
+        (
+        SELECT
+        user_id AS userId,
+        max(user_account) AS userAccount,
+        IFNULL(SUM(bet_amount), 0) AS betAmount,
+        IFNULL(SUM(win_loss_amount), 0) AS winLossAmount,
+        IFNULL(SUM(valid_amount), 0) AS validAmount
+        ,currency
+        FROM
+        report_user_venue_win_lose
+        WHERE
+        site_code = #{vo.siteCode}
+        <if test="vo.venueCode != null and vo.venueCode !=''">
+            AND venue_code = #{vo.venueCode}
+        </if>
+        <if test="vo.userIdList != null and vo.userIdList.size() > 0">
+            AND user_id IN
+            <foreach collection="vo.userIdList" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.venueCodeList != null and vo.venueCodeList.size() > 0">
+            AND venue_code IN
+            <foreach collection="vo.venueCodeList" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.dayMillis != null ">
+            AND day_millis = #{vo.dayMillis}
+        </if>
+
+        <if test="vo.startTime != null ">
+            AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+
+        <if test="vo.endTime != null ">
+            AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+
+        GROUP BY
+        user_id,currency
+        ) t
+        <where>
+            <if test="vo.winLossAmountMin != null">
+                AND t.winLossAmount <![CDATA[ >= ]]> #{vo.winLossAmountMin}
+            </if>
+            <if test="vo.winLossAmountMax != null">
+                AND t.winLossAmount <![CDATA[ <= ]]> #{vo.winLossAmountMax}
+            </if>
+            <if test="vo.betAmountMin != null">
+                AND t.betAmount <![CDATA[ >= ]]> #{vo.betAmountMin}
+            </if>
+            <if test="vo.betAmountMax != null">
+                AND t.betAmount <![CDATA[ <= ]]> #{vo.betAmountMax}
+            </if>
+        </where>
+        <if test="vo.orderField != null and vo.orderField != ''">
+            order by ${vo.orderField}
+            <if test="vo.orderType != null and vo.orderType != ''">
+                ${vo.orderType}
+            </if>
+        </if>
+    </select>
+
+</mapper>

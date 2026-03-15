@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.report.repositories.ReportUserRechargeWithdrawRepository">
+
+
+
+    <select id="queryRechargeAmount" resultType="com.cloud.baowang.report.api.vo.ReportUserRechargeResponseVO">
+        SELECT
+            site_code AS siteCode,
+            user_id AS userId,
+            user_account AS userAccount,
+            currency AS currency,
+            sum(amount) AS rechargeAmount
+        FROM
+        report_user_recharge_withdraw
+        where type = 1
+        AND site_code = #{vo.siteCode}
+
+        <if test="vo.dateStr != null and vo.dateStr !=''">
+            AND day_str = #{vo.dateStr}
+        </if>
+        <if test="vo.startTime != null">
+            AND day_hour_millis <![CDATA[ >= ]]>  #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND day_hour_millis <![CDATA[ <= ]]>  #{vo.endTime}
+        </if>
+        GROUP BY site_code,user_id ,user_account, currency
+    </select>
+
+    <select id="queryRechargeAmountByUserId" resultType="com.cloud.baowang.report.api.vo.ReportUserRechargeResponseVO">
+        SELECT
+            site_code AS siteCode,
+            user_id AS userId,
+            user_account AS userAccount,
+            currency AS currency,
+            sum(amount) AS rechargeAmount
+        FROM
+            report_user_recharge_withdraw
+        where
+            user_id = #{vo.userId}
+            AND type = 1
+            <if test="vo.startTime != null">
+                AND day_hour_millis <![CDATA[ >= ]]>  #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND day_hour_millis <![CDATA[ <= ]]>  #{vo.endTime}
+            </if>
+        GROUP BY site_code,user_id,user_account,currency
+    </select>
+    <select id="queryByTimeAndAgent"
+            resultType="com.cloud.baowang.report.api.vo.rechagerwithdraw.ReportRechargeAgentVO">
+        SELECT
+        agent_id AS agentId,
+        currency AS currency,
+        SUM(IF(type = 1, amount, 0)) AS rechargeAmount,
+        SUM(IF(type = 2, amount, 0)) AS withdrawAmount,
+        SUM(settlement_fee_amount) AS settlementFeeAmount
+        FROM
+        report_user_recharge_withdraw
+        where
+        site_code = #{vo.siteCode}
+        <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+            AND agent_id IN
+            <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null">
+            AND day_hour_millis <![CDATA[ >= ]]>  #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND day_hour_millis <![CDATA[ <= ]]>  #{vo.endTime}
+        </if>
+        <if test="vo.currency != null and vo.currency != '' ">
+            AND currency = #{vo.currency}
+        </if>
+        GROUP BY agent_id,currency
+    </select>
+    <select id="queryPayMethodByTimeAndAgent"
+            resultType="com.cloud.baowang.report.api.vo.rechagerwithdraw.ReportUserRechargePayMethodAgentVO">
+        SELECT currency AS currency,
+        deposit_withdraw_way_id AS payMethodId,
+        SUM(IF(type = #{vo.type}, amount, 0)) AS amount,
+        SUM(settlement_fee_amount) AS settlementFeeAmount
+        from report_user_recharge_withdraw
+        where site_code = #{vo.siteCode}
+        and type = #{vo.type}
+        <if test="vo.startTime != null">
+            AND day_hour_millis <![CDATA[ >= ]]>  #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND day_hour_millis <![CDATA[ <= ]]>  #{vo.endTime}
+        </if>
+        <if test="vo.currency != null">
+            AND currency = #{vo.currency}
+        </if>
+        <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+            AND agent_id IN
+            <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        GROUP BY deposit_withdraw_way_id,currency
+    </select>
+
+    <select id="getUserDepositWithdrawalPOList" resultType="com.cloud.baowang.wallet.api.vo.report.DepositWithdrawalVO">
+        SELECT
+        t.user_id AS userId,
+        t.type As type,
+        t.user_account AS userAccount,
+        t.agent_id AS agentId,
+        t.agent_account AS agentAccount,
+        t.currency as currency,
+        SUM(t.nums) AS nums,
+        SUM(t.amount) AS amount,
+        SUM(t.large_nums) AS largeNums,
+        SUM(t.large_amount) AS largeAmount,
+        SUM(t.deposit_subordinates_nums) AS depositSubordinatesNums,
+        SUM(t.deposit_subordinates_amount) AS depositSubordinatesAmount
+        FROM
+        report_user_recharge_withdraw t
+        left join user_info a on t.user_id = a.user_id
+
+        <where>
+            <if test="vo.siteCode != null and vo.siteCode !=''">
+                AND a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.startTime != null">
+                AND day_hour_millis <![CDATA[ >= ]]>  #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND day_hour_millis <![CDATA[ <= ]]>  #{vo.endTime}
+            </if>
+
+        </where>
+        group by t.user_id,t.user_account,t.type,t.agent_id,t.agent_account,t.currency
+
+    </select>
+
+    <select id="getUserDepAmountByAgentIds" resultType="com.cloud.baowang.report.api.vo.rechagerwithdraw.ReportUserAmountVO">
+        select
+        SUM(IF(type = 1, amount, 0)) AS rechargeAmount,
+        SUM(IF(type = 2, amount, 0)) AS withdrawAmount,
+        sum(way_fee_amount) as wayFeeAmount,
+        sum(settlement_fee_amount) as settleFeeAmount,
+        user_id as userId,
+        currency as currency
+        from report_user_recharge_withdraw
+        where
+         agent_id IN
+        <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+            #{value}
+        </foreach>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND day_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND day_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        group by currency, user_id
+    </select>
+
+    <select id="getUserDepAmountByUserId" resultType="com.cloud.baowang.report.api.vo.rechagerwithdraw.ReportUserAmountVO">
+        select
+        SUM(IF(type = 1, amount, 0)) AS rechargeAmount,
+        SUM(IF(type = 2, amount, 0)) AS withdrawAmount,
+        currency as currency
+        from report_user_recharge_withdraw
+        where user_id = #{vo.userId}
+        <if test="vo.agentId != null and vo.agentId != ''">
+            AND agent_id = #{vo.agentId}
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND day_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND day_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        group by currency
+    </select>
+
+    <select id="getUserDepAmountByUserIds" resultType="com.cloud.baowang.report.api.vo.rechagerwithdraw.ReportUserAmountVO">
+        select
+        user_id as userId,
+        SUM(IF(type = 1, amount, 0)) AS rechargeAmount,
+        SUM(IF(type = 2, amount, 0)) AS withdrawAmount,
+        currency as currency
+        from report_user_recharge_withdraw
+        where 1 = 1
+        <if test="vo.agentId != null and vo.agentId != ''">
+            AND agent_id = #{vo.agentId}
+        </if>
+        <if test="vo.userIds != null and vo.userIds.size() > 0">
+            and user_id IN
+            <foreach collection="vo.userIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND day_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND day_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        group by user_id, currency
+    </select>
+
+    <select id="getUserFeeAmountByType" resultType="com.cloud.baowang.report.api.vo.rechagerwithdraw.ReportUserAmountVO">
+        select
+        SUM(IF(type = 1, amount, 0)) AS rechargeAmount,
+        SUM(IF(type = 2, amount, 0)) AS withdrawAmount,
+        sum(way_fee_amount) as wayFeeAmount,
+        type as type,
+        currency as currency
+        from report_user_recharge_withdraw
+        where agent_id is not null
+        and agent_id != ''
+        <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+            and agent_id IN
+            <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND day_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND day_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        group by currency, type
+    </select>
+</mapper>

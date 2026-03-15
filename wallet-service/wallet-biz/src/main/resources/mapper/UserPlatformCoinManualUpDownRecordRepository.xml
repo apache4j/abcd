@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.wallet.repositories.UserPlatformCoinManualUpDownRecordRepository">
+
+
+    <select id="selectUpReviewPage" resultType="com.cloud.baowang.wallet.po.UserPlatformCoinManualUpDownRecordPO">
+        SELECT
+        id,
+        site_code AS siteCode,
+        agent_id AS agentId,
+        agent_account AS agentAccount,
+        user_account AS userAccount,
+        user_id AS userId,
+        user_name AS userName,
+        vip_grade_code AS vipGradeCode,
+        order_no AS orderNo,
+        adjust_way AS adjustWay,
+        adjust_type AS adjustType,
+        activity_template AS activityTemplate,
+        activity_id AS activityId,
+        currency_code AS currencyCode,
+        platform_currency_code AS platformCurrencyCode,
+        adjust_amount AS adjustAmount,
+        running_water_multiple AS runningWaterMultiple,
+        certificate_address AS certificateAddress,
+        apply_reason AS applyReason,
+        apply_time AS applyTime,
+        applicant AS applicant,
+        audit_datetime AS auditDatetime,
+        audit_id AS auditId,
+        audit_remark AS auditRemark,
+        audit_status AS auditStatus,
+        review_operation AS reviewOperation,
+        lock_status AS lockStatus,
+        locker AS locker,
+        IF(locker = #{vo.operator}, -1, 1) as lockStatus1
+        FROM user_platform_coin_manual_up_down_record
+        WHERE site_code = #{vo.siteCode}
+        AND review_operation = #{vo.reviewOperation}
+        <if test="vo.applyStartTime != null">
+            AND apply_time &gt;= #{vo.applyStartTime}
+        </if>
+        <if test="vo.applyEndTime != null">
+            AND apply_time &lt;= #{vo.applyEndTime}
+        </if>
+        <if test="vo.userAccount != null and vo.userAccount != ''">
+            AND user_account = #{vo.userAccount}
+        </if>
+        <if test="vo.orderNo != null and vo.orderNo != ''">
+            AND order_no = #{vo.orderNo}
+        </if>
+        <if test="vo.lockStatus != null">
+            AND lock_status = #{vo.lockStatus}
+        </if>
+        <if test="vo.locker != null and vo.locker != ''">
+            AND locker = #{vo.locker}
+        </if>
+        ORDER BY lockStatus1 ASC, lock_status ASC, apply_time ASC
+    </select>
+
+    <select id="getPageCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM user_platform_coin_manual_up_down_record a
+        <where>
+            and a.site_code = #{vo.siteCode}
+            AND a.adjust_way = 1
+            <if test="vo.applyStartTime != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyStartTime}
+            </if>
+            <if test="vo.applyEndTime != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyEndTime}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.userId != '' and vo.userId != null">
+                AND a.user_id = #{vo.userId}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.orderStatus != null">
+                AND a.order_status = #{vo.orderStatus}
+            </if>
+            <if test="vo.adjustType != null">
+                AND a.adjust_type = #{vo.adjustType}
+            </if>
+            <if test="vo.adjustAmountMin != '' and vo.adjustAmountMin != null">
+                AND a.adjust_amount <![CDATA[ >= ]]> #{vo.adjustAmountMin}
+            </if>
+            <if test="vo.adjustAmountMax != '' and vo.adjustAmountMax != null">
+                AND a.adjust_amount <![CDATA[ <= ]]> #{vo.adjustAmountMax}
+            </if>
+        </where>
+    </select>
+    <select id="getPlatManualUpDownAmount" resultType="java.math.BigDecimal">
+        SELECT IFNULL(SUM(IF(adjust_way = '1',adjust_amount,-adjust_amount)),0)
+        FROM
+            user_platform_coin_manual_up_down_record
+        WHERE audit_status = 3 AND balance_change_status = 1
+            AND  user_id = #{userId}
+    </select>
+
+</mapper>

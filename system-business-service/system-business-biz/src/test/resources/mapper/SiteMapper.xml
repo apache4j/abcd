@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.system.repositories.SiteRepository">
+
+
+    <select id="querySiteInfo" resultType="com.cloud.baowang.system.api.vo.site.SiteVO">
+        SELECT
+        a.site_code as siteCode,
+        a.site_name as siteName,
+        a.company as company,
+        a.site_type as siteType,
+        a.site_model as siteModel,
+        a.STATUS as status,
+        a.commission_plan as commissionPlan,
+        a.bk_name as bkName,
+        a.site_prefix as sitePrefix,
+        a.skin as skin,
+        a.long_logo as longLogo,
+        a.short_logo as shortLogo,
+        (select group_concat(code separator ',') from language_manager where site_code = a.site_code group by site_code)
+        as language,
+        (select group_concat(plat_currency_code separator ',') from site_currency_info where site_code = a.site_code
+        group by site_code) as currency,
+        a.site_admin_account as siteAdminAccount,
+        a.remark as remark,
+        a.created_time as createTime,
+        a.updated_time as operatorTime,
+        a.updater as operator
+        FROM
+        site_info a
+        WHERE 1 = 1
+        <if test="siteVO.siteCode != null">
+            and a.site_code like concat ('%', #{siteVO.siteCode},'%')
+        </if>
+        <if test="siteVO.siteName != null and siteVO.siteName != ''">
+            and a.site_name like concat ('%', #{siteVO.siteName},'%')
+        </if>
+        <if test="siteVO.company != null and siteVO.company != ''">
+            and a.company like concat ('%', #{siteVO.company},'%')
+        </if>
+        <if test="siteVO.siteModel != null">
+            and a.site_model = #{siteVO.siteModel}
+        </if>
+        <if test="siteVO.status != null">
+            and a.status = #{siteVO.status}
+        </if>
+        <if test="siteVO.startTime != null">
+            AND a.updated_time <![CDATA[ >= ]]> #{siteVO.startTime}
+        </if>
+        <if test="siteVO.endTime != null">
+            AND a.updated_time <![CDATA[ <= ]]> #{siteVO.endTime}
+        </if>
+        order by a.status , a.updated_time desc
+    </select>
+
+
+    <select id="allSiteInfo" resultType="com.cloud.baowang.system.api.vo.site.SiteVO">
+        SELECT
+        site_code as siteCode,
+        site_name as siteName,
+        company as company
+        FROM
+        site_info
+
+    </select>
+
+</mapper>

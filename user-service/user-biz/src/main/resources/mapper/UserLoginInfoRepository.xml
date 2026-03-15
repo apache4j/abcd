@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.user.repositories.UserLoginInfoRepository">
+
+    <select id="getTotalCount" resultType="java.lang.Long">
+        <choose>
+            <!-- 去重模式 -->
+            <when test="vo.distinct == true">
+                SELECT COUNT(1)
+                FROM (
+                SELECT
+                ROW_NUMBER() OVER (PARTITION BY a.ip, a.device_no ORDER BY a.login_time DESC) as rn
+                FROM user_login_info a
+                <where>
+                    <if test="vo.loginStartTime != null">
+                        AND a.login_time <![CDATA[ >= ]]> #{vo.loginStartTime}
+                    </if>
+                    <if test="vo.loginEndTime != null">
+                        AND a.login_time <![CDATA[ <= ]]> #{vo.loginEndTime}
+                    </if>
+                    <if test="vo.userAccount != '' and vo.userAccount != null">
+                        AND a.user_account = #{vo.userAccount}
+                    </if>
+                    <if test="vo.loginType != null">
+                        AND a.login_type = #{vo.loginType}
+                    </if>
+                    <if test="vo.accountType != null and vo.accountType.size() > 0">
+                        AND a.account_type IN
+                        <foreach collection="vo.accountType" item="value" separator="," open="(" close=")">
+                            #{value}
+                        </foreach>
+                    </if>
+                    <if test="vo.loginTerminal != null and vo.loginTerminal.size() > 0">
+                        AND a.login_terminal IN
+                        <foreach collection="vo.loginTerminal" item="value" separator="," open="(" close=")">
+                            #{value}
+                        </foreach>
+                    </if>
+                    <if test="vo.ip != '' and vo.ip != null">
+                        AND a.ip = #{vo.ip}
+                    </if>
+                    <if test="vo.ipAddress != '' and vo.ipAddress != null">
+                        AND a.ip_address = #{vo.ipAddress}
+                    </if>
+                    <if test="vo.deviceNo != '' and vo.deviceNo != null">
+                        AND a.device_no = #{vo.deviceNo}
+                    </if>
+                    <if test="vo.siteCode != '' and vo.siteCode != null">
+                        AND a.site_code = #{vo.siteCode}
+                    </if>
+                </where>
+                ) t
+                WHERE t.rn = 1
+            </when>
+
+            <!-- 不去重模式 -->
+            <otherwise>
+                SELECT COUNT(1)
+                FROM user_login_info a
+                <where>
+                    <if test="vo.loginStartTime != null">
+                        AND a.login_time <![CDATA[ >= ]]> #{vo.loginStartTime}
+                    </if>
+                    <if test="vo.loginEndTime != null">
+                        AND a.login_time <![CDATA[ <= ]]> #{vo.loginEndTime}
+                    </if>
+                    <if test="vo.userAccount != '' and vo.userAccount != null">
+                        AND a.user_account = #{vo.userAccount}
+                    </if>
+                    <if test="vo.loginType != null">
+                        AND a.login_type = #{vo.loginType}
+                    </if>
+                    <if test="vo.accountType != null and vo.accountType.size() > 0">
+                        AND a.account_type IN
+                        <foreach collection="vo.accountType" item="value" separator="," open="(" close=")">
+                            #{value}
+                        </foreach>
+                    </if>
+                    <if test="vo.loginTerminal != null and vo.loginTerminal.size() > 0">
+                        AND a.login_terminal IN
+                        <foreach collection="vo.loginTerminal" item="value" separator="," open="(" close=")">
+                            #{value}
+                        </foreach>
+                    </if>
+                    <if test="vo.ip != '' and vo.ip != null">
+                        AND a.ip = #{vo.ip}
+                    </if>
+                    <if test="vo.ipAddress != '' and vo.ipAddress != null">
+                        AND a.ip_address = #{vo.ipAddress}
+                    </if>
+                    <if test="vo.deviceNo != '' and vo.deviceNo != null">
+                        AND a.device_no = #{vo.deviceNo}
+                    </if>
+                    <if test="vo.siteCode != '' and vo.siteCode != null">
+                        AND a.site_code = #{vo.siteCode}
+                    </if>
+                </where>
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <select id="selectUserLoginPage" resultType="com.cloud.baowang.user.api.vo.user.UserLoginInfoVO">
+        <choose>
+            <!-- 去重模式 -->
+            <when test="vo.distinct == true">
+                SELECT
+                t.user_id as userId,
+                t.user_account as userAccount,
+                t.account_type as accountType,
+                t.ip as ip,
+                t.ip_address as ipAddress,
+                t.login_type as loginType,
+                t.login_address as loginAddress,
+                t.login_terminal as loginTerminal,
+                t.login_time as loginTime,
+                t.device_no as deviceNo,
+                t.device_version as deviceVersion,
+                t.remark as remark,
+                t.site_code siteCode,
+                t.super_agent_account as superAgentAccount,
+                t.version as version
+                FROM (
+                SELECT
+                a.*,
+                ROW_NUMBER() OVER (PARTITION BY a.ip, a.device_no ORDER BY a.login_time DESC) as rn
+                FROM user_login_info a
+                <include refid="userLoginWhere" />
+                ) t
+                WHERE t.rn = 1
+                <choose>
+                    <when test="vo.orderField != null and vo.orderField != ''
+                                and vo.orderType != null and vo.orderType != ''
+                                and (vo.orderName == null or vo.orderName == '')
+                                and (vo.orderValue == null or vo.orderValue == '')">
+                        ORDER BY ${vo.orderField} ${vo.orderType}
+                    </when>
+                    <when test="vo.orderName != null and vo.orderName != ''
+                                and vo.orderValue != null and vo.orderValue != ''
+                                and (vo.orderField == null or vo.orderField == '')
+                                and (vo.orderType == null or vo.orderType == '')">
+                        ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc
+                    </when>
+                    <when test="vo.orderField != null and vo.orderField != ''
+                                and vo.orderType != null and vo.orderType != ''
+                                and vo.orderName != null and vo.orderName != ''
+                                and vo.orderValue != null and vo.orderValue != ''">
+                        ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc, ${vo.orderField} ${vo.orderType}
+                    </when>
+                    <otherwise>
+                        ORDER BY t.login_time DESC
+                    </otherwise>
+                </choose>
+            </when>
+
+            <!-- 普通模式 -->
+            <otherwise>
+                SELECT
+                a.user_id as userId,
+                a.user_account as userAccount,
+                a.account_type as accountType,
+                a.ip as ip,
+                a.ip_address as ipAddress,
+                a.login_type as loginType,
+                a.login_address as loginAddress,
+                a.login_terminal as loginTerminal,
+                a.login_time as loginTime,
+                a.device_no as deviceNo,
+                a.device_version as deviceVersion,
+                a.remark as remark,
+                a.site_code siteCode,
+                a.super_agent_account as superAgentAccount,
+                a.version as version
+                FROM user_login_info a
+                <include refid="userLoginWhere" />
+                <choose>
+                    <when test="vo.orderField != null and vo.orderField != ''
+                                and vo.orderType != null and vo.orderType != ''
+                                and (vo.orderName == null or vo.orderName == '')
+                                and (vo.orderValue == null or vo.orderValue == '')">
+                        ORDER BY ${vo.orderField} ${vo.orderType}
+                    </when>
+                    <when test="vo.orderName != null and vo.orderName != ''
+                                and vo.orderValue != null and vo.orderValue != ''
+                                and (vo.orderField == null or vo.orderField == '')
+                                and (vo.orderType == null or vo.orderType == '')">
+                        ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc
+                    </when>
+                    <when test="vo.orderField != null and vo.orderField != ''
+                                and vo.orderType != null and vo.orderType != ''
+                                and vo.orderName != null and vo.orderName != ''
+                                and vo.orderValue != null and vo.orderValue != ''">
+                        ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc, ${vo.orderField} ${vo.orderType}
+                    </when>
+                    <otherwise>
+                        ORDER BY a.login_time DESC
+                    </otherwise>
+                </choose>
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 公共 where 条件抽取 -->
+    <sql id="userLoginWhere">
+        <where>
+            <if test="vo.loginStartTime != null">
+                AND a.login_time <![CDATA[ >= ]]> #{vo.loginStartTime}
+            </if>
+            <if test="vo.loginEndTime != null">
+                AND a.login_time <![CDATA[ <= ]]> #{vo.loginEndTime}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.loginType != null">
+                AND a.login_type = #{vo.loginType}
+            </if>
+            <if test="vo.accountType != null and vo.accountType.size() > 0">
+                AND a.account_type IN
+                <foreach collection="vo.accountType" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.loginTerminal != null and vo.loginTerminal.size() > 0">
+                AND a.login_terminal IN
+                <foreach collection="vo.loginTerminal" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.ip != '' and vo.ip != null">
+                AND a.ip = #{vo.ip}
+            </if>
+            <if test="vo.ipAddress != '' and vo.ipAddress != null">
+                AND a.ip_address = #{vo.ipAddress}
+            </if>
+            <if test="vo.deviceNo != '' and vo.deviceNo != null">
+                AND a.device_no = #{vo.deviceNo}
+            </if>
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.superAgentAccount != null and vo.superAgentAccount !=''">
+                AND a.super_agent_account LIKE CONCAT('%', #{vo.superAgentAccount}, '%')
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectUserLoginAll" resultType="com.cloud.baowang.user.api.vo.user.UserLoginInfoCountVO">
+        <choose>
+            <!-- 去重模式 -->
+            <when test="vo.distinct == true">
+                SELECT
+                sum(case when t.login_type = 1 then 1 else 0 end) as loginNum,
+                count(*) as logAll
+                FROM (
+                SELECT
+                a.*,
+                ROW_NUMBER() OVER (PARTITION BY a.ip, a.device_no ORDER BY a.login_time DESC) as rn
+                FROM user_login_info a
+                <include refid="userLoginWhere" />
+                ) t
+                WHERE t.rn = 1
+
+            </when>
+
+            <!-- 普通模式 -->
+            <otherwise>
+                SELECT
+                sum(case when a.login_type = 1 then 1 else 0 end) as loginNum,
+                count(*)  as logAll
+                FROM user_login_info a
+                <include refid="userLoginWhere" />
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+    <select id="getLatestLoginInfoByAccountList" resultType="com.cloud.baowang.user.po.UserLoginInfoPO">
+        SELECT MAX(user_account) userAccount,
+        MAX(id) AS id
+        FROM
+        user_login_info
+        WHERE
+        <if test="vo.accountList != null and vo.accountList.size() > 0">
+            user_id IN
+            <foreach collection="vo.accountList" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        GROUP BY user_account
+    </select>
+
+    <select id="getLatestLoginInfoByUserIds" resultType="com.cloud.baowang.user.po.UserLoginInfoPO">
+        SELECT i_t.*
+        FROM user_login_info i_t
+        JOIN (
+        SELECT user_id, MAX(created_time) AS max_time
+        FROM user_login_info
+        WHERE 1=1
+        <if test="vo != null and vo.size() > 0">
+            AND user_id IN
+            <foreach collection="vo" item="value" open="(" separator="," close=")">
+                #{value}
+            </foreach>
+        </if>
+        GROUP BY user_id
+        ) t ON i_t.user_id = t.user_id AND i_t.created_time = t.max_time
+    </select>
+
+    <select id="getLatestLoginInfoByUserIdForTask" resultType="com.cloud.baowang.user.po.UserLoginInfoPO">
+        SELECT *
+        FROM user_login_info
+        WHERE user_id = #{userId}
+        ORDER BY created_time DESC LIMIT 1;
+
+    </select>
+
+
+    <select id="getLogStatisticsBySiteCode"
+            resultType="com.cloud.baowang.user.api.vo.site.GetStatisticsBySiteCodeVO">
+        SELECT
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(`login_time`/1000), @@session.time_zone, #{dbZone}), '%Y-%m-%d') myDay,
+        count(distinct user_id) as statisticNumber
+        FROM
+        user_login_info
+        <where>
+            <if test="siteCode != null and siteCode != ''">
+                AND site_code = #{siteCode}
+            </if>
+            <if test="start != null">
+                AND `login_time` <![CDATA[ >= ]]> #{start}
+            </if>
+            <if test="end != null">
+                AND `login_time` <![CDATA[ <= ]]> #{end}
+            </if>
+            AND account_type = 2
+        </where>
+        GROUP BY DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(`login_time`/1000), @@session.time_zone, #{dbZone}), '%Y-%m-%d')
+        ORDER BY myDay ASC
+    </select>
+
+    <select id="getDomainNameRanking"
+            resultType="com.cloud.baowang.user.api.vo.site.IPTop10ResVO">
+        SELECT
+        login_address as ipAddress,
+        count(login_address) as visitCount
+        FROM
+        user_login_info
+        <where>
+            1=1
+            <if test="siteCode != null and siteCode != ''">
+                AND site_code = #{siteCode}
+            </if>
+            <if test="start != null">
+                AND `login_time` <![CDATA[ >= ]]> #{start}
+            </if>
+            <if test="end != null">
+                AND `login_time` <![CDATA[ <= ]]> #{end}
+            </if>
+            AND account_type = 2
+            AND login_address is not null
+        </where>
+        GROUP BY ipAddress
+        ORDER BY visitCount desc  limit 10
+    </select>
+
+    <select id="getVisitFrom"
+            resultType="com.cloud.baowang.user.api.vo.site.VisitFromResVO">
+        SELECT
+        login_terminal as loginTerminal,
+        count(ip) as visitCount
+        FROM
+        user_login_info
+        <where>
+            <if test="siteCode != null and siteCode != ''">
+                AND site_code = #{siteCode}
+            </if>
+            <if test="start != null">
+                AND `login_time` <![CDATA[ >= ]]> #{start}
+            </if>
+            <if test="end != null">
+                AND `login_time` <![CDATA[ <= ]]> #{end}
+            </if>
+            AND account_type = 2
+        </where>
+        GROUP BY login_terminal
+        ORDER BY visitCount desc limit 10
+    </select>
+
+
+    <select id="getVisitFromByIp"
+            resultType="com.cloud.baowang.user.api.vo.site.IPTop10ResVO">
+        SELECT
+        ip_address as ipAddress,
+        count(ip) as visitCount
+        FROM
+        user_login_info
+        <where>
+            <if test="siteCode != null and siteCode != ''">
+                AND site_code = #{siteCode}
+            </if>
+            <if test="start != null">
+                AND `login_time` <![CDATA[ >= ]]> #{start}
+            </if>
+            <if test="end != null">
+                AND `login_time` <![CDATA[ <= ]]> #{end}
+            </if>
+            AND account_type = 2
+        </where>
+        GROUP BY ip_address
+        ORDER BY visitCount desc
+    </select>
+
+
+
+</mapper>

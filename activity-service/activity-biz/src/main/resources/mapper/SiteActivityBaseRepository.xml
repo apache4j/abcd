@@ -1,0 +1,673 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.activity.repositories.SiteActivityBaseRepository">
+
+
+    <select id="selectDataReportPage" resultType="com.cloud.baowang.activity.api.vo.report.ActivityDataReportRespVO">
+        SELECT siteCode,
+        activityNo,
+        activityName,
+        activityTemplate,
+        staticDate,
+        sum(sendMemberNum) as sendMemberNum,
+        sum(totalAmount) as totalAmount,
+        sum(acquireWheelNum) as acquireWheelNum,
+        sum(acquireSpinWheelNum) as acquireSpinWheelNum,
+        sum(eventMemberNum) as eventMemberNum,
+        sum(recvMemberNum) as recvMemberNum,
+        sum(recvAmount) as recvAmount
+        from (
+        <include refid="activityDataReportSql" />
+        ) as t
+        group by siteCode,activityNo,activityName,staticDate
+        order by staticDate desc
+    </select>
+
+
+    <sql id="activityDataReportSql" >
+        SELECT a.site_code as siteCode,
+        a.activity_no as activityNo,
+        b.activity_name_i18n_code as activityName,
+        b.activity_template as activityTemplate,
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.created_time/1000), @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d') as staticDate,
+        0 as sendMemberNum,
+        sum(a.plat_activity_amount) as totalAmount,
+        0 as acquireWheelNum,
+        0 as acquireSpinWheelNum,
+        0 as eventMemberNum,
+        0 as recvMemberNum,
+        0 as recvAmount
+        from site_activity_order_record a
+        join user_info c on a.user_id=c.user_id and c.account_type=2
+        left join site_activity_base b on a.activity_id=b.id
+        where
+        a.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        <if test="dataReportReqVO.beginTime!=null">
+            and a.created_time &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and a.created_time &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.activityName!=null and dataReportReqVO.activityName!='' ">
+            and  b.activity_name_i18n_code in (SELECT message_key from i18n_message where message_key like 'BIZ_ACTIVITY_NAME%' and message like  concat(#{dataReportReqVO.activityName},'%'))
+        </if>
+        <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''">
+            and a.activity_no =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+        </if>
+        group by a.site_code,a.activity_no,b.activity_name_i18n_code,b.activity_template,DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.created_time/1000), @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d')
+
+        union all
+
+        SELECT a.site_code as siteCode,
+        a.activity_no as activityNo,
+        b.activity_name_i18n_code as activityName,
+        b.activity_template as activityTemplate,
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.receive_time/1000), @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d') as staticDate,
+        0 as sendMemberNum,
+        0 as totalAmount,
+        0 as acquireWheelNum,
+        0 as acquireSpinWheelNum,
+        0 as eventMemberNum,
+        count(distinct a.user_id ) as recvMemberNum,
+        sum( a.plat_activity_amount ) as recvAmount
+        from site_activity_order_record a
+        join user_info c on a.user_id=c.user_id and c.account_type=2
+        left join site_activity_base b on a.activity_id=b.id
+        where
+        a.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        and a.receive_status=1
+        <if test="dataReportReqVO.beginTime!=null">
+            and a.receive_time &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and a.receive_time &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.activityName!=null and dataReportReqVO.activityName!='' ">
+            and  b.activity_name_i18n_code in (SELECT message_key from i18n_message where message_key like 'BIZ_ACTIVITY_NAME%' and message like  concat(#{dataReportReqVO.activityName},'%'))
+        </if>
+        <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''">
+            and a.activity_no =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+        </if>
+        group by a.site_code,a.activity_no,b.activity_name_i18n_code,b.activity_template,DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.receive_time/1000), @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d')
+
+        union all
+        SELECT
+        a.site_code as siteCode,
+        a.activity_no as activityNo,
+        b.activity_name_i18n_code as activityName,
+        b.activity_template as activityTemplate,
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.order_time/1000), @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d') as staticDate,
+        count(distinct   a.user_id  )  as sendMemberNum,
+        0,
+        sum( a.acquire_num  ) as acquireWheelNum,
+        0 as acquireSpinWheelNum,
+        0,
+        0,
+        0
+        from site_activity_free_game_record a
+        join user_info c on a.user_id=c.user_id and c.account_type=2
+        left join site_activity_base b on a.activity_id=b.id
+        where
+        a.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        <if test="dataReportReqVO.beginTime!=null">
+            and a.order_time &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and a.order_time &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.activityName!=null and dataReportReqVO.activityName!='' ">
+            and  b.activity_name_i18n_code in (SELECT message_key from i18n_message where message_key like 'BIZ_ACTIVITY_NAME%' and message like  concat(#{dataReportReqVO.activityName},'%'))
+        </if>
+        <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''">
+            and a.activity_no =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+        </if>
+        group by a.site_code,a.activity_no,b.activity_name_i18n_code,b.activity_template,DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.order_time/1000), @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d')
+        union all
+        select
+        tt.siteCode,tt.activityNo,tt.activityName,tt.activityTemplate,tt.staticDate,
+        0 as sendMemberNum,
+        0 as totalAmount,
+        0 as acquireWheelNum,
+        0 as acquireSpinWheelNum,
+        count(DISTINCT tt.userId) as eventMemberNum,
+        0 as recvMemberNum,
+        0 as recvAmount
+        from
+        (
+            SELECT a.site_code as siteCode,
+            b.activity_no as activityNo,
+            b.activity_name_i18n_code as activityName,
+            b.activity_template as activityTemplate,
+            DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(day/1000), @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d') as staticDate,
+            a.user_id userId
+            from site_activity_event_record a
+            join user_info c on a.user_id=c.user_id and c.account_type=2
+            left join site_activity_base b on a.activity_id=b.id
+            where
+            a.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+            <if test="dataReportReqVO.beginTime!=null">
+                and a.day &gt;= #{dataReportReqVO.beginTime}
+            </if>
+            <if test="dataReportReqVO.endTime!=null">
+                and a.day &lt;= #{dataReportReqVO.endTime}
+            </if>
+            <if test="dataReportReqVO.activityName!=null and dataReportReqVO.activityName!='' ">
+                and  b.activity_name_i18n_code in (SELECT message_key from i18n_message where message_key like 'BIZ_ACTIVITY_NAME%' and message like  concat(#{dataReportReqVO.activityName},'%'))
+            </if>
+            <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''  ">
+                and b.activity_no =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+            </if>
+            union all
+            SELECT a.site_code as siteCode,
+            a.activity_no as activityNo,
+            b.activity_name_i18n_code as activityName,
+            b.activity_template as activityTemplate,
+            DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.created_time/1000), @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d') as staticDate,
+            a.user_id userId
+            from site_activity_order_record a
+            join user_info c on a.user_id=c.user_id and c.account_type=2
+            left join site_activity_base b on a.activity_id=b.id
+            where
+            a.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+            <if test="dataReportReqVO.beginTime!=null">
+                and a.created_time &gt;= #{dataReportReqVO.beginTime}
+            </if>
+            <if test="dataReportReqVO.endTime!=null">
+                and a.created_time &lt;= #{dataReportReqVO.endTime}
+            </if>
+            <if test="dataReportReqVO.activityName!=null and dataReportReqVO.activityName!='' ">
+                and  b.activity_name_i18n_code in (SELECT message_key from i18n_message where message_key like 'BIZ_ACTIVITY_NAME%' and message like  concat(#{dataReportReqVO.activityName},'%'))
+            </if>
+            <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''">
+                and a.activity_no =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+            </if>
+
+        ) tt
+        group by tt.siteCode,tt.activityNo,tt.activityName,tt.activityTemplate,tt.staticDate
+
+        union all
+        SELECT a.site_code as siteCode,
+        a.activity_no as activityNo,
+        b.activity_name_i18n_code as activityName,
+        b.activity_template as activityTemplate,
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.created_time/1000), @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d') as staticDate,
+        count( distinct  a.user_id   ) as sendMemberNum,
+        0,
+        0,
+        sum( a.reward_count  ) as acquireSpinWheelNum,
+        0,
+        0,
+        0
+        from site_activity_lottery_record a
+        join user_info c on a.user_id=c.user_id and c.account_type=2
+        left join site_activity_base b on a.activity_id=b.id
+        where
+        a.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        <if test="dataReportReqVO.beginTime!=null">
+            and a.created_time &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and a.created_time &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.activityName!=null and dataReportReqVO.activityName!='' ">
+            and  b.activity_name_i18n_code in (SELECT message_key from i18n_message where message_key like 'BIZ_ACTIVITY_NAME%' and message like  concat(#{dataReportReqVO.activityName},'%'))
+        </if>
+        <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''">
+            and a.activity_no =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+        </if>
+        group by a.site_code,a.activity_no,b.activity_name_i18n_code,b.activity_template,DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.created_time/1000), @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d')
+
+        union all
+
+        SELECT a.site_code as siteCode,
+        b.activity_no as activityNo,
+        b.activity_name_i18n_code as activityName,
+        b.activity_template as activityTemplate,
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.audit_datetime/1000), @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d') as staticDate,
+        0 as sendMemberNum,
+        0 as totalAmount,
+        0 as acquireWheelNum,
+        0 as acquireSpinWheelNum,
+        0 as eventMemberNum,
+        count(distinct a.user_id ) as recvMemberNum,
+        sum( truncate(if(a.adjust_way=1,a.adjust_amount,-adjust_amount) / a.final_rate,4)) as recvAmount
+        from user_manual_up_down_record a
+        join user_info c on a.user_id=c.user_id and c.account_type=2
+        join site_activity_base b on a.activity_id=b.activity_no
+        where
+        a.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        and a.audit_status=3
+        and a.adjust_type=6
+        <if test="dataReportReqVO.beginTime!=null">
+            and a.audit_datetime &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and a.audit_datetime &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.activityName!=null and dataReportReqVO.activityName!='' ">
+            and  b.activity_name_i18n_code in (SELECT message_key from i18n_message where message_key like 'BIZ_ACTIVITY_NAME%' and message like  concat(#{dataReportReqVO.activityName},'%'))
+        </if>
+        <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''">
+            and b.activity_no =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+        </if>
+        group by a.site_code,b.activity_no,b.activity_name_i18n_code,b.activity_template,DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.audit_datetime/1000), @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d')
+
+        union all
+
+        SELECT a.site_code as siteCode,
+        b.activity_no as activityNo,
+        b.activity_name_i18n_code as activityName,
+        b.activity_template as activityTemplate,
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.audit_datetime/1000), @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d') as staticDate,
+        0 as sendMemberNum,
+        0 as totalAmount,
+        0 as acquireWheelNum,
+        0 as acquireSpinWheelNum,
+        0 as eventMemberNum,
+        count(distinct a.user_id ) as recvMemberNum,
+        sum( if(a.adjust_way=1,a.adjust_amount,-adjust_amount)) as recvAmount
+        from user_platform_coin_manual_up_down_record a
+        join user_info c on a.user_id=c.user_id and c.account_type=2
+        join site_activity_base b on a.activity_id=b.activity_no
+        where
+        a.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        and a.audit_status=3
+        and a.adjust_type=2
+        <if test="dataReportReqVO.beginTime!=null">
+            and a.audit_datetime &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and a.audit_datetime &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.activityName!=null and dataReportReqVO.activityName!='' ">
+            and  b.activity_name_i18n_code in (SELECT message_key from i18n_message where message_key like 'BIZ_ACTIVITY_NAME%' and message like  concat(#{dataReportReqVO.activityName},'%'))
+        </if>
+        <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''">
+            and b.activity_no =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+        </if>
+        group by a.site_code,b.activity_no,b.activity_name_i18n_code,b.activity_template,DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.audit_datetime/1000), @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d')
+
+        union all
+
+        select
+        z.site_code,
+        z.activity_id,
+        '兑换码' as activityName,
+        '兑换码' as activityTemplate,
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(x.created_time/1000), @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d') as staticDate,
+        0 as eventMemberNum,
+        0 as totalAmount,
+        0 as sendMemberNum,
+        0 as acquireSpinWheelNum,
+        0 as acquireWheelNum,
+        coalesce(sum(x.amount), 0) as recvAmount,
+        count(distinct x.user_id) as recvMemberNum
+        from
+        site_activity_redemption_code_exchange_info x
+        join
+        site_activity_redemption_gen_code_info y on x.code = y.code
+        join
+        site_activity_redemption_code_detail_info z on y.activity_detail_id = z.activity_id
+        where
+        z.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        <if test="dataReportReqVO.beginTime!=null">
+            and x.created_time &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and x.created_time &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''">
+            and z.activity_id =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+        </if>
+        group by z.site_code,z.activity_id,DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(x.created_time/1000), @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d')
+
+    </sql>
+
+
+    <select id="sumAllOrderDataReport" resultType="com.cloud.baowang.activity.api.vo.report.ActivityDataReportRespVO">
+        select
+        siteCode,
+        sum(totalAmount) as totalAmount,
+        0 as recvMemberNum,
+        sum(recvAmount) as recvAmount
+        from
+        (
+        SELECT
+        a.site_code as siteCode,
+        sum(a.plat_activity_amount) as totalAmount,
+        0 as recvMemberNum,
+        0 as recvAmount
+        from site_activity_order_record a
+        join user_info c on a.user_id=c.user_id and c.account_type=2
+        left join site_activity_base b on a.activity_id=b.id
+        where
+        a.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        <if test="dataReportReqVO.beginTime!=null">
+            and a.created_time &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and a.created_time &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.activityName!=null and dataReportReqVO.activityName!='' ">
+            and  b.activity_name_i18n_code in (SELECT message_key from i18n_message where message_key like 'BIZ_ACTIVITY_NAME%' and message like  concat(#{dataReportReqVO.activityName},'%'))
+        </if>
+        <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''">
+            and a.activity_no =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+        </if>
+        group by a.site_code
+
+        union all
+
+        SELECT
+        a.site_code as siteCode,
+        0 as totalAmount,
+        0 as recvMemberNum,
+        sum(  a.plat_activity_amount ) as recvAmount
+        from site_activity_order_record a
+        join user_info c on a.user_id=c.user_id and c.account_type=2
+        left join site_activity_base b on a.activity_id=b.id
+        where
+        a.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        and a.receive_status=1
+        <if test="dataReportReqVO.beginTime!=null">
+            and a.receive_time &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and a.receive_time &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.activityName!=null and dataReportReqVO.activityName!='' ">
+            and  b.activity_name_i18n_code in (SELECT message_key from i18n_message where message_key like 'BIZ_ACTIVITY_NAME%' and message like  concat(#{dataReportReqVO.activityName},'%'))
+        </if>
+        <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''">
+            and a.activity_no =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+        </if>
+        group by a.site_code
+
+        union all
+
+            SELECT
+            a.site_code as siteCode,
+            0 as totalAmount,
+            0 as recvMemberNum,
+            sum(TRUNCATE ( IF ( a.adjust_way = 1, a.adjust_amount,- adjust_amount ) / a.final_rate, 4 )) AS recvAmount
+            FROM
+            user_manual_up_down_record a
+            JOIN user_info c ON a.user_id = c.user_id AND c.account_type = 2
+            JOIN site_activity_base b ON a.activity_id = b.activity_no
+        where
+            a.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+            and a.audit_status=3
+            and a.adjust_type=6
+            <if test="dataReportReqVO.beginTime!=null">
+                and a.audit_datetime &gt;= #{dataReportReqVO.beginTime}
+            </if>
+            <if test="dataReportReqVO.endTime!=null">
+                and a.audit_datetime &lt;= #{dataReportReqVO.endTime}
+            </if>
+            <if test="dataReportReqVO.activityName!=null and dataReportReqVO.activityName!='' ">
+                and  b.activity_name_i18n_code in (SELECT message_key from i18n_message where message_key like 'BIZ_ACTIVITY_NAME%' and message like  concat(#{dataReportReqVO.activityName},'%'))
+            </if>
+            <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''">
+                and b.activity_no =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+            </if>
+            group by a.site_code
+
+        union all
+
+            SELECT a.site_code as siteCode,
+            0 as totalAmount,
+            0 as recvMemberNum,
+            sum( if(a.adjust_way=1,a.adjust_amount,-adjust_amount)) as recvAmount
+            from user_platform_coin_manual_up_down_record a
+            join user_info c on a.user_id=c.user_id and c.account_type=2
+            join site_activity_base b on a.activity_id=b.activity_no
+            where
+            a.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+            and a.audit_status=3
+            and a.adjust_type=2
+            <if test="dataReportReqVO.beginTime!=null">
+                and a.audit_datetime &gt;= #{dataReportReqVO.beginTime}
+            </if>
+            <if test="dataReportReqVO.endTime!=null">
+                and a.audit_datetime &lt;= #{dataReportReqVO.endTime}
+            </if>
+            <if test="dataReportReqVO.activityName!=null and dataReportReqVO.activityName!='' ">
+                and  b.activity_name_i18n_code in (SELECT message_key from i18n_message where message_key like 'BIZ_ACTIVITY_NAME%' and message like  concat(#{dataReportReqVO.activityName},'%'))
+            </if>
+            <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''">
+                and b.activity_no =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+            </if>
+            group by a.site_code
+
+        ) as t
+        group by siteCode
+
+    </select>
+
+    <select id="sumAllWheelNumDataReport" resultType="com.cloud.baowang.activity.api.vo.report.ActivityDataReportRespVO">
+        SELECT siteCode,
+        count(distinct   userId  )  as sendMemberNum,
+        sum( acquireWheelNum  ) as acquireWheelNum,
+        sum( acquireSpinWheelNum  ) as acquireSpinWheelNum
+
+        from (
+        <include refid="activityWheelNumDataReportSql" />
+        ) as t
+        group by siteCode
+    </select>
+
+    <sql id="activityWheelNumDataReportSql">
+        SELECT a.site_code as siteCode,
+        a.user_id as userId,
+        a.acquire_num as acquireWheelNum,
+        0 as acquireSpinWheelNum
+        from site_activity_free_game_record a
+        join user_info c on a.user_id=c.user_id and c.account_type=2
+        left join site_activity_base b on a.activity_id=b.id
+        where
+        a.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        <if test="dataReportReqVO.beginTime!=null">
+            and a.order_time &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and a.order_time &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.activityName!=null and dataReportReqVO.activityName!='' ">
+            and b.activity_name_i18n_code in (SELECT message_key from i18n_message where message_key like
+            'BIZ_ACTIVITY_NAME%' and message like concat(#{dataReportReqVO.activityName},'%'))
+        </if>
+        <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''">
+            and a.activity_no =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+        </if>
+        union all
+        SELECT a.site_code as siteCode,
+        a.user_id as userId,
+        0 as acquireWheelNum,
+        a.reward_count as acquireSpinWheelNum
+        from site_activity_lottery_record a
+        join user_info c on a.user_id=c.user_id and c.account_type=2
+        left join site_activity_base b on a.activity_id=b.id
+        where
+        a.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        <if test="dataReportReqVO.beginTime!=null">
+            and a.created_time &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and a.created_time &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.activityName!=null and dataReportReqVO.activityName!='' ">
+            and b.activity_name_i18n_code in (SELECT message_key from i18n_message where message_key like
+            'BIZ_ACTIVITY_NAME%' and message like concat(#{dataReportReqVO.activityName},'%'))
+        </if>
+        <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''">
+            and a.activity_no =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+        </if>
+
+
+    </sql>
+
+    <select id="sumAllEventDataReport"  resultType="com.cloud.baowang.activity.api.vo.report.ActivityDataReportRespVO">
+
+        select
+        tt.siteCode,
+        count(DISTINCT tt.userId) as eventMemberNum
+        from
+        (
+        SELECT a.site_code as siteCode,
+        b.activity_no as activityNo,
+        b.activity_name_i18n_code as activityName,
+        b.activity_template as activityTemplate,
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(day/1000), @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d') as staticDate,
+        a.user_id userId
+        from site_activity_event_record a
+        join user_info c on a.user_id=c.user_id and c.account_type=2
+        left join site_activity_base b on a.activity_id=b.id
+        where
+        a.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        <if test="dataReportReqVO.beginTime!=null">
+            and a.day &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and a.day &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.activityName!=null and dataReportReqVO.activityName!='' ">
+            and  b.activity_name_i18n_code in (SELECT message_key from i18n_message where message_key like 'BIZ_ACTIVITY_NAME%' and message like  concat(#{dataReportReqVO.activityName},'%'))
+        </if>
+        <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''  ">
+            and b.activity_no =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+        </if>
+        union all
+        SELECT a.site_code as siteCode,
+        a.activity_no as activityNo,
+        b.activity_name_i18n_code as activityName,
+        b.activity_template as activityTemplate,
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.created_time/1000), @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d') as staticDate,
+        a.user_id userId
+        from site_activity_order_record a
+        join user_info c on a.user_id=c.user_id and c.account_type=2
+        left join site_activity_base b on a.activity_id=b.id
+        where
+        a.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        <if test="dataReportReqVO.beginTime!=null">
+            and a.created_time &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and a.created_time &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.activityName!=null and dataReportReqVO.activityName!='' ">
+            and  b.activity_name_i18n_code in (SELECT message_key from i18n_message where message_key like 'BIZ_ACTIVITY_NAME%' and message like  concat(#{dataReportReqVO.activityName},'%'))
+        </if>
+        <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''">
+            and a.activity_no =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+        </if>
+
+        ) tt
+        group by tt.siteCode
+    </select>
+
+
+    <select id="sumAllRecvDataReport"  resultType="com.cloud.baowang.activity.api.vo.report.ActivityDataReportRespVO">
+        select
+        ttt.siteCode,
+        count(DISTINCT ttt.userId) as recvMemberNum
+        from
+        (
+                SELECT
+                a.site_code as siteCode,
+                a.user_id as userId
+                from site_activity_order_record a
+                join user_info c on a.user_id=c.user_id and c.account_type=2
+                left join site_activity_base b on a.activity_id=b.id
+                where
+                a.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+                and a.receive_status=1
+                <if test="dataReportReqVO.beginTime!=null">
+                    and a.receive_time &gt;= #{dataReportReqVO.beginTime}
+                </if>
+                <if test="dataReportReqVO.endTime!=null">
+                    and a.receive_time &lt;= #{dataReportReqVO.endTime}
+                </if>
+                <if test="dataReportReqVO.activityName!=null and dataReportReqVO.activityName!='' ">
+                    and  b.activity_name_i18n_code in (SELECT message_key from i18n_message where message_key like 'BIZ_ACTIVITY_NAME%' and message like  concat(#{dataReportReqVO.activityName},'%'))
+                </if>
+                <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''">
+                    and a.activity_no =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+                </if>
+                union all
+
+            SELECT
+            a.site_code as siteCode,
+            a.user_id
+            FROM
+            user_manual_up_down_record a
+            JOIN user_info c ON a.user_id = c.user_id AND c.account_type = 2
+            JOIN site_activity_base b ON a.activity_id = b.activity_no
+            where
+            a.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+            and a.audit_status=3
+            and a.adjust_type=6
+            <if test="dataReportReqVO.beginTime!=null">
+                and a.audit_datetime &gt;= #{dataReportReqVO.beginTime}
+            </if>
+            <if test="dataReportReqVO.endTime!=null">
+                and a.audit_datetime &lt;= #{dataReportReqVO.endTime}
+            </if>
+            <if test="dataReportReqVO.activityName!=null and dataReportReqVO.activityName!='' ">
+                and  b.activity_name_i18n_code in (SELECT message_key from i18n_message where message_key like 'BIZ_ACTIVITY_NAME%' and message like  concat(#{dataReportReqVO.activityName},'%'))
+            </if>
+            <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''">
+                and b.activity_no =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+            </if>
+
+                union all
+
+                SELECT a.site_code as siteCode,
+                a.user_id
+                from user_platform_coin_manual_up_down_record a
+                join user_info c on a.user_id=c.user_id and c.account_type=2
+                join site_activity_base b on a.activity_id=b.activity_no
+                where
+                a.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+                and a.audit_status=3
+                and a.adjust_type=2
+                <if test="dataReportReqVO.beginTime!=null">
+                    and a.audit_datetime &gt;= #{dataReportReqVO.beginTime}
+                </if>
+                <if test="dataReportReqVO.endTime!=null">
+                    and a.audit_datetime &lt;= #{dataReportReqVO.endTime}
+                </if>
+                <if test="dataReportReqVO.activityName!=null and dataReportReqVO.activityName!='' ">
+                    and  b.activity_name_i18n_code in (SELECT message_key from i18n_message where message_key like 'BIZ_ACTIVITY_NAME%' and message like  concat(#{dataReportReqVO.activityName},'%'))
+                </if>
+                <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''">
+                    and b.activity_no =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+                </if>
+                union all
+
+                SELECT
+                z.site_code,
+                x.user_id
+                from
+                site_activity_redemption_code_exchange_info x
+                join
+                site_activity_redemption_gen_code_info y on x.code = y.code
+                join
+                site_activity_redemption_code_detail_info z on y.activity_detail_id = z.activity_id
+                where
+                z.site_code = #{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+                <if test="dataReportReqVO.beginTime!=null">
+                    and x.created_time &gt;= #{dataReportReqVO.beginTime}
+                </if>
+                <if test="dataReportReqVO.endTime!=null">
+                    and x.created_time &lt;= #{dataReportReqVO.endTime}
+                </if>
+                <if test="dataReportReqVO.activityNo!=null and dataReportReqVO.activityNo!=''">
+                    and z.activity_id =#{dataReportReqVO.activityNo,jdbcType=VARCHAR}
+                </if>
+
+        ) as ttt
+        group by ttt.siteCode
+    </select>
+
+
+</mapper>

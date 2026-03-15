@@ -1,0 +1,590 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.play.repositories.GameInfoRepository">
+
+
+    <select id="queryGameAuthorize" resultType="com.cloud.baowang.play.api.vo.venue.SiteGameResponsePageVO">
+        SELECT
+        t.id AS id,
+        t.game_id AS gameId,
+        t.game_name AS gameName,
+        t.venue_name AS venueName,
+        t.venue_type AS venueType,
+        t.status AS status,
+        CASE
+        WHEN t1.site_code IS NOT NULL AND t1.site_code != '' THEN t1.created_time
+        ELSE t.updated_time
+        END AS operatorTime,
+
+        CASE
+        WHEN t1.site_code IS NOT NULL AND t1.site_code != '' THEN t1.creator
+        ELSE t.creator
+        END AS operator,
+
+        CASE
+        WHEN t.id = t1.game_info_id THEN 1
+        ELSE 0
+        END AS chooseFlag
+
+        FROM
+        game_info t
+        LEFT JOIN
+        site_game t1 ON t.id = t1.game_info_id AND t1.site_code = #{vo.siteCode}
+        WHERE
+        t.venue_code = #{vo.venueCode}
+        <if test="vo.gameName != null and vo.gameName != ''">
+            AND t.game_name = #{vo.gameName}
+        </if>
+        <if test="vo.gameId != null and vo.gameId != ''">
+            AND t.game_id = #{vo.gameId}
+        </if>
+        <if test="vo.status != null and vo.status != ''">
+            AND t.status = #{vo.status}
+        </if>
+        ORDER BY
+        chooseFlag desc,
+        t.status ASC,
+        t.updated_time DESC,
+        t.id DESC
+    </select>
+
+
+
+    <sql id="queryGameInfoSiteGame">
+        SELECT
+
+        info.`id`,
+        info.`game_id`,
+        info.`game_name`,
+        info.`game_i18n_code`,
+        info.`venue_id`,
+        info.`venue_code`,
+        info.`venue_name`,
+        info.`venue_type`,
+        s_g.`status`,
+        info.`support_device`,
+        info.`icon`,
+        info.`icon_i18n_code`,
+        info.`se_icon_i18n_code`,
+        info.`vt_icon_i18n_code`,
+        info.`ht_icon_i18n_code`,
+        info.`game_desc`,
+        info.`game_desc_i18n_code`,
+        s_g.`remark`,
+        info.`is_rebate`,
+        info.`access_parameters`,
+        s_g.`maintenance_start_time`,
+        s_g.`maintenance_end_time`,
+
+        s_g.label as label,s_g.corner_labels as cornerLabels,s_g.creator as creator,
+
+        s_g.created_time as createdTime,s_g.updater as updater,s_g.updated_time as updatedTime,
+        s_g.currency_code
+
+    </sql>
+
+
+    <sql id="getGameInfoLobbyPage">
+
+        SELECT *
+        FROM (SELECT info.`id`,
+        info.`game_id`,
+        info.`game_i18n_code`,
+        info.`venue_code`,
+        s_g.`status`,
+        info.`icon_i18n_code`,
+        info.`se_icon_i18n_code`,
+        info.`vt_icon_i18n_code`,
+        info.`ht_icon_i18n_code`,
+        info.`game_desc_i18n_code`,
+        info.`access_parameters`,
+        s_g.`maintenance_start_time`,
+        s_g.`maintenance_end_time`,
+        s_g.label as label,
+        s_g.corner_labels as cornerLabels,
+        s_g.creator as creator,
+        s_g.created_time as createdTime,
+        s_g.updater as updater,
+        s_g.updated_time as updatedTime,
+        s_g.currency_code,
+        two_sort.sort,
+        tw_info.id as gameTwoId,
+        ifnull (tw_info.sort ,100) as classTwoSort,
+        tw_info.icon as classTwoIcon,
+        tw_info.type_i18n_code as gameTwoClassName,
+        two_sort.game_one_hot_sort
+        FROM site_game s_g
+
+        INNER JOIN game_info info ON s_g.game_info_id = info.id
+
+        INNER JOIN game_two_currency_sort two_sort ON two_sort.game_id = s_g.game_info_id
+
+        INNER JOIN game_two_class_info tw_info ON tw_info.id = two_sort.game_two_id and tw_info.`status` = 1
+
+        where s_g.site_code = #{siteCode} and s_g.currency_code LIKE CONCAT('%', #{requestVO.currencyCode}, '%')
+
+        and s_g.`status` in (1, 2) and two_sort.currency_code = #{requestVO.currencyCode}
+
+
+        <if test="requestVO.label != null and requestVO.label != ''">
+            and s_g.label = #{requestVO.label}
+        </if>
+
+        <if test="requestVO.gameTwoId != null and requestVO.gameTwoId != ''">
+            and  tw_info.id = #{requestVO.gameTwoId}
+        </if>
+
+        <if test="requestVO.gameOneId != null and requestVO.gameOneId != ''">
+            and   two_sort.game_one_id = #{requestVO.gameOneId}
+        </if>
+
+
+        <if test="requestVO.gameI18nCodeList != null and !requestVO.gameI18nCodeList.isEmpty()">
+            AND info.game_i18n_code IN
+            <foreach item="item" index="index" collection="requestVO.gameI18nCodeList" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="requestVO.ids != null and requestVO.ids.size() > 0">
+            AND info.id IN
+            <foreach collection="requestVO.ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+
+        ) tb
+        GROUP BY tb.id
+        ORDER BY tb.sort
+    </sql>
+
+    <select id="getGameInfoLobbyPage" resultType="com.cloud.baowang.play.api.vo.venue.GameInfoVO">
+        <include refid="getGameInfoLobbyPage"/>
+    </select>
+
+    <select id="getLobbyTopGame" resultType="com.cloud.baowang.play.api.vo.venue.GameInfoVO">
+        select * from (
+            <include refid="lobbyTopGameSQL"/>
+        )t GROUP BY t.id,t.gameOneId
+    </select>
+
+
+    <sql id="lobbyTopGameSQL">
+        SELECT info.`id`,
+               info.`game_id`,
+               info.`game_i18n_code`,
+               info.`venue_code`,
+               s_g.`status`,
+               info.`icon_i18n_code`,
+               info.`se_icon_i18n_code`,
+               info.`vt_icon_i18n_code`,
+               info.`ht_icon_i18n_code`,
+               info.`game_desc_i18n_code`,
+               info.`access_parameters`,
+               s_g.`maintenance_start_time`,
+               s_g.`maintenance_end_time`,
+               s_g.label                   as label,
+               s_g.corner_labels           as cornerLabels,
+               s_g.creator                 as creator,
+               s_g.created_time            as createdTime,
+               s_g.updater                 as updater,
+               s_g.updated_time            as updatedTime,
+               s_g.currency_code,
+               two_sort.sort,
+               tw_info.id                  as gameTwoId,
+               ifnull(tw_info.sort, 100)   as classTwoSort,
+               tw_info.icon                as classTwoIcon,
+               tw_info.type_i18n_code      as gameTwoClassName,
+               two_sort.game_one_hot_sort,
+               two_sort.game_one_id        as gameOneId,
+               two_sort.game_one_home_sort as gameOneHomeSort,
+               tw_info.ht_icon_i18n_code as classTwoHtIconI18nCode,
+               tw_info.site_label_change_type as siteLabelChangeType
+        FROM site_game s_g
+
+                 INNER JOIN game_info info ON s_g.game_info_id = info.id
+
+                 INNER JOIN game_two_currency_sort two_sort
+                            ON two_sort.game_id = s_g.game_info_id and two_sort.currency_code = #{currencyCode}
+
+                 INNER JOIN game_two_class_info tw_info ON tw_info.id = two_sort.game_two_id and tw_info.`status` = 1
+
+        where s_g.site_code = #{siteCode}
+          and s_g.currency_code LIKE CONCAT('%', #{currencyCode}, '%')
+          and s_g.`status` in (1, 2)
+    </sql>
+
+    <select id="getLobbyLabelList" resultType="com.cloud.baowang.play.api.vo.venue.GameInfoVO">
+        <include refid="lobbyTopGameSQL"/>
+    </select>
+
+
+
+    <select id="getGameInfoByOneClassId" resultType="com.cloud.baowang.play.api.vo.venue.GameInfoVO">
+
+         SELECT info.`id`,
+        info.`game_id`,
+        info.`game_i18n_code`,
+        info.`venue_code`,
+        s_g.`status`,
+        info.`icon_i18n_code`,
+        info.`se_icon_i18n_code`,
+        info.`vt_icon_i18n_code`,
+        info.`ht_icon_i18n_code`,
+        info.`game_desc_i18n_code`,
+        info.`access_parameters`,
+        s_g.`maintenance_start_time`,
+        s_g.`maintenance_end_time`,
+        s_g.label as label,
+        s_g.corner_labels as cornerLabels,
+        s_g.creator as creator,
+        s_g.created_time as createdTime,
+        s_g.updater as updater,
+        s_g.updated_time as updatedTime,
+        s_g.currency_code,
+        two_sort.sort,
+        tw_info.id as gameTwoId,
+        ifnull (tw_info.sort ,100) as classTwoSort,
+        tw_info.icon as classTwoIcon,
+        tw_info.type_i18n_code as gameTwoClassName,
+        two_sort.game_one_hot_sort
+        FROM site_game s_g
+
+        INNER JOIN game_info info ON s_g.game_info_id = info.id
+
+        INNER JOIN game_two_currency_sort two_sort ON two_sort.game_id = s_g.game_info_id and two_sort.currency_code = #{currencyCode}
+
+        INNER JOIN game_two_class_info tw_info ON tw_info.id = two_sort.game_two_id and tw_info.`status` = 1
+
+        where s_g.site_code = #{siteCode} and s_g.currency_code LIKE CONCAT('%', #{currencyCode}, '%') and s_g.`status` in (1, 2)
+
+        <if test="gameOneId != null and gameOneId != ''">
+            and two_sort.game_one_id = #{gameOneId}
+        </if>
+
+
+
+    </select>
+
+    <select id="getSiteGameHotList" resultType="com.cloud.baowang.play.api.vo.venue.GameInfoVO">
+        SELECT *
+        FROM (SELECT
+
+        ifnull(hot.home_hot_sort, 100) as homeHotSort,
+        two_sort.game_one_hot_sort as gameOneHotSort,
+        info.`id`,
+        info.`game_name`,
+        info.`game_i18n_code`,
+        info.`venue_code`,
+        s_g.`status`
+        FROM site_game s_g
+
+        INNER JOIN game_info info ON s_g.game_info_id = info.id
+
+        INNER JOIN game_two_currency_sort two_sort
+        ON two_sort.game_id = s_g.game_info_id and two_sort.currency_code = #{currencyCode}
+
+        INNER JOIN game_two_class_info tw_info
+        ON tw_info.id = two_sort.game_two_id and tw_info.`status` = 1
+
+        LEFT JOIN site_game_hot_sort hot ON hot.game_id = info.id and hot.site_code = #{siteCode}
+
+        where s_g.site_code = #{siteCode}
+        and s_g.currency_code LIKE CONCAT('%', #{currencyCode}, '%')
+        and s_g.`status` in (1, 2)
+
+        <if test="gameOneId != null">
+            and two_sort.game_one_id = #{gameOneId}
+        </if>
+
+        and s_g.label = 1) t
+        GROUP BY t.id
+    </select>
+
+    <select id="getSiteGameHomeList" resultType="com.cloud.baowang.play.api.vo.venue.GameInfoVO">
+        SELECT *
+        FROM (SELECT two_sort.game_one_home_sort,
+                     info.`id`,
+                     info.`game_i18n_code`,
+                     info.`game_name`,
+                     info.`venue_code`,
+                     s_g.`status`
+              FROM site_game s_g
+
+                       INNER JOIN game_info info ON s_g.game_info_id = info.id
+
+                       INNER JOIN game_two_currency_sort two_sort
+                                  ON two_sort.game_id = s_g.game_info_id and two_sort.currency_code = #{currencyCode}
+
+                       INNER JOIN game_two_class_info tw_info
+                                  ON tw_info.id = two_sort.game_two_id and tw_info.`status` = 1
+
+              where s_g.site_code = #{siteCode}
+                and s_g.currency_code LIKE CONCAT('%',#{currencyCode} , '%')
+                and s_g.`status` in (1, 2)
+                and two_sort.game_one_id = #{gameOneId}) t
+        GROUP BY t.id
+    </select>
+
+    <select id="getLobbyTopGameById" resultType="com.cloud.baowang.play.api.vo.venue.GameInfoVO">
+        select * from (
+        <include refid="lobbyTopGameSQL"/>
+        <if test="gameId != null">
+            and info.id = #{gameId}
+        </if>
+        )t GROUP BY t.id
+    </select>
+
+
+    <select id="queryNewSiteGameInfoAndSiteGamePage" resultType="com.cloud.baowang.play.api.vo.venue.GameInfoVO">
+
+
+        select
+            g_info.id,g_info.game_name,
+            g_info.game_i18n_code,
+            g_info.game_id,s_game.`status`,
+            s_game.label,s_game.corner_labels,
+            s_game.currency_code,
+            g_info.ht_icon_i18n_code,
+            g_info.se_icon_i18n_code,
+            g_info.vt_icon_i18n_code,
+            g_info.icon_i18n_code,
+        g_info.venue_name,
+            s_game.maintenance_start_time,
+            s_game.maintenance_end_time,
+            s_game.remark,
+            s_game.venue_code,
+            s_game.updater,
+            s_game.updated_time,
+            g_info.access_parameters
+
+
+        FROM site_game s_game
+
+        LEFT JOIN game_info g_info on g_info.id = s_game.game_info_id
+
+        where s_game.site_code = #{siteCode}
+
+        <if test="requestVO.gameNumberId != null">
+            AND g_info.game_id = #{requestVO.gameNumberId}
+        </if>
+
+        <if test="requestVO.gameName != null and requestVO.gameName != ''">
+            AND g_info.game_name LIKE CONCAT('%', #{requestVO.gameName}, '%')
+        </if>
+
+        <if test="requestVO.ids != null and requestVO.ids.size() > 0">
+            AND g_info.id IN
+            <foreach collection="requestVO.ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+
+
+        <if test="requestVO.venueCode != null and requestVO.venueCode != ''">
+            AND g_info.venue_code = #{requestVO.venueCode}
+        </if>
+
+
+        <if test="requestVO.status != null">
+            AND s_game.status = #{requestVO.status}
+        </if>
+
+        <if test="requestVO.siteUpdater != null and requestVO.siteUpdater != ''">
+            AND s_game.updater = #{requestVO.siteUpdater}
+        </if>
+
+
+
+        <if test="requestVO.label != null">
+            AND s_game.label = #{requestVO.label}
+        </if>
+
+        <if test="requestVO.cornerLabels != null">
+            AND s_game.cornerLabels = #{requestVO.cornerLabels}
+        </if>
+
+
+
+
+        <if test="requestVO.id != null">
+            AND g_info.id = #{requestVO.id}
+        </if>
+
+
+
+        <if test="requestVO.currencyCode != null and requestVO.currencyCode != ''">
+            AND s_game.currency_code LIKE CONCAT('%', #{requestVO.currencyCode}, '%')
+        </if>
+
+
+
+<!--        <if test="requestVO.statusIds != null and requestVO.statusIds.size() > 0">-->
+<!--            AND s_game.status IN-->
+<!--            <foreach collection="requestVO.statusIds" item="statusId" open="(" close=")" separator=",">-->
+<!--                #{statusId}-->
+<!--            </foreach>-->
+<!--        </if>-->
+
+
+<!--        <if test="requestVO.venueCodeIds != null and requestVO.venueCodeIds.size() > 0">-->
+<!--            AND g_info.venue_code IN-->
+<!--            <foreach collection="requestVO.venueCodeIds" item="venueCodeId" open="(" close=")" separator=",">-->
+<!--                #{venueCodeId}-->
+<!--            </foreach>-->
+<!--        </if>-->
+
+
+<!--        <if test="requestVO.gameCodeIds != null and requestVO.gameCodeIds.size() > 0">-->
+<!--            AND g_info.access_parameters IN-->
+<!--            <foreach collection="requestVO.gameCodeIds" item="gameCodeId" open="(" close=")" separator=",">-->
+<!--                #{gameCodeId}-->
+<!--            </foreach>-->
+<!--        </if>-->
+
+        <if test="requestVO.notGameIds != null and requestVO.notGameIds.size() > 0">
+            AND g_info.id NOT IN
+            <foreach collection="notGameIds" item="notGameId" open="(" close=")" separator=",">
+                #{notGameId}
+            </foreach>
+        </if>
+
+        order by s_game.status
+
+<!--        <if test="requestVO.venueId != null">-->
+<!--            AND g_info.venue_id = #{requestVO.venueId}-->
+<!--        </if>-->
+
+
+    </select>
+
+    <select id="getSiteGameHomeHotList" resultType="com.cloud.baowang.play.api.vo.venue.GameInfoVO">
+
+        SELECT *
+        FROM (SELECT
+
+        ifnull(hot.home_hot_sort, 100) as homeHotSort,
+        info.`id`,
+        info.`game_name`,
+        info.`game_i18n_code`,
+        info.`venue_code`,
+        s_g.`status`
+        FROM site_game s_g
+
+        INNER JOIN game_info info ON s_g.game_info_id = info.id
+
+        LEFT JOIN site_game_hot_sort hot ON hot.game_id = info.id  AND hot.currency_code = #{currencyCode} and hot.site_code = #{siteCode}
+
+        where s_g.site_code = #{siteCode} and s_g.currency_code LIKE CONCAT('%', #{currencyCode}, '%') and s_g.`status` in (1, 2)
+        and s_g.label = 1 ) t
+        GROUP BY t.id ORDER BY t.homeHotSort
+
+    </select>
+
+    <select id="getGameInfoHomeHotSort" resultType="com.cloud.baowang.play.api.vo.venue.GameInfoVO">
+        SELECT * FROM (
+                          SELECT
+                              ifnull(hot.home_hot_sort, 100) as homeHotSort ,info.`id`, info.`game_id`, info.`game_i18n_code`,
+                                 info.`venue_code`, s_g.`status`, info.`icon_i18n_code`, info.`se_icon_i18n_code`,
+                                 info.`vt_icon_i18n_code`, info.`ht_icon_i18n_code`,
+                                 info.`game_desc_i18n_code`, info.`access_parameters`, s_g.`maintenance_start_time`,
+                                 s_g.`maintenance_end_time`, s_g.label as label, s_g.corner_labels as cornerLabels,
+                                 s_g.creator as creator, s_g.created_time as createdTime,
+                                 s_g.updater as updater, s_g.updated_time as updatedTime, s_g.currency_code
+                       FROM site_game s_g
+                                INNER JOIN game_info info ON s_g.game_info_id = info.id
+                                LEFT JOIN site_game_hot_sort hot ON hot.game_id = info.id AND hot.currency_code = #{requestVO.currencyCode} and hot.site_code = #{siteCode}
+                       where s_g.site_code = #{siteCode} and s_g.currency_code LIKE CONCAT('%', #{requestVO.currencyCode}, '%') and s_g.`status` in (1, 2)
+                         and s_g.label = 1 ) tb GROUP BY tb.id ORDER BY tb.homeHotSort
+
+
+    </select>
+
+    <select id="getCollectionGameInfoLobbyPage" resultType="com.cloud.baowang.play.api.vo.venue.GameInfoVO">
+        SELECT *
+        FROM (SELECT info.`id`,
+                     info.`game_id`,
+                     info.`game_i18n_code`,
+                     info.`venue_code`,
+                     s_g.`status`,
+                     info.`icon_i18n_code`,
+                     info.`se_icon_i18n_code`,
+                     info.`vt_icon_i18n_code`,
+                     info.`ht_icon_i18n_code`,
+                     info.`game_desc_i18n_code`,
+                     info.`access_parameters`,
+                     s_g.`maintenance_start_time`,
+                     s_g.`maintenance_end_time`,
+                     s_g.label as label,
+                     s_g.corner_labels as cornerLabels,
+                     s_g.creator as creator,
+                     s_g.created_time as createdTime,
+                     s_g.updater as updater,
+                     s_g.updated_time as updatedTime,
+                     s_g.currency_code
+              FROM site_game s_g
+
+                       INNER JOIN game_info info ON s_g.game_info_id = info.id
+
+                       INNER JOIN game_collection g_c ON g_c.game_id = info.id
+
+                       LEFT JOIN game_two_currency_sort two_sort ON two_sort.game_id = info.id
+
+        LEFT JOIN game_two_class_info tw_info ON tw_info.id = two_sort.game_two_id and tw_info.`status` = 1
+
+              where s_g.site_code = #{siteCode} and s_g.currency_code LIKE CONCAT('%', #{currencyCode}, '%') and s_g.`status` in (1, 2)
+
+                AND g_c.user_id = #{userId}
+
+            <if test="twoId != null">
+                AND tw_info.id = #{twoId}
+            </if>
+
+        <if test="gameI18nCodeList != null and !gameI18nCodeList.isEmpty()">
+            AND info.game_i18n_code IN
+            <foreach item="item" index="index" collection="gameI18nCodeList" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+              ORDER BY g_c.created_time
+             ) tb
+        GROUP BY tb.id
+    </select>
+
+    <select id="getConfigSiteGameInfoList" resultType="com.cloud.baowang.play.api.vo.venue.SiteGameInfoVO">
+        SELECT *
+        FROM (SELECT info.id, info.game_name, info.game_i18n_code, info.venue_code,info.access_parameters
+              FROM site_game sg
+                       INNER JOIN game_info info ON info.id = sg.game_info_id
+                       INNER JOIN game_two_currency_sort sort ON sort.game_id = info.id
+                       INNER JOIN game_two_class_info two ON two.id = sort.game_two_id
+                       INNER JOIN game_one_class_info one ON one.id = sort.game_one_id
+              WHERE sg.`status` in (1)
+                and one.`status` = 1
+                and two.`status` = 1
+                and sg.site_code = #{siteCode} AND one.site_code = #{siteCode} AND two.site_code = #{siteCode} AND sort.site_code = #{siteCode}
+                  and info.venue_code = #{venueCode}
+                and sort.currency_code = #{currencyCode}) t
+        GROUP BY t.id
+        ORDER BY t.id
+    </select>
+
+
+    <select id="queryGameByCurrencyList" resultType="com.cloud.baowang.play.api.vo.venue.GameInfoVO">
+        SELECT id, currency_code, venue_code
+        FROM game_info
+        WHERE venue_code = #{venueCode}
+        <if test="currencyList != null and currencyList.size() > 0">
+            AND (
+            <foreach item="item" index="index" collection="currencyList" separator=" OR ">
+                currency_code LIKE CONCAT('%', #{item}, '%')
+            </foreach>
+            )
+        </if>
+    </select>
+
+    <select id="getGameInfoCountByTwoAndLabel" resultType="com.cloud.baowang.play.api.vo.venue.GameInfoVO">
+        <include refid="getGameInfoLobbyPage"/>
+    </select>
+</mapper>

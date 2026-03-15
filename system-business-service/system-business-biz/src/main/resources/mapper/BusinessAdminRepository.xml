@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.system.repositories.member.BusinessAdminRepository">
+
+    <select id="selectUserBySiteCodeAndApiUrl" resultType="java.lang.String">
+        SELECT DISTINCT ba.user_id
+        FROM business_menu bm
+        LEFT JOIN business_role_menu brm ON bm.id = brm.menu_id
+        LEFT JOIN business_role br ON brm.role_id = br.id
+        LEFT JOIN business_admin_role bar ON br.id = bar.role_id
+        LEFT JOIN business_admin ba ON bar.admin_id = ba.id
+        WHERE bm.menu_key IN
+        <foreach collection="menuKey" open="(" close=")" item="item" separator=",">
+            #{item}
+        </foreach>
+        AND bm.business_system = 'SITE'
+        AND br.site_code = #{siteCode}
+
+        UNION
+
+        SELECT DISTINCT ba.user_id
+        FROM business_admin ba
+        WHERE ba.is_super_admin = 1
+        AND ba.site_code = #{siteCode}
+
+        ORDER BY user_id ASC
+    </select>
+</mapper>

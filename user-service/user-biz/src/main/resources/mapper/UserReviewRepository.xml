@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.user.repositories.UserReviewRepository">
+    <select id="getTotalCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM  user_review a
+        <where>
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.applyTimeStart != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.oneReviewFinishTimeStart != null">
+                AND a.one_review_finish_time <![CDATA[ >= ]]> #{vo.oneReviewFinishTimeStart}
+            </if>
+            <if test="vo.oneReviewFinishTimeEnd != null">
+                AND a.one_review_finish_time <![CDATA[ <= ]]> #{vo.oneReviewFinishTimeEnd}
+            </if>
+            <if test="vo.reviewStatus != null and vo.reviewStatus.size() > 0">
+                AND a.review_status IN
+                <foreach collection="vo.reviewStatus" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.lockStatus != null">
+                AND a.lock_status = #{vo.lockStatus}
+            </if>
+            <if test="vo.reviewOperation != null">
+                AND a.review_operation = #{vo.reviewOperation}
+            </if>
+            <if test="vo.applicant != '' and vo.applicant != null">
+                AND a.applicant = #{vo.applicant}
+            </if>
+            <if test="vo.reviewer != '' and vo.reviewer != null">
+                AND a.reviewer = #{vo.reviewer}
+            </if>
+            <if test="vo.reviewOrderNo != '' and vo.reviewOrderNo != null">
+                AND a.review_order_no = #{vo.reviewOrderNo}
+            </if>
+        </where>
+    </select>
+
+    <select id="getReviewPage" resultType="com.cloud.baowang.user.api.vo.UserReviewResponseVO">
+        SELECT
+        a.id id,
+        a.review_order_no reviewOrderNo,
+        a.apply_info applyInfo,
+        a.apply_time applyTime,
+        a.applicant applicant,
+        a.one_review_finish_time oneReviewFinishTime,
+        a.reviewer reviewer,
+        a.review_operation reviewOperation,
+        IF(a.locker = #{adminName}, -1, 5) reviewOperation1,
+        a.review_status reviewStatus,
+        a.lock_status lockStatus,
+        a.locker locker,
+        a.site_code siteCode
+        FROM user_review a
+        <where>
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND a.site_code =  #{vo.siteCode}
+            </if>
+            <if test="vo.applyTimeStart != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.oneReviewFinishTimeStart != null">
+                AND a.one_review_finish_time <![CDATA[ >= ]]> #{vo.oneReviewFinishTimeStart}
+            </if>
+            <if test="vo.oneReviewFinishTimeEnd != null">
+                AND a.one_review_finish_time <![CDATA[ <= ]]> #{vo.oneReviewFinishTimeEnd}
+            </if>
+            <if test="vo.reviewStatus != null and vo.reviewStatus.size() > 0">
+                AND a.review_status IN
+                <foreach collection="vo.reviewStatus" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.lockStatus != null">
+                AND a.lock_status = #{vo.lockStatus}
+            </if>
+            <if test="vo.reviewOperation != null">
+                AND a.review_operation = #{vo.reviewOperation}
+            </if>
+            <if test="vo.applicant != '' and vo.applicant != null">
+                AND a.applicant = #{vo.applicant}
+            </if>
+            <if test="vo.reviewer != '' and vo.reviewer != null">
+                AND a.reviewer = #{vo.reviewer}
+            </if>
+            <if test="vo.reviewOrderNo != '' and vo.reviewOrderNo != null">
+                AND a.review_order_no = #{vo.reviewOrderNo}
+            </if>
+        </where>
+        <choose>
+            <when test="vo.orderField == 'applyTime' and vo.orderType == 'desc'">
+                ORDER BY apply_time desc
+            </when>
+            <when test="vo.orderField == 'applyTime' and vo.orderType == 'asc'">
+                ORDER BY apply_time ASC
+            </when>
+            <when test="vo.orderField == 'oneReviewFinishTime' and vo.orderType == 'desc'">
+                ORDER BY one_review_finish_time desc
+            </when>
+            <when test="vo.orderField == 'oneReviewFinishTime' and vo.orderType == 'asc'">
+                ORDER BY one_review_finish_time ASC
+            </when>
+            <otherwise>
+                ORDER BY reviewOperation1 ASC, a.review_operation ASC, a.review_status ASC, a.apply_time ASC
+            </otherwise>
+        </choose>
+
+    </select>
+
+    <select id="getByUserAccount" resultType="com.cloud.baowang.user.po.UserReviewPO">
+        SELECT
+            *
+        FROM user_review
+        <where>
+            user_account = #{userAccount}
+            AND site_code=#{siteCode}
+            AND review_status != 4
+        </where>
+    </select>
+
+    <select id="findUserReviewExist" resultType="com.cloud.baowang.user.po.UserReviewPO">
+        SELECT
+        *
+        FROM user_review
+        <where>
+            <if test="vo.email != '' and vo.email != null">
+                and email = #{vo.email}
+            </if>
+            <if test="vo.phone != '' and vo.phone != null">
+                and phone = #{vo.phone}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                and user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                and site_code = #{vo.siteCode}
+            </if>
+        </where>
+    </select>
+
+</mapper>

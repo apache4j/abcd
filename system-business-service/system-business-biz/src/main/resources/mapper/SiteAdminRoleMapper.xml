@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.system.repositories.site.SiteAdminRoleRepository">
+
+
+    <insert id="batchAdminRole">
+        insert into business_admin_role(admin_id, role_id) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.adminId},#{item.roleId})
+        </foreach>
+    </insert>
+
+</mapper>

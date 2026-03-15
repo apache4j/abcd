@@ -1,0 +1,647 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.wallet.repositories.UserManualUpDownRecordRepository">
+
+    <select id="getPage" resultType="com.cloud.baowang.wallet.api.vo.fundadjust.UserManualUpRecordResponseVO">
+        SELECT
+        a.order_no orderNo,
+        a.user_account userId,
+        a.user_register userAccount,
+        concat('VIP', a.vip_rank) vipRank,
+        a.adjust_way adjustWay,
+        a.order_status orderStatus,
+        a.adjust_type adjustType,
+        a.adjust_amount adjustAmount,
+        a.apply_time applyTime,
+        a.applicant applicant,
+        a.apply_reason applyReason
+        FROM user_manual_up_down_record a
+        <where>
+            and a.site_code = #{vo.siteCode}
+            AND a.adjust_way = 1
+            <if test="vo.applyStartTime != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyStartTime}
+            </if>
+            <if test="vo.applyEndTime != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyEndTime}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.userId != '' and vo.userId != null">
+                AND a.user_account = #{vo.userId}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_register = #{vo.userAccount}
+            </if>
+            <if test="vo.orderStatus != null">
+                AND a.order_status = #{vo.orderStatus}
+            </if>
+            <if test="vo.adjustType != null">
+                AND a.adjust_type = #{vo.adjustType}
+            </if>
+            <if test="vo.adjustAmountMin != '' and vo.adjustAmountMin != null">
+                AND a.adjust_amount <![CDATA[ >= ]]> #{vo.adjustAmountMin}
+            </if>
+            <if test="vo.adjustAmountMax != '' and vo.adjustAmountMax != null">
+                AND a.adjust_amount <![CDATA[ <= ]]> #{vo.adjustAmountMax}
+            </if>
+        </where>
+
+        <choose>
+            <when test="vo.orderField == 'applyTime' and vo.orderType == 'asc'">
+                ORDER BY applyTime asc
+            </when>
+            <when test="vo.orderField == 'applyTime' and vo.orderType == 'desc'">
+                ORDER BY applyTime desc
+            </when>
+
+            <otherwise>
+                ORDER BY a.apply_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="getTotalPage" resultType="com.cloud.baowang.wallet.api.vo.fundadjust.UserManualUpRecordResponseVO">
+        SELECT
+        '总计' orderNo,
+        IFNULL(SUM(a.adjust_amount), 0) adjustAmount
+        FROM user_manual_up_down_record a
+        <where>
+            and a.site_code = #{vo.siteCode}
+            AND a.adjust_way = 1
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.auditStatus != null">
+                AND a.audit_status = #{vo.auditStatus}
+            </if>
+            <if test="vo.adjustType != null">
+                AND a.adjust_type = #{vo.adjustType}
+            </if>
+            <if test="vo.adjustAmountMin != '' and vo.adjustAmountMin != null">
+                AND a.adjust_amount <![CDATA[ >= ]]> #{vo.adjustAmountMin}
+            </if>
+            <if test="vo.adjustAmountMax != '' and vo.adjustAmountMax != null">
+                AND a.adjust_amount <![CDATA[ <= ]]> #{vo.adjustAmountMax}
+            </if>
+            <if test="vo.applyStartTime != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyStartTime}
+            </if>
+            <if test="vo.applyEndTime != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyEndTime}
+            </if>
+        </where>
+    </select>
+
+    <select id="getPageCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM user_manual_up_down_record a
+        <where>
+            and a.site_code = #{vo.siteCode}
+            AND a.adjust_way = 1
+            <if test="vo.applyStartTime != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyStartTime}
+            </if>
+            <if test="vo.applyEndTime != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyEndTime}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.userId != '' and vo.userId != null">
+                AND a.user_id = #{vo.userId}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.orderStatus != null">
+                AND a.order_status = #{vo.orderStatus}
+            </if>
+            <if test="vo.adjustType != null">
+                AND a.adjust_type = #{vo.adjustType}
+            </if>
+            <if test="vo.adjustAmountMin != '' and vo.adjustAmountMin != null">
+                AND a.adjust_amount <![CDATA[ >= ]]> #{vo.adjustAmountMin}
+            </if>
+            <if test="vo.adjustAmountMax != '' and vo.adjustAmountMax != null">
+                AND a.adjust_amount <![CDATA[ <= ]]> #{vo.adjustAmountMax}
+            </if>
+        </where>
+    </select>
+
+    <select id="getUpReviewPage" resultType="com.cloud.baowang.wallet.api.vo.fundrecord.UserManualUpReviewResponseVO">
+        SELECT
+        a.id id,
+        a.order_no orderNo,
+        a.user_account userId,
+        a.user_register userAccount,
+        a.user_name userName,
+        a.adjust_type adjustType,
+        a.adjust_amount adjustAmount,
+        a.apply_time applyTime,
+        a.order_status orderStatus,
+        a.lock_status lockStatus,
+        IF(a.locker = #{adminName}, -1, 1) lockStatus1,
+        a.locker locker,
+        a.applicant applicant,
+        a.one_reviewer oneReviewer
+        FROM user_manual_up_down_record a
+        <where>
+            AND a.adjust_way = 1
+            <if test="vo.review != null">
+                <if test="vo.review == 1">
+                    AND a.order_status in (0,1)
+                </if>
+                <if test="vo.review == 2">
+                    AND a.order_status in (3,4)
+                </if>
+            </if>
+            <if test="vo.applyTimeStart != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.lockStatus != null">
+                AND a.lock_status = #{vo.lockStatus}
+            </if>
+            <if test="vo.locker != '' and vo.locker != null">
+                AND a.locker = #{vo.locker}
+            </if>
+            <if test="vo.userId != '' and vo.userId != null">
+                AND a.user_account = #{vo.userId}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_register = #{vo.userAccount}
+            </if>
+        </where>
+        ORDER BY lockStatus1 ASC, a.lock_status ASC, a.apply_time ASC
+    </select>
+
+    <select id="sumUserManualDown"
+            resultType="com.cloud.baowang.wallet.api.vo.userCoinManualDown.UserManualDownRecordVO">
+
+        SELECT
+        "总计" AS orderNo,
+        IFNULL(SUM(a.adjust_amount),0) AS adjustAmount
+        FROM
+        user_manual_up_down_record a
+        <where>
+            AND a.adjust_way = 2
+            <if test="vo.creatorStartTime != null">
+                AND a.created_time &gt;= #{vo.creatorStartTime}
+            </if>
+            <if test="vo.creatorEndTime != null">
+                AND a.created_time &lt;= #{vo.creatorEndTime}
+            </if>
+            <if test="vo.orderNo != null and vo.orderNo !=''">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.userName != null and vo.userName !=''">
+                AND a.user_name = #{vo.userName}
+            </if>
+            <if test="vo.userAccount != null and vo.userAccount !=''">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.orderStatus != null and vo.orderStatus !=''">
+                AND a.order_status = #{vo.orderStatus}
+            </if>
+            <if test="vo.adjustType != null ">
+                AND a.adjust_type = #{vo.adjustType}
+            </if>
+            <if test="vo.minAdjustAmount != null ">
+                AND a.adjust_amount &gt;= #{vo.minAdjustAmount}
+            </if>
+            <if test="vo.maxAdjustAmount != null ">
+                AND a.adjust_amount &lt;= #{vo.maxAdjustAmount}
+            </if>
+        </where>
+    </select>
+
+    <select id="getRecordPage" resultType="com.cloud.baowang.wallet.api.vo.fundrecord.GetRecordResponseVO">
+        SELECT
+        a.id id,
+        a.order_no orderNo,
+        a.user_account userId,
+        a.user_register userAccount,
+        a.user_name userName,
+        a.order_status orderStatus,
+        a.adjust_type adjustType,
+        a.adjust_amount adjustAmount,
+        a.apply_time applyTime,
+        a.one_reviewer oneReviewer,
+        a.two_reviewer twoReviewer,
+        a.one_review_finish_time oneReviewFinishTime,
+        a.two_review_finish_time twoReviewFinishTime,
+        a.one_review_start_time oneReviewStartTime,
+        a.two_review_start_time twoReviewStartTime,
+        a.one_review_remark oneReviewRemark,
+        a.two_review_remark twoReviewRemark
+        FROM user_manual_up_down_record a
+        <where>
+            AND a.adjust_way = 1
+            AND a.order_status in (2,5,6)
+            <if test="vo.applyTimeStart != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.userId != '' and vo.userId != null">
+                AND a.user_id = #{vo.userId}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.orderStatus != null">
+                AND a.order_status = #{vo.orderStatus}
+            </if>
+        </where>
+        ORDER BY a.updated_time DESC
+    </select>
+
+    <select id="getTotalCountUpRecord" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM user_manual_up_down_record a
+        <where>
+            AND a.adjust_way = 1
+            AND a.order_status in (2,5,6)
+            <if test="vo.applyTimeStart != null">
+                AND a.apply_ti6.me <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.userId != '' and vo.userId != null">
+                AND a.user_id = #{vo.userId}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.orderStatus != null">
+                AND a.order_status = #{vo.orderStatus}
+            </if>
+        </where>
+    </select>
+    <select id="getReviewPage" resultType="com.cloud.baowang.wallet.api.vo.fundrecord.UserRechargeReviewResponseVO">
+        SELECT
+        a.id id,
+        a.order_no orderNo,
+        a.user_account userAccount,
+        a.user_register userRegister,
+        a.apply_amount applyAmount,
+        a.status status,
+        a.file_key applyFile,
+        a.cash_flow_file cashFlowFile,
+        a.lock_status lockStatus,
+        IF(a.locker = #{adminName}, -1, 1) lockStatus1,
+        a.locker locker,
+        a.deposit_withdraw_type depositWithdrawType,
+        a.deposit_withdraw_method depositWithdrawMethod,
+        a.currency,
+        a.trade_currency_amount tradeCurrencyAmount,
+        a.exchange_rate exchangeRate,
+        a.fee_rate feeRate,
+        /*a.first_audit_user oneReviewer,*/
+        a.account_type accountType,
+        a.account_branch accountBranch
+        /*a.withdraw_address withdrawAddress,*/
+        /*a.withdraw_name withdrawName*/
+        FROM user_deposit_withdrawal a
+        <where>
+            AND a.type = 1
+            <if test="vo.review != null">
+                <if test="vo.review == 1">
+                    AND a.status in (1,2)
+                </if>
+                <if test="vo.review == 2">
+                    AND a.status in (4,5)
+                </if>
+            </if>
+            <if test="vo.applyTimeStart != null">
+                AND a.created_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.created_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.lockStatus != null">
+                AND a.lock_status = #{vo.lockStatus}
+            </if>
+            <if test="vo.locker != '' and vo.locker != null">
+                AND a.locker = #{vo.locker}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.userRegister != '' and vo.userRegister != null">
+                AND a.user_register = #{vo.userRegister}
+            </if>
+            <if test="vo.userName != '' and vo.userName != null">
+                AND a.user_name = #{vo.userName}
+            </if>
+        </where>
+        ORDER BY lockStatus1 ASC, a.lock_status ASC, a.created_time ASC
+    </select>
+
+    <select id="getRechargeRecordPage"
+            resultType="com.cloud.baowang.wallet.api.vo.fundrecord.GetUserRechargeRecordResponseVO">
+        SELECT
+        a.id id,
+        a.order_no orderNo,
+        a.user_account userAccount,
+        a.user_register userRegister,
+        a.status status,
+        a.apply_amount applyAmount,
+        a.arrive_amount arriveAmount,
+        a.created_time applyTime,
+        a.file_key applyFile,
+        a.remark remark,
+        a.cash_flow_file cashFlowFile
+        FROM user_deposit_withdrawal a
+        <where>
+            AND a.type = 1
+            AND a.status in (3,101)
+            /* deposit_withdraw_type deposit_withdraw_method*/
+            -- AND a.deposit_withdraw_method in ('local_bank_card','local_alipay','local_wechat')
+
+            <if test="vo.applyTimeStart != null">
+                AND a.created_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.created_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.userRegister != '' and vo.userRegister != null">
+                AND a.user_register = #{vo.userRegister}
+            </if>
+            <if test="vo.userName != '' and vo.userName != null">
+                AND a.user_name = #{vo.userName}
+            </if>
+            <if test="vo.orderStatus != null">
+                AND a.status = #{vo.orderStatus}
+            </if>
+        </where>
+        ORDER BY a.updated_time DESC
+    </select>
+
+    <select id="getTotalCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM user_deposit_withdrawal a
+        <where>
+            AND a.type = 1
+            -- AND a.payment_method in ('local_bank_card','local_alipay','local_wechat')
+            AND a.status in (3,101)
+            <if test="vo.applyTimeStart != null">
+                AND a.created_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.created_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.userName != '' and vo.userName != null">
+                AND a.user_name = #{vo.userName}
+            </if>
+            <if test="vo.orderStatus != null">
+                AND a.status = #{vo.orderStatus}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectDepositActiveInfo" resultType="HashMap">
+        SELECT
+        b.userAccount as userAccount
+        FROM
+        (
+        SELECT
+        a.userAccount,
+        sum( a.amount ) AS resultAmount
+        FROM
+        (
+        SELECT
+        user_account AS userAccount,
+        SUM( adjust_amount ) AS amount
+        FROM
+        user_manual_up_down_record
+        WHERE
+        adjust_way = 1
+        AND adjust_type = 3
+        AND order_status = 6
+        <if test="vo.allDownAgentNum != null and vo.allDownAgentNum.size > 0">
+            AND agent_id in
+            <foreach collection="vo.allDownAgentNum" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND updated_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND updated_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        GROUP BY user_account UNION
+        (
+        SELECT
+        user_account AS userAccount,
+        SUM( arrive_amount ) AS amount
+        FROM
+        user_deposit_withdrawal
+        WHERE
+        type = 1
+        <if test="vo.allDownAgentNum != null and vo.allDownAgentNum.size > 0">
+            AND agent_id in
+            <foreach collection="vo.allDownAgentNum" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND updated_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND updated_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        AND STATUS = 101
+        GROUP BY user_account
+        )
+        union
+        (
+        SELECT
+        user_account AS userAccount,
+        SUM( amount ) AS amount
+        FROM
+        agent_deposit_subordinates
+        WHERE 1 = 1
+        <if test="vo.allDownAgentNum != null and vo.allDownAgentNum.size > 0">
+            AND agent_id in
+            <foreach collection="vo.allDownAgentNum" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND deposit_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND deposit_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        GROUP BY user_account
+        )
+        ) a
+        GROUP BY
+        a.userAccount
+        ) b
+        <if test="vo.validAmount != null">
+            WHERE b.resultAmount <![CDATA[ >= ]]> #{vo.validAmount}
+        </if>
+    </select>
+
+    <select id="getManualAmountGroupAgent"
+            resultType="com.cloud.baowang.wallet.api.vo.agent.WalletAgentSubLineResVO"
+            parameterType="com.cloud.baowang.wallet.api.vo.agent.WalletAgentSubLineReqVO">
+        SELECT
+        t.agent_account as agentAccount,
+        IFNULL(SUM(t.adjust_amount),0) as amount,
+        IFNULL(SUM(t.fee_amount),0) as feeAmount,
+        u.main_currency as currency
+        FROM
+        user_manual_up_down_record t
+        inner join user_info u on u.user_account = t.user_account
+        WHERE
+        u.account_type in (2, 3)
+        and t.audit_status = 3
+        and t.adjust_way = #{vo.manualOperateType}
+        <if test="vo.manualAdjustTypes != null and vo.manualAdjustTypes.size > 0">
+            AND t.adjust_type in
+            <foreach collection="vo.manualAdjustTypes" item="adjustType" separator="," open="(" close=")">
+                #{adjustType}
+            </foreach>
+        </if>
+        <if test="vo.agentAccountList != null and vo.agentAccountList.size > 0">
+            AND t.agent_account in
+            <foreach collection="vo.agentAccountList" item="agentAccount" separator="," open="(" close=")">
+                #{agentAccount}
+            </foreach>
+        </if>
+        <if test="vo.agentIds != null and vo.agentIds.size > 0">
+            AND t.agent_id in
+            <foreach collection="vo.agentIds" item="agentId" separator="," open="(" close=")">
+                #{agentId}
+            </foreach>
+        </if>
+        <if test="vo.currency != null and vo.currency != ''">
+            AND u.main_currency = #{vo.currency}
+        </if>
+        and t.updated_time <![CDATA[ >= ]]> #{vo.startTime}
+        AND t.updated_time <![CDATA[ <= ]]> #{vo.endTime}
+        GROUP BY
+        t.agent_account, u.main_currency
+    </select>
+    <select id="selectUpReviewPage" resultType="com.cloud.baowang.wallet.po.UserManualUpDownRecordPO">
+        SELECT
+        id,
+        site_code AS siteCode,
+        agent_id AS agentId,
+        agent_account AS agentAccount,
+        user_account AS userAccount,
+        user_id AS userId,
+        user_name AS userName,
+        vip_grade_code AS vipGradeCode,
+        order_no AS orderNo,
+        adjust_way AS adjustWay,
+        adjust_type AS adjustType,
+        activity_template AS activityTemplate,
+        activity_id AS activityId,
+        currency_code AS currencyCode,
+        adjust_amount AS adjustAmount,
+        running_water_multiple AS runningWaterMultiple,
+        certificate_address AS certificateAddress,
+        apply_reason AS applyReason,
+        apply_time AS applyTime,
+        applicant AS applicant,
+        audit_datetime AS auditDatetime,
+        audit_id AS auditId,
+        audit_remark AS auditRemark,
+        audit_status AS auditStatus,
+        review_operation AS reviewOperation,
+        lock_status AS lockStatus,
+        locker AS locker,
+        IF(locker = #{vo.operator}, -1, 1) as lockStatus1
+        FROM user_manual_up_down_record
+        WHERE site_code = #{vo.siteCode}
+        AND review_operation = #{vo.reviewOperation}
+        <if test="vo.applyTimeStart != null">
+            AND apply_time &gt;= #{vo.applyTimeStart}
+        </if>
+        <if test="vo.applyTimeEnd != null">
+            AND apply_time &lt;= #{vo.applyTimeEnd}
+        </if>
+        <if test="vo.userAccount != null and vo.userAccount != ''">
+            AND user_account = #{vo.userAccount}
+        </if>
+        <if test="vo.orderNo != null and vo.orderNo != ''">
+            AND order_no = #{vo.orderNo}
+        </if>
+        <if test="vo.lockStatus != null">
+            AND lock_status = #{vo.lockStatus}
+        </if>
+        <if test="vo.locker != null and vo.locker != ''">
+            AND locker = #{vo.locker}
+        </if>
+        ORDER BY lockStatus1 ASC, lock_status ASC, apply_time ASC
+    </select>
+
+    <select id="getUserManualUpAmount" resultType="com.cloud.baowang.agent.api.vo.agent.winLoss.UserDepositSumVO">
+        SELECT
+        user_id as userId,
+        currency_code as currencyCode ,
+        sum(adjust_amount) as depositAmount
+        FROM
+        user_manual_up_down_record
+        WHERE adjust_way = 1
+        AND adjust_type = 4
+        AND balance_change_status = 1
+        <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+            AND agent_id IN
+            <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            and updated_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            and updated_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        GROUP BY
+        user_id,
+        currency_code
+    </select>
+
+</mapper>

@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.wallet.repositories.SiteRechargeWayRepository">
+
+    <select id="queryDepositAuthorizePage" resultType="com.cloud.baowang.wallet.api.vo.recharge.RechargeAuthorizeResVO">
+        SELECT
+        a.id AS rechargeWayId,
+        a.recharge_way_i18 AS rechargeWayName,
+        a.recharge_type_id AS rechargeTypeId,
+        (SELECT recharge_type_i18 FROM system_recharge_type WHERE id = a.recharge_type_id) AS rechargeTypeName,
+        IFNULL(t1.way_fee, a.way_fee) AS depositFee,
+        IFNULL(t1.way_fee_fixed_amount, a.way_fee_fixed_amount) AS wayFeeFixedAmount,
+        IFNULL(t1.fee_type, a.fee_type) AS feeType,
+        a.way_icon AS wayIcon,
+        a.memo AS memo,
+        a.status AS status,
+
+        CASE
+        WHEN t1.site_code IS NOT NULL AND t1.site_code != '' THEN t1.created_time
+        ELSE a.updated_time
+        END AS operatorTime,
+
+        CASE
+        WHEN t1.site_code IS NOT NULL AND t1.site_code != '' THEN t1.creator
+        ELSE a.creator
+        END AS operator,
+
+        CASE
+        WHEN a.id = t1.recharge_way_id THEN 1
+        ELSE 0
+        END AS chooseFlag
+
+        FROM
+        (
+        SELECT
+        t.id,
+        t.recharge_way,
+        t.recharge_way_i18,
+        t.recharge_type_id,
+        t.way_fee,
+        t.way_fee_fixed_amount,
+        t.fee_type,
+        t.way_icon,
+        t.memo,
+        t.status,
+        t.sort_order,
+        t.updated_time,
+        t.creator,
+        t.recharge_type_code,
+
+        (SELECT COUNT(1) FROM system_recharge_channel src WHERE src.recharge_way_id = t.id) AS channelTotal
+
+        FROM
+        system_recharge_way t
+        WHERE
+        t.currency_code = #{vo.currency}
+        <if test="vo.rechargeTypeId != '' and vo.rechargeTypeId != null">
+            AND t.recharge_type_id = #{vo.rechargeTypeId}
+        </if>
+        <if test="vo.rechargeWayId != '' and vo.rechargeWayId != null">
+            AND t.id = #{vo.rechargeWayId}
+        </if>
+        <if test="vo.status != null and vo.status != ''">
+            AND t.status = #{vo.status}
+        </if>
+        ) a
+        LEFT JOIN
+        site_recharge_way t1 ON a.id = t1.recharge_way_id AND t1.site_code = #{vo.siteCode}
+        where ( a.channelTotal > 0 or a.recharge_type_code = 'manual_recharge')
+        ORDER BY
+        chooseFlag desc,
+        a.status DESC,
+        a.sort_order DESC
+
+    </select>
+    <select id="queryBySite" resultType="com.cloud.baowang.wallet.api.vo.recharge.SiteRechargeWayResVO">
+        SELECT
+        a.id AS payMethodId,
+        a.recharge_way_i18 AS rechargeWayI18
+        FROM
+        system_recharge_way a
+    </select>
+    <select id="selectRechargePage"
+            resultType="com.cloud.baowang.wallet.api.vo.recharge.SiteRechargeWayResponseVO">
+        SELECT
+            a.id AS id,
+            b.currency_code AS currencyCode,
+        a.recharge_way_id AS rechargeWayId,
+            b.recharge_way_i18 AS rechargeWayI18,
+            b.recharge_type_code AS rechargeTypeCode,
+            b.way_icon AS wayIcon,
+            a.fee_type AS feeType,
+            a.way_fee AS wayFee,
+            a.way_fee_fixed_amount AS wayFeeFixedAmount,
+            a.status AS status,
+            a.sort_order AS sortOrder,
+            a.creator AS creator,
+            a.created_time AS createdTime,
+            a.updater AS updater,
+            a.updated_time AS updatedTime,
+            c.recharge_type_i18 AS rechargeTypeI18,
+            a.vip_grade_use_scope AS vipGradeUseScope
+        FROM
+            site_recharge_way a
+        LEFT JOIN system_recharge_way b ON b.id = a.recharge_way_id
+        LEFT JOIN system_recharge_type c ON c.id = b.recharge_type_id
+        WHERE
+            a.site_code = #{vo.siteCode}
+        <if test="vo.rechargeTypeId != null and vo.rechargeTypeId != ''">
+            AND c.id = #{vo.rechargeTypeId}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode != ''">
+            AND b.currency_code = #{vo.currencyCode}
+        </if>
+        <if test="vo.rechargeWay != null and vo.rechargeWay != ''">
+            AND b.recharge_way LIKE CONCAT('%', #{vo.rechargeWay}, '%')
+        </if>
+        <if test="vo.status != null">
+            AND a.status = #{vo.status}
+        </if>
+        <if test="vo.feeType != null ">
+            AND a.fee_type = #{vo.feeType}
+        </if>
+        ORDER BY a.updated_time DESC
+
+    </select>
+    <select id="selectBySort" resultType="com.cloud.baowang.wallet.api.vo.recharge.SiteRechargeWayResponseVO">
+        SELECT
+        a.id AS id,
+        b.currency_code AS currencyCode,
+        a.recharge_way_id AS rechargeWayId,
+        b.recharge_way_i18 AS rechargeWayI18,
+        b.recharge_type_code AS rechargeTypeCode,
+        b.way_icon AS wayIcon,
+        a.fee_type AS feeType,
+        a.way_fee AS wayFee,
+        a.way_fee_fixed_amount AS wayFeeFixedAmount,
+        a.status AS status,
+        a.sort_order AS sortOrder,
+        a.creator AS creator,
+        a.created_time AS createdTime,
+        a.updater AS updater,
+        a.updated_time AS updatedTime,
+        c.recharge_type_i18 AS rechargeTypeI18,
+        a.vip_grade_use_scope AS vipGradeUseScope
+        FROM
+        site_recharge_way a
+        LEFT JOIN system_recharge_way b ON b.id = a.recharge_way_id
+        LEFT JOIN system_recharge_type c ON c.id = b.recharge_type_id
+        WHERE
+        a.site_code = #{vo.siteCode}
+        <if test="vo.rechargeTypeId != null and vo.rechargeTypeId != ''">
+            AND c.id = #{vo.rechargeTypeId}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode != ''">
+            AND b.currency_code = #{vo.currencyCode}
+        </if>
+        <if test="vo.rechargeWay != null and vo.rechargeWay != ''">
+            AND b.recharge_way LIKE CONCAT('%', #{vo.rechargeWay}, '%')
+        </if>
+        <if test="vo.status !=null">
+            and a.status = #{vo.status}
+        </if>
+        <if test="vo.feeType != null ">
+            AND a.fee_type = #{vo.feeType}
+        </if>
+        ORDER BY a.sort_order ASC
+    </select>
+    <select id="selectFrontWayList" resultType="com.cloud.baowang.wallet.api.vo.userCoin.SystemRechargeWayVO">
+        SELECT
+            b.id AS id,
+            b.currency_code AS currencyCode,
+            b.recharge_type_id AS rechargeTypeId,
+            b.recharge_type_code AS rechargeTypeCode,
+            b.recharge_way AS rechargeWay,
+            b.recharge_way_i18 AS rechargeWayI18,
+            b.network_type AS networkType,
+            b.fee_type AS feeType,
+            b.way_fee AS wayFee,
+            b.way_fee_fixed_amount AS wayFeeFixedAmount,
+            b.quick_amount AS quickAmount,
+            b.way_icon AS wayIcon,
+            b.memo AS memo,
+            b.recommend_flag AS recommendFlag,
+            a.vip_grade_use_scope AS vipGradeUseScope
+        FROM
+        site_recharge_way a
+        LEFT JOIN system_recharge_way b ON b.id = a.recharge_way_id
+        LEFT JOIN system_recharge_type c ON c.id = b.recharge_type_id
+        WHERE
+        a.site_code = #{vo.siteCode}
+        AND a.status = 1
+        AND b.status = 1
+        <if test="vo.mainCurrency != null and vo.mainCurrency != ''">
+            AND b.currency_code = #{vo.mainCurrency}
+        </if>
+        ORDER BY b.recommend_flag DESC, a.sort_order ASC
+    </select>
+
+
+
+
+    <select id="selectRechargeWayList" resultType="com.cloud.baowang.wallet.api.vo.recharge.SiteRechargeWayResChangeVO">
+        SELECT
+        site.recharge_way_id rechargeWayId,
+        site.site_code siteCode,
+        site.way_fee wayFee,
+        site.way_fee_fixed_amount wayFeeFixedAmount,
+        way.currency_code currencyCode,
+        m.message as rechargeWayName
+        FROM
+        site_recharge_way site
+        left join system_recharge_way way on way.id = site.recharge_way_id
+        left join i18n_message m on way.recharge_way_i18 = m.message_key  and m.`language` ='zh-CN'
+        WHERE
+        site.site_code = #{siteCode}
+    </select>
+    <select id="getRechargeWayByCurrencyAndNetworkType"
+            resultType="com.cloud.baowang.wallet.api.vo.recharge.SystemRechargeWayDetailRespVO">
+        SELECT
+        b.id AS id,
+        b.currency_code AS currencyCode,
+        b.recharge_type_id AS rechargeTypeId,
+        b.recharge_type_code AS rechargeTypeCode,
+        b.recharge_way AS rechargeWay,
+        b.recharge_way_i18 AS rechargeWayI18,
+        b.network_type AS networkType,
+        b.fee_type AS feeType,
+        b.way_fee AS wayFee,
+        b.way_fee_fixed_amount AS wayFeeFixedAmount,
+        b.quick_amount AS quickAmount,
+        b.way_icon AS wayIcon,
+        b.memo AS memo,
+        b.recommend_flag AS recommendFlag
+        FROM
+        site_recharge_way a
+        LEFT JOIN system_recharge_way b ON b.id = a.recharge_way_id
+        WHERE
+        a.site_code = #{siteCode}
+        AND a.status = 1
+        AND b.status = 1
+        <if test="currencyCode != null and currencyCode != ''">
+            AND b.currency_code = #{currencyCode}
+        </if>
+        <if test="wayId != null and wayId != ''">
+            AND b.id = #{wayId}
+        </if>
+        <if test="networkType != null and networkType != ''">
+            AND b.network_type = #{networkType}
+        </if>
+        LIMIT 1
+
+    </select>
+
+</mapper>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.user.repositories.SiteVIPRankRepository">
+
+    <select id="queryVIPRankPage" resultType="com.cloud.baowang.user.api.vo.vip.SiteVIPRankVO">
+        SELECT
+        t.id,
+        t.vip_rank_code as vipRankCode,
+        t.vip_rank_name as vipRankName,
+        t.vip_grade_codes as vipGradeCodes,
+        (select vip_grade_name from vip_grade where vip_grade_code = SUBSTRING_INDEX( t.vip_grade_codes, ',', 1 ))  AS minGrade,
+        (select vip_grade_name from vip_grade where vip_grade_code = SUBSTRING_INDEX( t.vip_grade_codes, ',', -1 )) as maxGrade,
+        t.vip_icon as vipIcon,
+        t.remark as remark
+        FROM
+        site_vip_rank t
+        where t.site_code = #{siteCode}
+    </select>
+
+</mapper>

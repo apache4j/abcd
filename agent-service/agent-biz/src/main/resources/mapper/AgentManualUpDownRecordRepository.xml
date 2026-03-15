@@ -1,0 +1,728 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentManualUpDownRecordRepository">
+
+
+    <select id="getPage" resultType="com.cloud.baowang.agent.api.vo.manualup.AgentManualUpRecordResponseVO">
+        SELECT
+        a.order_no as orderNo,
+        a.agent_account as agentAccount,
+        a.agent_name as agentName,
+        a.adjust_way as adjustWay,
+        a.order_status as orderStatus,
+        a.wallet_type as walletType,
+        a.adjust_type as adjustType,
+        a.adjust_amount as adjustAmount,
+        a.apply_time as applyTime,
+        a.applicant as applicant,
+        a.apply_reason as applyReason
+        FROM agent_manual_up_down_record a
+        <where>
+            and a.site_code=#{vo.siteCode}
+            AND a.adjust_way = 1
+            <if test="vo.applyStartTime != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyStartTime}
+            </if>
+            <if test="vo.applyEndTime != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyEndTime}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.agentAccount != '' and vo.agentAccount != null">
+                AND a.agent_account = #{vo.agentAccount}
+            </if>
+            <if test="vo.agentName != '' and vo.agentName != null">
+                AND a.agent_name = #{vo.agentName}
+            </if>
+            <if test="vo.orderStatus != null">
+                AND a.order_status = #{vo.orderStatus}
+            </if>
+            <if test="vo.adjustType != null">
+                AND a.adjust_type = #{vo.adjustType}
+            </if>
+            <if test="vo.adjustAmountMin != '' and vo.adjustAmountMin != null">
+                AND a.adjust_amount <![CDATA[ >= ]]> #{vo.adjustAmountMin}
+            </if>
+            <if test="vo.adjustAmountMax != '' and vo.adjustAmountMax != null">
+                AND a.adjust_amount <![CDATA[ <= ]]> #{vo.adjustAmountMax}
+            </if>
+        </where>
+
+        <choose>
+            <when test="vo.orderField == 'applyTime' and vo.orderType == 'asc'">
+                ORDER BY applyTime asc
+            </when>
+            <when test="vo.orderField == 'applyTime' and vo.orderType == 'desc'">
+                ORDER BY applyTime desc
+            </when>
+
+            <otherwise>
+                ORDER BY a.apply_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <select id="getPageCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM agent_manual_up_down_record a
+        <where>
+            and a.site_code = #{vo.siteCode}
+            AND a.adjust_way = 1
+            <if test="vo.applyStartTime != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyStartTime}
+            </if>
+            <if test="vo.applyEndTime != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyEndTime}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.agentAccount != '' and vo.agentAccount != null">
+                AND a.agent_account = #{vo.agentAccount}
+            </if>
+            <if test="vo.agentName != '' and vo.agentName != null">
+                AND a.agent_name = #{vo.agentName}
+            </if>
+            <if test="vo.orderStatus != null">
+                AND a.order_status = #{vo.orderStatus}
+            </if>
+            <if test="vo.adjustType != null">
+                AND a.adjust_type = #{vo.adjustType}
+            </if>
+            <if test="vo.adjustAmountMin != '' and vo.adjustAmountMin != null">
+                AND a.adjust_amount <![CDATA[ >= ]]> #{vo.adjustAmountMin}
+            </if>
+            <if test="vo.adjustAmountMax != '' and vo.adjustAmountMax != null">
+                AND a.adjust_amount <![CDATA[ <= ]]> #{vo.adjustAmountMax}
+            </if>
+        </where>
+    </select>
+
+    <select id="getTotalPage" resultType="com.cloud.baowang.agent.api.vo.manualup.AgentManualUpRecordResponseVO">
+        SELECT
+        '总计' as orderNo,
+        IFNULL(SUM(a.adjust_amount), 0) as adjustAmount
+        FROM agent_manual_up_down_record a
+        <where>
+            and a.site_code =#{vo.site_code}
+            AND a.adjust_way = 1
+            <if test="vo.applyStartTime != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyStartTime}
+            </if>
+            <if test="vo.applyEndTime != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyEndTime}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.agentAccount != '' and vo.agentAccount != null">
+                AND a.agent_account = #{vo.agentAccount}
+            </if>
+            <if test="vo.agentName != '' and vo.agentName != null">
+                AND a.agent_name = #{vo.agentName}
+            </if>
+            <if test="vo.orderStatus != null">
+                AND a.order_status = #{vo.orderStatus}
+            </if>
+            <if test="vo.adjustType != null">
+                AND a.adjust_type = #{vo.adjustType}
+            </if>
+            <if test="vo.adjustAmountMin != '' and vo.adjustAmountMin != null">
+                AND a.adjust_amount <![CDATA[ >= ]]> #{vo.adjustAmountMin}
+            </if>
+            <if test="vo.adjustAmountMax != '' and vo.adjustAmountMax != null">
+                AND a.adjust_amount <![CDATA[ <= ]]> #{vo.adjustAmountMax}
+            </if>
+        </where>
+    </select>
+
+    <select id="getUpReviewPage" resultType="com.cloud.baowang.agent.api.vo.manualup.AgentManualUpReviewResponseVO">
+        SELECT
+        a.id as id,
+        a.order_no as orderNo,
+        a.agent_account as agentAccount,
+        a.agent_name as agentName,
+        a.adjust_type as adjustType,
+        a.adjust_amount as adjustAmount,
+        a.apply_time as applyTime,
+        a.order_status as orderStatus,
+        a.lock_status as lockStatus,
+        IF(a.locker = #{adminName}, -1, 1) as lockStatus1,
+        a.locker as locker,
+        a.applicant as applicant,
+        a.one_reviewer as oneReviewer
+        FROM agent_manual_up_down_record a
+        <where>
+            and a.site_code = #{vo.siteCode}
+            AND a.adjust_way = 1
+            <if test="vo.review != null">
+                <if test="vo.review == 1">
+                    AND a.order_status in (0,1)
+                </if>
+                <if test="vo.review == 2">
+                    AND a.order_status in (3,4)
+                </if>
+            </if>
+            <if test="vo.applyTimeStart != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.lockStatus != null">
+                AND a.lock_status = #{vo.lockStatus}
+            </if>
+            <if test="vo.locker != '' and vo.locker != null">
+                AND a.locker = #{vo.locker}
+            </if>
+            <if test="vo.adjustType != null">
+                AND a.adjust_type = #{vo.adjustType}
+            </if>
+            <if test="vo.adjustAmtMin != null">
+                AND a.adjust_amount &gt;= #{vo.adjustAmtMin}
+            </if>
+            <if test="vo.adjustAmtMax != null">
+                AND a.adjust_amount &lt;= #{vo.adjustAmtMax}
+            </if>
+        </where>
+        ORDER BY lockStatus1 ASC, a.lock_status ASC, a.apply_time ASC
+    </select>
+
+
+    <select id="getRecordPage" resultType="com.cloud.baowang.agent.api.vo.manualup.AgentGetRecordResponseVO">
+        SELECT
+        a.id as id,
+        a.order_no as orderNo,
+        a.agent_account as agentAccount,
+        a.agent_name as agentName,
+        a.wallet_type as walletType,
+        a.order_status as orderStatus,
+        a.adjust_type as adjustType,
+        a.adjust_amount as adjustAmount,
+        a.apply_time as applyTime,
+        a.one_reviewer as oneReviewer,
+        a.two_reviewer as twoReviewer,
+        a.one_review_finish_time as oneReviewFinishTime,
+        a.two_review_finish_time as twoReviewFinishTime,
+        a.one_review_start_time as oneReviewStartTime,
+        a.two_review_start_time as twoReviewStartTime,
+        a.one_review_remark as oneReviewRemark,
+        a.two_review_remark as twoReviewRemark
+        FROM agent_manual_up_down_record a
+        <where>
+            and a.site_code = #{vo.siteCode}
+            AND a.adjust_way = 1
+            <if test="vo.reviewOperation != null">
+                And a.review_operation = #{vo.reviewOperation}
+            </if>
+            <if test="vo.applyTimeStart != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.auditTimeStart != null">
+                and a.one_review_finish_time <![CDATA[ >= ]]> #{vo.auditTimeStart}
+            </if>
+
+            <if test="vo.auditTimeEnd != null">
+                and a.one_review_finish_time <![CDATA[ <= ]]> #{vo.auditTimeEnd}
+            </if>
+            <if test="vo.walletType != null ">
+                and a.wallet_type = #{vo.walletType}
+            </if>
+            <if test="vo.adjustType != null ">
+                and a.adjust_type = #{vo.adjustType}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.agentAccount != '' and vo.agentAccount != null">
+                AND a.agent_account = #{vo.agentAccount}
+            </if>
+            <if test="vo.orderStatus != null">
+                AND a.order_status = #{vo.orderStatus}
+            </if>
+            <if test="vo.oneReviewer != null and vo.oneReviewer != ''">
+                AND a.one_reviewer = #{vo.oneReviewer}
+            </if>
+        </where>
+        ORDER BY a.updated_time DESC
+    </select>
+
+    <select id="getTotalCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM agent_manual_up_down_record a
+        <where>
+            and a.site_code = #{vo.siteCode}
+            AND a.adjust_way = 1
+            <if test="vo.reviewOperation != null">
+                And a.review_operation = #{vo.reviewOperation}
+            </if>
+            <if test="vo.applyTimeStart != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.auditTimeStart != null">
+                and a.one_review_finish_time <![CDATA[ >= ]]> #{vo.auditTimeStart}
+            </if>
+
+            <if test="vo.auditTimeEnd != null">
+                and a.one_review_finish_time <![CDATA[ <= ]]> #{vo.auditTimeEnd}
+            </if>
+            <if test="vo.walletType != null ">
+                and a.wallet_type = #{vo.walletType}
+            </if>
+            <if test="vo.adjustType != null ">
+                and a.adjust_type = #{vo.adjustType}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.agentAccount != '' and vo.agentAccount != null">
+                AND a.agent_account = #{vo.agentAccount}
+            </if>
+            <if test="vo.orderStatus != null">
+                AND a.order_status = #{vo.orderStatus}
+            </if>
+        </where>
+        ORDER BY a.updated_time DESC
+    </select>
+
+
+    <select id="getUserDiscountTotal" resultType="java.math.BigDecimal">
+        select sum(t.adjust_amount)
+        from agent_manual_up_down_record t
+        left join agent_info u on u.agent_account=t.agent_account
+        where t.updated_time between #{beginTime} and #{endTime}
+        and t.adjust_way = #{adjustWay} and t.adjust_type = #{adjustType} and t.site_code = #{siteCode}
+        <if test="orderStatus!=null">
+            and t.order_status = #{orderStatus}
+        </if>
+        and u.agent_type in (1,2)
+    </select>
+
+
+    <select id="getUserDiscountPersonCount" resultType="java.lang.Integer">
+        select count(a.person)
+        from (
+        select t.agent_account as person
+        from agent_manual_up_down_record t
+        left join agent_info u on u.agent_account=t.agent_account
+        where t.updated_time between #{beginTime} and #{endTime}
+        and t.adjust_way = #{adjustWay} and t.adjust_type in (2,3,5) and t.site_code = #{siteCode}
+        <if test="orderStatus!=null">
+            and t.order_status = #{orderStatus}
+        </if>
+        and u.agent_type in (1,2)
+        group by t.agent_account
+        ) a
+    </select>
+
+
+    <select id="getUserDiscountPersonCountList" resultType="String">
+        select t.agent_account as person
+        from agent_manual_up_down_record t
+        left join agent_info u on u.agent_account=t.agent_account
+        where t.updated_time between #{beginTime} and #{endTime}
+        and t.site_code = #{siteCode}
+        and t.adjust_way = 1 and t.adjust_type = 1
+        and t.order_status = 6
+        and u.agent_type in (1,2)
+    </select>
+
+
+    <select id="getUserDiscountPersonCount2" resultType="java.lang.Integer">
+        select count(a.person)
+        from (
+        select t.agent_account as person
+        from agent_manual_up_down_record t
+        left join agent_info u on u.agent_account=t.agent_account
+        where t.updated_time between #{beginTime} and #{endTime}
+        and t.adjust_type in (4)
+        <if test="orderStatus!=null">
+            and t.order_status = #{orderStatus}
+        </if>
+        and u.agent_type in (1,2)
+        group by t.agent_account
+        ) a
+    </select>
+
+
+    <select id="getUserDiscountPersonList" resultType="java.lang.String">
+        select t.user_account as person
+        from user_manual_up_down_record t
+        left join user_info u on u.user_account=t.user_account
+        where t.updated_time between #{beginTime} and #{endTime}
+        and t.adjust_type = 2
+        <if test="orderStatus!=null">
+            and t.order_status = #{orderStatus}
+        </if>
+        and u.account_type in (2,3)
+        group by t.user_account
+    </select>
+
+
+    <select id="getUserDiscountTimeCountList" resultType="String">
+        select t.agent_account
+        from agent_manual_up_down_record t
+        left join agent_info u on u.agent_account=t.agent_account
+        where t.updated_time between #{beginTime} and #{endTime}
+        and t.adjust_way = #{adjustWay} and t.adjust_type = #{adjustType}
+        <if test="orderStatus!=null">
+            and t.order_status = #{orderStatus}
+        </if>
+        and u.agent_type in (1,2)
+    </select>
+
+
+    <select id="getUserWithdrawalBigTimeCount" resultType="java.lang.String">
+        select m.agent_account
+        from agent_manual_up_down_record m
+        left join agent_info u on u.agent_account=m.agent_account
+        where m.adjust_way=#{adjustWay} and m.adjust_type=#{adjustType}
+        and m.updated_time between #{beginTime} and #{endTime}
+        and m.is_big_money = 1
+        <if test="orderStatus!=null">
+            and m.order_status = #{orderStatus}
+        </if>
+        and u.agent_type in (1,2)
+    </select>
+
+    <select id="selectRedEnvelopeAward" resultType="java.lang.String">
+        SELECT DISTINCT user_account
+        FROM user_manual_up_down_record t
+        WHERE t.adjust_amount >= #{limitAmount}
+        AND t.order_status = #{successCode}
+        AND t.adjust_way = 1
+        AND t.two_review_finish_time <![CDATA[ >= ]]> #{firstMonthStart}
+        AND t.two_review_finish_time <![CDATA[ <= ]]> #{firstMonthEnd}
+        AND user_account NOT IN (SELECT user_account
+        FROM vip_award_record
+        WHERE award_type = #{type}
+        AND created_time <![CDATA[ >= ]]> #{thisMonthStart}
+        AND created_time <![CDATA[ <= ]]> #{thisMonthEnd})
+    </select>
+
+    <select id="getAgentUserManualDownList"
+            resultType="com.cloud.baowang.agent.api.vo.manualup.UserManualUpReviewResponseVO">
+        SELECT
+        a.super_agent_id as agentId,
+        t.user_account as userAccount,
+        sum(t.adjust_amount) as adjustAmount
+        FROM
+        user_manual_up_down_record t,
+        user_info a
+        WHERE
+        a.user_account = t.user_account
+        and t.created_time <![CDATA[ >= ]]> #{vo.startTime}
+        and t.created_time <![CDATA[ <= ]]> #{vo.endTime}
+        AND t.order_status = 6
+        <if test="vo.userAgentId != null and vo.userAgentId.size() > 0">
+            AND a.super_agent_id IN
+            <foreach collection="vo.userAgentId" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        AND t.adjust_way = #{vo.justWay}
+        AND t.adjust_type = #{vo.manualType}
+        and a.account_type in(2,3)
+        group by a.super_agent_id, t.user_account, a.super_agent_id
+    </select>
+
+    <select id="sumAgentManualDown" resultType="com.cloud.baowang.agent.api.vo.manualup.AgentManualDownRecordVO">
+        SELECT
+        "总计" AS orderNo,
+        IFNULL(SUM(a.adjust_amount),0) AS adjustAmount
+        FROM
+        agent_manual_up_down_record a
+        <where>
+            and a.site_code = #{vo.siteCode}
+            AND a.adjust_way = 2
+            <if test="vo.applyStartTime != null">
+                AND a.created_time <![CDATA[ >= ]]> #{vo.applyStartTime}
+            </if>
+            <if test="vo.applyEndTime != null">
+                AND a.created_time <![CDATA[ <= ]]> #{vo.applyEndTime}
+            </if>
+            <if test="vo.orderNo != null and vo.orderNo !=''">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.agentName != null and vo.agentName !=''">
+                AND a.agent_name = #{vo.agentName}
+            </if>
+            <if test="vo.agentAccount != null and vo.agentAccount !=''">
+                AND a.agent_account = #{vo.agentAccount}
+            </if>
+            <if test="vo.orderStatus != null and vo.orderStatus !=''">
+                AND a.order_status = #{vo.orderStatus}
+            </if>
+            <if test="vo.adjustType != null ">
+                AND a.adjust_type = #{vo.adjustType}
+            </if>
+            <if test="vo.minAdjustAmount != null ">
+                AND a.adjust_amount <![CDATA[ >= ]]> #{vo.minAdjustAmount}
+            </if>
+            <if test="vo.maxAdjustAmount != null ">
+                AND a.adjust_amount <![CDATA[ <= ]]> #{vo.maxAdjustAmount}
+            </if>
+        </where>
+    </select>
+
+    <select id="sumAgentManualUpDown" resultType="com.cloud.baowang.agent.api.vo.manualup.AgentManualUpDownVO">
+        SELECT
+        IFNULL(SUM(adjust_amount),0) AS amount,
+        COUNT(1) AS countTime,
+        adjust_way as adjustWay
+        FROM
+        agent_manual_up_down_record
+        WHERE adjust_way in (1,2) and adjust_type = 1
+        and agent_account = #{agentAccount} and order_status =6 group by adjust_way
+
+    </select>
+
+    <select id="sumToDayAgentManualUpDown" resultType="com.cloud.baowang.agent.api.vo.manualup.AgentManualUpDownVO">
+        SELECT
+        IFNULL(SUM(adjust_amount),0) AS amount,
+        COUNT(1) AS countTime,
+        adjust_way as adjustWay
+        FROM
+        agent_manual_up_down_record
+        WHERE adjust_way in (1,2) and adjust_type = 1
+        and agent_account = #{agentAccount} and order_status =6
+        and created_time <![CDATA[ >= ]]> #{min}
+        and created_time <![CDATA[ <= ]]> #{max} group by adjust_way
+
+    </select>
+
+    <select id="getAllUpCommissionByAgentAccount" resultType="java.math.BigDecimal">
+        SELECT
+        IFNULL(SUM(a.adjust_amount), 0)
+        FROM
+        agent_manual_up_down_record a
+        <where>
+            AND a.agent_account = #{agentAccount}
+            AND a.adjust_way = 1
+            AND a.adjust_type = 2
+            AND a.order_status = 6
+        </where>
+    </select>
+
+    <select id="getAllUpCommissionByAgentAccounts"
+            resultType="com.cloud.baowang.agent.api.vo.manualup.GetAllUpCommissionByAgentAccountsVO">
+        SELECT
+        a.agent_account,
+        IFNULL(SUM(a.adjust_amount), 0) as allUpCommission
+        FROM
+        agent_manual_up_down_record a
+        <where>
+            <if test="agentAccounts != null and agentAccounts.size() > 0">
+                AND agent_account IN
+                <foreach collection="agentAccounts" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            AND a.adjust_way = 1
+            AND a.adjust_type = 2
+            AND a.order_status = 6
+        </where>
+        group by a.agent_account
+    </select>
+
+    <select id="getAllDownCommissionByAgentAccount" resultType="java.math.BigDecimal">
+        SELECT
+        IFNULL(SUM(a.adjust_amount), 0)
+        FROM
+        agent_manual_up_down_record a
+        <where>
+            AND a.agent_account = #{agentAccount}
+            AND a.adjust_way = 2
+            AND a.adjust_type = 2
+            AND a.order_status = 6
+        </where>
+    </select>
+
+    <select id="getAllDownCommissionByAgentAccounts"
+            resultType="com.cloud.baowang.agent.api.vo.manualup.GetAllUpCommissionByAgentAccountsVO">
+        SELECT
+        a.agent_account,
+        IFNULL(SUM(a.adjust_amount), 0) allUpCommission
+        FROM
+        agent_manual_up_down_record a
+        <where>
+            <if test="agentAccounts != null and agentAccounts.size() > 0">
+                AND agent_account IN
+                <foreach collection="agentAccounts" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            AND a.adjust_way = 2
+            AND a.adjust_type = 2
+            AND a.order_status = 6
+        </where>
+        group by a.agent_account
+    </select>
+
+    <select id="getAllUpRebateByAgentAccount" resultType="java.math.BigDecimal">
+        SELECT
+        IFNULL(SUM(a.adjust_amount), 0)
+        FROM
+        agent_manual_up_down_record a
+        <where>
+            AND a.agent_account = #{agentAccount}
+            AND a.adjust_way = 1
+            AND a.adjust_type = 3
+            AND a.order_status = 6
+        </where>
+    </select>
+
+    <select id="getAllDownRebateByAgentAccount" resultType="java.math.BigDecimal">
+        SELECT
+        IFNULL(SUM(a.adjust_amount), 0)
+        FROM
+        agent_manual_up_down_record a
+        <where>
+            AND a.agent_account = #{agentAccount}
+            AND a.adjust_way = 2
+            AND a.adjust_type = 3
+            AND a.order_status = 6
+        </where>
+    </select>
+
+    <select id="getAgentManualUpDownRecordList"
+            resultType="com.cloud.baowang.agent.api.vo.manualup.GetAgentManualUpDownRecordListVO">
+        SELECT
+        a.agent_account AS agentAccount,
+        a.adjust_way adjustWay,
+        a.adjust_amount adjustAmount,
+        a.wallet_type walletType,
+        a.is_big_money as isBigMoney
+        FROM
+        agent_manual_up_down_record a
+        <where>
+            AND a.adjust_type = 1
+            AND a.order_status = 3
+            AND a.balance_change_status = 1
+            AND a.site_code = #{siteCode}
+            <if test="agentAccounts != null and agentAccounts.size > 0">
+                AND a.agent_account in
+                <foreach collection="agentAccounts" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="pageQuery" resultType="com.cloud.baowang.agent.po.AgentManualUpDownRecordPO">
+        SELECT
+        id AS id,
+        site_code AS siteCode,
+        agent_id AS agentId,
+        agent_account AS agentAccount,
+        agent_name AS agentName,
+        order_no AS orderNo,
+        wallet_type AS walletType,
+        adjust_way AS adjustWay,
+        adjust_type AS adjustType,
+        adjust_amount AS adjustAmount,
+        certificate_address AS certificateAddress,
+        apply_reason AS applyReason,
+        apply_time AS applyTime,
+        applicant AS applicant,
+        one_review_start_time AS oneReviewStartTime,
+        one_review_finish_time AS oneReviewFinishTime,
+        one_reviewer AS oneReviewer,
+        one_review_remark AS oneReviewRemark,
+        two_review_start_time AS twoReviewStartTime,
+        two_review_finish_time AS twoReviewFinishTime,
+        two_reviewer AS twoReviewer,
+        two_review_remark AS twoReviewRemark,
+        review_operation AS reviewOperation,
+        order_status AS orderStatus,
+        balance_change_status AS balanceChangeStatus,
+        lock_status AS lockStatus,
+        locker AS locker,
+        creator AS creator,
+        updater AS updater,
+        created_time AS createdTime,
+        updated_time AS updatedTime,
+        is_big_money AS isBigMoney,
+        last_operator AS lastOperator,
+        currency_code AS currencyCode,
+        IF(locker = #{vo.adminName}, -1, 1) as lockStatus1
+        FROM
+        agent_manual_up_down_record
+        <where>
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                and site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.reviewOperation != null">
+                AND review_operation = #{vo.reviewOperation}
+            </if>
+            <if test="vo.applyTimeStart != null">
+                AND apply_time &gt;= #{vo.applyTimeStart}
+            </if>
+
+            <if test="vo.applyTimeEnd != null">
+                AND apply_time &lt;= #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.orderNo != null and vo.orderNo != ''">
+                AND order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.lockStatus != null">
+                AND lock_status = #{vo.lockStatus}
+            </if>
+            <if test="vo.locker != null and vo.locker != ''">
+                AND locker = #{vo.locker}
+            </if>
+            <if test="vo.adjustType != null">
+                AND adjust_type = #{vo.adjustType}
+            </if>
+            <if test="vo.adjustAmtMin != null">
+                AND adjust_amount &gt;= #{vo.adjustAmtMin}
+            </if>
+            <if test="vo.adjustAmtMax != null">
+                AND adjust_amount &lt;= #{vo.adjustAmtMax}
+            </if>
+            <if test="vo.agentAccount != null and vo.agentAccount != ''">
+                AND agent_account = #{vo.agentAccount}
+            </if>
+            <if test="vo.walletType != null">
+                AND wallet_type = #{vo.walletType}
+            </if>
+        </where>
+        ORDER BY lockStatus1 ASC, lock_status desc, apply_time ASC
+    </select>
+    <select id="queryAgentDepositWithdraw"
+            resultType="com.cloud.baowang.agent.api.vo.manualup.AgentManualUpDownVO">
+        select agent_id agentId,
+        SUM(IF(adjust_way = 1, adjust_amount,0)) depositeAmount,
+        SUM(IF(adjust_way = 2, adjust_amount,0)) withdrawAmount
+        from agent_manual_up_down_record
+        <where>
+            adjust_type = 1
+            and order_status = 3
+            <if test="vo.startTime != null ">
+                and one_review_finish_time <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND one_review_finish_time <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+            <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+                AND agent_id IN
+                <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+        </where>
+        group by agent_id
+    </select>
+</mapper>

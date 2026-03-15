@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.play.repositories.VenueInfoRepository">
+
+
+
+
+    <select id="queryVenueInfoPage" resultType="com.cloud.baowang.play.po.VenueInfoPO">
+        SELECT *
+        FROM venue_info info
+        WHERE id IN (SELECT m_venue.id FROM (SELECT MAX(id) AS id, venue_code FROM venue_info GROUP BY venue_code) AS
+        m_venue)
+
+
+        <if test="vo.ids != null and vo.ids.size() > 0 ">
+            AND info.id IN
+            <foreach collection="vo.ids" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+
+        <if test="vo.venueName != null and vo.venueName != ''">
+            AND info.venue_name = #{vo.venueName}
+        </if>
+
+        <if test="vo.id != null">
+            AND info.id = #{vo.id}
+        </if>
+
+        <if test="vo.status != null">
+            AND info.status = #{vo.status}
+        </if>
+
+        <if test="vo.venueCode != null and vo.venueCode != ''">
+            AND info.venue_code = #{vo.venueCode}
+        </if>
+
+
+        <if test="vo.venuePlatformNameList != null and vo.venuePlatformNameList.size() > 0">
+            AND info.venue_platform_name IN
+            <foreach collection="vo.venuePlatformNameList" item="code" separator="," open="(" close=")">
+                #{code}
+            </foreach>
+        </if>
+
+
+        <if test="vo.venueCodeList != null and vo.venueCodeList.size() > 0">
+            AND info.venue_code IN
+            <foreach collection="vo.venueCodeList" item="code" separator="," open="(" close=")">
+                #{code}
+            </foreach>
+        </if>
+
+        <if test="vo.venueType != null">
+            AND info.venue_type = #{vo.venueType}
+        </if>
+
+        <if test="vo.venueJoinType != null">
+            AND info.venue_join_type = #{vo.venueJoinType}
+        </if>
+
+        <if test="vo.creator != null and vo.creator != ''">
+            AND info.updater = #{vo.creator}
+        </if>
+
+        <if test="vo.currencyCode != null and vo.currencyCode != ''">
+            AND info.currency_code LIKE CONCAT('%', #{vo.currencyCode}, '%')
+        </if>
+
+        <if test="vo.proportionType != null">
+            AND info.proportion_type = #{vo.proportionType}
+        </if>
+
+        <if test="vo.statusList != null and vo.statusList.size() > 0">
+            AND info.status IN
+            <foreach collection="vo.statusList" item="status" separator="," open="(" close=")">
+                #{status}
+            </foreach>
+        </if>
+
+        <if test="vo.venueCurrencyType != null">
+            AND info.venue_currency_type = #{vo.venueCurrencyType}
+        </if>
+        ORDER BY info.created_time DESC
+    </select>
+
+    <select id="querySiteVenueInfoPage" resultType="com.cloud.baowang.play.po.VenueInfoPO">
+
+
+        SELECT
+        info.id,
+        info.venue_code,
+        info.venue_currency_type,
+        info.currency_code,
+        info.venue_type,
+        info.venue_platform,
+        info.venue_icon,
+        info.pc_venue_icon,
+        info.h5_venue_icon,
+        info.api_url as apiUrl,
+        info.bet_url as betUrl,
+        info.game_url as gameUrl,
+        site_c.middle_icon_i18n_code,
+        site_c.venue_name,
+        site_c.icon_i18n_code,
+        site_c.pc_icon_i18n_code,
+        site_c.h5_icon_i18n_code,
+        site_c.pc_background_code,
+        site_c.pc_logo_code,
+        site_c.ht_icon_i18n_code,
+        site_c.small_icon1_i18n_code,
+        site_c.small_icon2_i18n_code,
+        site_c.small_icon3_i18n_code,
+        site_c.small_icon4_i18n_code,
+        site_c.small_icon5_i18n_code,
+        site_c.small_icon6_i18n_code,
+        info.venue_join_type,
+        s_v.valid_proportion,
+        s_v.handling_fee as venueProportion,
+        info.proportion_type,
+        info.venue_platform_name,
+        s_v.status,
+        site_c.updated_time,
+        site_c.created_time,
+        site_c.venue_desc,
+        s_v.remark,
+        s_v.maintenance_start_time,
+        s_v.maintenance_end_time,
+        s_v.creator,
+        s_v.updater
+        FROM venue_info info
+        INNER JOIN site_venue s_v ON s_v.venue_code = info.venue_code
+        LEFT JOIN site_venue_config site_c ON site_c.venue_code = info.venue_code and site_c.site_code = #{vo.siteCode}
+        where s_v.site_code = #{vo.siteCode}
+        and info.id in (SELECT max(id)  as id  FROM venue_info GROUP BY venue_code )
+        <if test="vo.ids != null and vo.ids.size() > 0 ">
+            AND info.id IN
+            <foreach collection="vo.ids" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+
+        <if test="vo.venueName != null and vo.venueName != ''">
+            AND info.venue_name = #{vo.venueName}
+        </if>
+
+        <if test="vo.id != null">
+            AND info.id = #{vo.id}
+        </if>
+
+        <if test="vo.status != null">
+            AND s_v.status = #{vo.status}
+        </if>
+
+        <if test="vo.venueCode != null and vo.venueCode != ''">
+            AND info.venue_code = #{vo.venueCode}
+        </if>
+
+        <if test="vo.venueCodeList != null and vo.venueCodeList.size() > 0">
+            AND info.venue_code IN
+            <foreach collection="vo.venueCodeList" item="code" separator="," open="(" close=")">
+                #{code}
+            </foreach>
+        </if>
+
+        <if test="vo.venueType != null">
+            AND info.venue_type = #{vo.venueType}
+        </if>
+
+        <if test="vo.creator != null and vo.creator != ''">
+            AND s_v.updater = #{vo.creator}
+        </if>
+
+        <if test="vo.currencyCode != null and vo.currencyCode != ''">
+            AND info.currency_code LIKE CONCAT('%', #{vo.currencyCode}, '%')
+        </if>
+
+        <if test="vo.proportionType != null">
+            AND info.proportion_type = #{vo.proportionType}
+        </if>
+
+        <if test="vo.statusList != null and vo.statusList.size() > 0">
+            AND info.status IN
+            <foreach collection="vo.statusList" item="status" separator="," open="(" close=")">
+                #{status}
+            </foreach>
+        </if>
+
+
+        <if test="vo.venueJoinType != null">
+            AND info.venue_join_type = #{vo.venueJoinType}
+        </if>
+
+        <if test="vo.venueCurrencyType != null">
+            AND info.venue_currency_type = #{vo.venueCurrencyType}
+        </if>
+        ORDER BY info.created_time DESC
+    </select>
+</mapper>

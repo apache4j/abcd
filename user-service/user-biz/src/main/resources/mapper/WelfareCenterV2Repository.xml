@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.user.repositories.WelfareCenterV2Repository">
+    <select id="getList" resultType="com.cloud.baowang.user.api.vo.welfarecenter.WelfareCenterRewardRespVO">
+        SELECT
+        tab.id,
+        tab.orderNo,
+        tab.welfareCenterRewardType,
+        tab.receiveStatus,
+        tab.currencyCode,
+        tab.amount,
+        tab.detailType,
+        tab.pfTime,
+        tab.pfEndTime
+        FROM
+        (
+        <!--活动类型为1,对应system_param welfare_center_reward_type-->
+        SELECT
+        id,
+        order_no as orderNo,
+        1 AS welfareCenterRewardType,
+        CASE
+        WHEN receive_status = 0 AND receive_end_time &lt; #{vo.systemTime} THEN 2
+        ELSE receive_status END AS receiveStatus,
+        currency_code AS currencyCode,
+        activity_amount AS amount,
+        activity_template AS detailType,
+        CASE
+        WHEN receive_status = 0 AND receive_end_time &lt; #{vo.systemTime} or receive_status = 2 THEN receive_end_time
+        WHEN receive_status = 1 THEN receive_time
+        ELSE created_time END AS pfTime,
+        receive_end_time AS pfEndTime
+        FROM
+        site_activity_order_record_v2
+        WHERE
+        user_account = #{vo.userAccount}
+        and show_flag = 1
+        AND site_code = #{vo.siteCode}
+        AND created_time >= #{vo.siteStartTime}
+
+        <!--vip福利为0,对应welfare_center_reward_type-->
+        UNION ALL
+        SELECT
+        id,
+        order_id as orderNo,
+        0 AS welfareCenterRewardType,
+        CASE
+        WHEN receive_status = 0 AND expired_time &lt; #{vo.systemTime} THEN 2
+        ELSE receive_status END AS receiveStatus,
+
+        currency AS currencyCode,
+        award_amount AS amount,
+        award_type AS detailType,
+        IF
+        ( receive_status = 1, receive_time, record_start_time ) AS pfTime,
+        expired_time AS pfEndTime
+        FROM
+        site_vip_award_record_v2
+        WHERE
+        site_code = #{vo.siteCode}
+        AND user_account = #{vo.userAccount}
+        AND record_start_time >= #{vo.siteStartTime}
+
+
+        <!--返水-->
+        UNION ALL
+        SELECT
+        id,
+        order_no as orderNo,
+        7 AS welfareCenterRewardType,
+        CASE
+        WHEN open_status = 0 AND invalid_time &lt; #{vo.systemTime} THEN 2
+        ELSE open_status END AS receiveStatus,
+        'WTC' AS currencyCode,
+        reward_amount AS amount,
+        'LOOKUP_11608' AS detailType,
+        IF
+        ( open_status = 1, reward_time, updated_time ) AS pfTime,
+        invalid_time AS pfEndTime
+        FROM
+        site_rebate_reward_record
+        WHERE
+        user_id =#{vo.userId}
+        AND created_time >= #{vo.siteStartTime}
+
+
+        ) tab
+        <where>
+            <if test="vo.welfareCenterRewardType!=null">
+                and tab.welfareCenterRewardType = #{vo.welfareCenterRewardType}
+            </if>
+            <if test="vo.receiveStatus!=null">
+                and tab.receiveStatus = #{vo.receiveStatus}
+            </if>
+            <if test="vo.pfTimeStartTime != null and vo.pfTimeEndTime != null ">
+                AND tab.pfTime BETWEEN #{vo.pfTimeStartTime} AND #{vo.pfTimeEndTime}
+            </if>
+        </where>
+        ORDER BY
+        receiveStatus ASC,
+        pfTime DESC
+    </select>
+    <select id="pageQuery" resultType="com.cloud.baowang.user.api.vo.welfarecenter.WelfareCenterRewardRespVO">
+        SELECT
+        tab.id,
+        tab.orderNo,
+        tab.welfareCenterRewardType,
+        tab.receiveStatus,
+        tab.currencyCode,
+        tab.amount,
+        tab.detailType,
+        tab.pfTime,
+        tab.pfEndTime
+        FROM
+        (
+        <!--活动类型为1,对应system_param welfare_center_reward_type-->
+        SELECT
+        id,
+        order_no as orderNo,
+        1 AS welfareCenterRewardType,
+        CASE
+        WHEN receive_status = 0 AND receive_end_time &lt; #{vo.systemTime} THEN 2
+        ELSE receive_status END AS receiveStatus,
+        currency_code AS currencyCode,
+        activity_amount AS amount,
+        activity_template AS detailType,
+        CASE
+        WHEN receive_status = 0 AND receive_end_time &lt; #{vo.systemTime} or receive_status = 2 THEN receive_end_time
+        WHEN receive_status = 1 THEN receive_time
+        ELSE created_time END AS pfTime,
+        receive_end_time AS pfEndTime
+        FROM
+        site_activity_order_record_v2
+        WHERE
+        site_code = #{vo.siteCode}
+        and show_flag = 1
+        AND user_account = #{vo.userAccount}
+        AND created_time >= #{vo.siteStartTime}
+
+        <!--vip福利为0,对应welfare_center_reward_type-->
+        UNION ALL
+        SELECT
+        id,
+        order_id as orderNo,
+        0 AS welfareCenterRewardType,
+        CASE
+        WHEN receive_status = 0 AND expired_time &lt; #{vo.systemTime} THEN 2
+        ELSE receive_status END AS receiveStatus,
+
+        currency AS currencyCode,
+        award_amount AS amount,
+        award_type AS detailType,
+        IF
+        ( receive_status = 1, receive_time, record_start_time ) AS pfTime,
+        expired_time AS pfEndTime
+        FROM
+        site_vip_award_record_v2
+        WHERE
+        site_code = #{vo.siteCode}
+        AND user_account = #{vo.userAccount}
+        AND record_start_time >= #{vo.siteStartTime}
+
+        <!--返水-->
+        UNION ALL
+        SELECT
+        id,
+        order_no as orderNo,
+        7 AS welfareCenterRewardType,
+        CASE
+        WHEN open_status = 0 AND invalid_time &lt; #{vo.systemTime} THEN 2
+        ELSE open_status END AS receiveStatus,
+        'WTC' AS currencyCode,
+        reward_amount AS amount,
+        'LOOKUP_11608' AS detailType,
+        IF
+        ( open_status = 1, reward_time, updated_time ) AS pfTime,
+        invalid_time AS pfEndTime
+        FROM
+        site_rebate_reward_record
+        WHERE
+        user_id =#{vo.userId}
+        AND created_time >= #{vo.siteStartTime}
+
+
+        ) tab
+        <where>
+            <if test="vo.welfareCenterRewardType!=null">
+                and tab.welfareCenterRewardType = #{vo.welfareCenterRewardType}
+            </if>
+            <if test="vo.receiveStatus!=null">
+                and tab.receiveStatus = #{vo.receiveStatus}
+            </if>
+            <if test="vo.pfTimeStartTime != null and vo.pfTimeEndTime != null ">
+                AND tab.pfTime BETWEEN #{vo.pfTimeStartTime} AND #{vo.pfTimeEndTime}
+            </if>
+        </where>
+        ORDER BY
+        receiveStatus ASC,
+        pfTime DESC
+    </select>
+    <select id="detail" resultType="com.cloud.baowang.user.api.vo.welfarecenter.WelfareCenterRewardRespVO">
+        SELECT
+        tab.id,
+        tab.orderNo,
+        tab.welfareCenterRewardType,
+        tab.receiveStatus,
+        tab.currencyCode,
+        tab.amount,
+        tab.detailType,
+        tab.pfTime,
+        tab.pfEndTime
+        FROM
+        (
+        <!--活动类型为1,对应system_param welfare_center_reward_type-->
+        SELECT
+        id,
+        order_no as orderNo,
+        1 AS welfareCenterRewardType,
+        CASE
+        WHEN receive_status = 0 AND receive_end_time &lt; #{vo.systemTime} THEN 2
+        ELSE receive_status END AS receiveStatus,
+        currency_code AS currencyCode,
+        activity_amount AS amount,
+        activity_template AS detailType,
+        CASE
+        WHEN receive_status = 0 AND receive_end_time &lt; #{vo.systemTime} or receive_status = 2 THEN receive_end_time
+        WHEN receive_status = 1 THEN receive_time
+        ELSE created_time END AS pfTime,
+        receive_end_time AS pfEndTime
+        FROM
+        site_activity_order_record_v2
+        WHERE
+        site_code = #{vo.siteCode}
+        AND show_flag = 1
+        AND user_account = #{vo.userAccount}
+        <!--vip福利为0,对应welfare_center_reward_type-->
+        UNION ALL
+        SELECT
+        id,
+        order_id as orderNo,
+        0 AS welfareCenterRewardType,
+        CASE
+        WHEN receive_status = 0 AND expired_time &lt; #{vo.systemTime} THEN 2
+        ELSE receive_status END AS receiveStatus,
+        currency AS currencyCode,
+        award_amount AS amount,
+        award_type AS detailType,
+        IF
+        ( receive_status = 1, receive_time, record_start_time ) AS pfTime,
+        expired_time AS pfEndTime
+        FROM
+        site_vip_award_record_v2
+        WHERE
+        site_code = #{vo.siteCode}
+        AND user_account = #{vo.userAccount}
+
+
+        <!--返水-->
+        UNION ALL
+        SELECT
+        id,
+        order_no as orderNo,
+        7 AS welfareCenterRewardType,
+        CASE
+        WHEN open_status = 0 AND invalid_time &lt; #{vo.systemTime} THEN 2
+        ELSE open_status END AS receiveStatus,
+        'WTC' AS currencyCode,
+        reward_amount AS amount,
+        'LOOKUP_11608' AS detailType,
+        IF
+        ( open_status = 1, reward_time, created_time ) AS pfTime,
+        invalid_time AS pfEndTime
+        FROM
+        site_rebate_reward_record
+        WHERE
+        user_id =#{vo.userId}
+        <if test="vo.pfTimeStartTime != null and vo.pfTimeEndTime != null ">
+            AND created_time BETWEEN #{vo.pfTimeStartTime} AND #{vo.pfTimeEndTime}
+        </if>
+
+        ) tab
+        <where>
+            <if test="vo.welfareCenterRewardType!=null">
+                and tab.welfareCenterRewardType = #{vo.welfareCenterRewardType}
+            </if>
+            <if test="vo.id != null and vo.id != ''">
+                and tab.id = #{vo.id}
+            </if>
+        </where>
+        ORDER BY
+        receiveStatus ASC,
+        pfTime DESC
+    </select>
+    <select id="getWaitReceiveByUserId" resultType="java.lang.Integer">
+        SELECT
+        tab.id,
+        tab.orderNo,
+        tab.welfareCenterRewardType,
+        tab.receiveStatus,
+        tab.currencyCode,
+        tab.amount,
+        tab.detailType,
+        tab.pfTime,
+        tab.pfEndTime
+        FROM
+        (
+        <!--活动类型为1,对应system_param welfare_center_reward_type-->
+        SELECT
+        id,
+        order_no as orderNo
+        FROM
+        site_activity_order_record_v2
+        WHERE
+        site_code = #{siteCode}
+        AND show_flag = 1
+        AND user_account = #{userAccount}
+        and receive_status = 0
+        <!--vip福利为0,对应welfare_center_reward_type-->
+        UNION ALL
+        SELECT
+        id,
+        order_id as orderNo
+        FROM
+        site_vip_award_record_v2
+        WHERE
+        site_code = #{siteCode}
+        AND user_account = #{userAccount}
+        and receive_status = 0
+
+    </select>
+</mapper>

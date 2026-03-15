@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.user.repositories.AgentNoticeRepository">
+
+
+    <select id="getAgentNoticeList" resultType="com.cloud.baowang.user.api.vo.notice.user.reponse.UserNoticeRespVO">
+        select
+            c.notice_id as noticeId, c.id as targetId, c.notice_type, c.notice_title, c.message_content, c.target_type
+             ,c.created_time as createdTime
+
+             ,read_state as readState
+
+        from user_notice_target c
+                left join agent_info ag on ag.agent_account=c.user_account
+
+        where c.target_type = 5 and c.delete_state=2 and c.agent_account = #{vo.agentAccount}
+                and c.notice_type = #{vo.noticeType}
+        order by readState asc, createdTime desc
+    </select>
+
+
+
+
+    <select id="getUnreadCountForAgentNoticebak" resultType="java.lang.Integer">
+        select
+            count(c.id)
+        from agent_notice c
+                    left join agent_info ag on ag.agent_account=c.agent_account
+        where c.target_type = 2 and c.delete_state=2
+                and c.agent_account = #{agentAccount}
+                and c.notice_type = 3 and c.read_state=0
+    </select>
+
+    <select id="getUnreadCountForAgentNotice" resultType="java.lang.Integer">
+        select
+            count(c.id)
+        from user_notice_target c
+                 left join agent_info ag on ag.agent_account=c.user_account
+        where c.target_type = 2 and c.delete_state=2
+          and c.agent_acuser_accountcount = #{agentAccount}
+          and c.notice_type = 3 and c.read_state=0
+    </select>
+
+
+
+
+</mapper>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.system.repositories.site.SiteRoleMenuRepository">
+
+
+    <insert id="batchRoleMenu">
+        insert into business_role_menu(role_id, menu_id) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.roleId},#{item.menuId})
+        </foreach>
+    </insert>
+    <select id="selectRoleMenuUrls" resultType="com.cloud.baowang.system.api.vo.member.RoleMenuUrlVO">
+        SELECT
+            brm.role_id AS roleId,
+            bm.api_url AS menuUrl
+        FROM
+             business_role_menu brm
+        LEFT JOIN  business_menu bm ON brm.menu_id = bm.id
+        WHERE
+            bm.api_url is not null AND  bm.api_url != '' AND
+            brm.role_id in (
+        <foreach item="item" index="index" collection="roleIds" separator=",">
+            #{item}
+        </foreach>)
+    </select>
+
+</mapper>

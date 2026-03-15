@@ -1,0 +1,553 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.play.repositories.OrderRecordRepository">
+    <sql id="order_condition">
+        <where>
+            <!--注单id-->
+            <if test="dto.orderId != null and dto.orderId !=''">
+                AND o.order_id = #{dto.orderId}
+            </if>
+            <!--站点Code-->
+            <if test="dto.siteCode != null and dto.siteCode !=''">
+                AND o.site_code = #{dto.siteCode}
+            </if>
+            <!--站点名称-->
+            <if test="dto.siteName != null and dto.siteName !=''">
+                AND o.site_name = #{dto.siteName}
+            </if>
+            <!--场馆大类-->
+            <if test="dto.venueTypeList != null and dto.venueTypeList.size() > 0">
+                AND o.venue_type in
+                <foreach collection="dto.venueTypeList" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+
+            <!--币种-->
+            <if test="dto.currency != null and dto.currency !=''">
+                AND o.currency = #{dto.currency}
+            </if>
+            <!--三方注单id-->
+            <if test="dto.thirdOrderId != null and dto.thirdOrderId !=''">
+                AND o.third_order_id = #{dto.thirdOrderId}
+            </if>
+            <!--用户账号-->
+            <if test="dto.userAccount != null and dto.userAccount !=''">
+                AND o.user_account = #{dto.userAccount}
+            </if>
+            <!--用户类型-->
+            <if test="dto.accountType != null and dto.accountType.size() > 0">
+                AND o.account_type in
+                <foreach collection="dto.accountType" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <!--场馆游戏名称-->
+            <if test="dto.casinoUserName != null and dto.casinoUserName !=''">
+                AND o.casino_user_name = #{dto.casinoUserName}
+            </if>
+            <!--场馆code-->
+            <if test="dto.venueCode != null and dto.venueCode.size() > 0">
+                AND o.venue_code in
+                <foreach collection="dto.venueCode" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <!--投注ip-->
+            <if test="dto.betIp != null and dto.betIp !=''">
+                AND o.bet_ip = #{dto.betIp}
+            </if>
+            <!--游戏名称-->
+            <if test="dto.gameName != null and dto.gameName !=''">
+                AND o.game_name like CONCAT('%',#{dto.gameName},'%')
+            </if>
+            <!--游戏编号-->
+            <if test="dto.gameNo != null and dto.gameNo !=''">
+                AND o.game_no like CONCAT('%',#{dto.gameNo},'%')
+            </if>
+            <!--代理id-->
+            <if test="dto.agentId != null and dto.agentId !=''">
+                AND o.agent_id = #{dto.agentId}
+            </if>
+            <!--代理账号-->
+            <if test="dto.agentAcct != null and dto.agentAcct !=''">
+                AND o.agent_acct = #{dto.agentAcct}
+            </if>
+            <!--注单状态-->
+            <if test="dto.orderStatusList != null and dto.orderStatusList.size() > 0">
+                AND o.order_classify in
+                <foreach collection="dto.orderStatusList" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <!--变更状态-->
+            <if test="dto.changeStatus != null">
+                AND o.change_status = #{dto.changeStatus}
+            </if>
+            <!--设备类型-->
+            <if test="dto.deviceType != null and dto.deviceType.size() > 0 ">
+                AND o.device_type in
+                <foreach collection="dto.deviceType" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <!--投注金额 下面金额为0时 != '' 不生效 所以去掉 update by xiaozhi 20250712-->
+            <if test="dto.betAmountMin != null ">
+                AND o.bet_amount <![CDATA[ >= ]]> #{dto.betAmountMin}
+            </if>
+            <if test="dto.betAmountMax != null ">
+                AND o.bet_amount <![CDATA[ <= ]]> #{dto.betAmountMax}
+            </if>
+            <!--有效投注金额-->
+            <if test="dto.validAmountMin != null ">
+                AND o.valid_amount <![CDATA[ >= ]]> #{dto.validAmountMin}
+            </if>
+            <if test="dto.validAmountMax != null ">
+                AND o.valid_amount <![CDATA[ <= ]]> #{dto.validAmountMax}
+            </if>
+            <!--输赢金额-->
+            <if test="dto.winLossAmountMin != null ">
+                AND o.win_loss_amount <![CDATA[ >= ]]> #{dto.winLossAmountMin}
+            </if>
+            <if test="dto.winLossAmountMax != null ">
+                AND o.win_loss_amount <![CDATA[ <= ]]> #{dto.winLossAmountMax}
+            </if>
+            <!--vip段位-->
+            <if test="dto.vipRankList != null and dto.vipRankList.size() > 0 ">
+                AND o.vip_rank in
+                <foreach collection="dto.vipRankList" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <!--vip等级-->
+            <if test="dto.vipGradeList != null and dto.vipGradeList.size() > 0 ">
+                AND o.vip_grade_code in
+                <foreach collection="dto.vipGradeList" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <!--投注时间-->
+            <if test="dto.betBeginTime != null">
+                AND o.bet_time <![CDATA[ >= ]]> #{dto.betBeginTime}
+            </if>
+            <if test="dto.betEndTime != null">
+                AND o.bet_time <![CDATA[ <= ]]> #{dto.betEndTime}
+            </if>
+            <!--结算时间-->
+            <if test="dto.settleBeginTime != null">
+                AND o.settle_time <![CDATA[ >= ]]> #{dto.settleBeginTime}
+            </if>
+            <if test="dto.settleEndTime != null">
+                AND o.settle_time <![CDATA[ <= ]]> #{dto.settleEndTime}
+            </if>
+            <!--首次结算时间-->
+            <if test="dto.firstSettleBeginTime != null">
+                AND o.first_settle_time <![CDATA[ >= ]]> #{dto.firstSettleBeginTime}
+            </if>
+            <if test="dto.firstSettleEndTime != null">
+                AND o.first_settle_time <![CDATA[ <= ]]> #{dto.firstSettleEndTime}
+            </if>
+
+            <if test="dto.freeRoundGameOrderNo != null  and dto.freeRoundGameOrderNo !=''">
+                AND o.event_info  = #{dto.freeRoundGameOrderNo}
+            </if>
+
+            <if test="dto.transactionId != null and dto.transactionId !=''">
+                AND o.transaction_id = #{dto.transactionId}
+            </if>
+
+            <!--gameNameList-->
+            <if test="dto.gameNameList != null">
+                AND o.game_name in
+                <foreach collection="dto.gameNameList" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <!--roomTypeList-->
+<!--            <if test="dto.roomTypeList != null and dto.roomTypeList.size() > 0 ">-->
+<!--                AND o.room_type in-->
+<!--                <foreach collection="dto.roomTypeList" item="value" separator="," open="(" close=")">-->
+<!--                    #{value}-->
+<!--                </foreach>-->
+<!--            </if>-->
+            <!--thirdGameCodeList-->
+<!--            <if test="dto.thirdGameCodeList != null and dto.thirdGameCodeList.size() > 0 ">-->
+<!--                AND o.third_game_code in-->
+<!--                <foreach collection="dto.thirdGameCodeList" item="value" separator="," open="(" close=")">-->
+<!--                    #{value}-->
+<!--                </foreach>-->
+<!--            </if>-->
+
+
+            <choose>
+                <when test="dto.roomTypeList != null and dto.roomTypeList.size() > 0 and dto.thirdGameCodeList != null and dto.thirdGameCodeList.size() > 0 ">
+                    AND ( o.room_type in
+                    <foreach collection="dto.roomTypeList" item="value" separator="," open="(" close=")">
+                        #{value}
+                    </foreach>
+
+                    or o.game_name in
+
+                    <foreach collection="dto.thirdGameCodeList" item="value" separator="," open="(" close=")">
+                        #{value}
+                    </foreach>
+                    )
+                </when>
+                <when test="dto.roomTypeList != null and dto.roomTypeList.size() > 0 ">
+                    AND o.room_type in
+                    <foreach collection="dto.roomTypeList" item="value" separator="," open="(" close=")">
+                        #{value}
+                    </foreach>
+                </when>
+
+                <when test="dto.thirdGameCodeList != null and dto.thirdGameCodeList.size() > 0 ">
+                    AND o.third_game_code in
+                    <foreach collection="dto.thirdGameCodeList" item="value" separator="," open="(" close=")">
+                        #{value}
+                    </foreach>
+                </when>
+            </choose>
+
+            <!--dto.eventInfo-->
+            <if test="dto.eventInfo != null and dto.eventInfo !=''">
+                AND o.event_info = #{dto.eventInfo}
+            </if>
+        </where>
+    </sql>
+
+    <select id="orderCountAndSumGroup" resultType="com.cloud.baowang.play.api.vo.order.OrderRecordAggregationDTO">
+        select /*+ read_from_storage(tiflash[o]) */
+        o.order_classify orderClassify,
+        count(order_classify) num,
+        sum(bet_amount) betAmount,
+        sum(win_loss_amount) winLossAmount,
+        sum(valid_amount) validAmount
+        from order_record o
+        <include refid="order_condition"/>
+        group by orderClassify
+    </select>
+
+    <select id="orderRecordCount" resultType="java.lang.Long">
+        select /*+ read_from_storage(tiflash[o]) */
+            count(*)
+        from order_record o
+        <include refid="order_condition"/>
+    </select>
+
+
+    <select id="getAgentUserVenueLis" resultType="com.cloud.baowang.agent.api.vo.agent.UserVenueTopVO">
+        select
+        venue_code as venueCode,
+        currency,
+        SUM(bet_amount) AS betAmount,
+        SUM(win_loss_amount) AS winLossAmount,
+        SUM(valid_amount) AS validAmount
+        from order_record a
+        <where>
+            <!--结算时间-->
+            <if test="dto.startTime != null">
+                AND a.settle_time <![CDATA[ >= ]]> #{dto.startTime}
+            </if>
+            <if test="dto.endTime != null">
+                AND a.settle_time <![CDATA[ <= ]]> #{dto.endTime}
+            </if>
+            <if test="dto.agentAcctIds != null and dto.agentAcctIds.size() > 0">
+                AND a.agent_id IN
+                <foreach collection="dto.agentAcctIds" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+        </where>
+        group by venue_code,currency order by betAmount desc
+    </select>
+    <select id="getAgentUserRecordByUserWinLoss" resultType="java.util.HashMap">
+        select
+        sum(t.valid_amount) as validAmount,
+        t.user_account as userAccount
+        from order_record t left join user_info t1
+        on t.agent_Acct = t1.super_agent_account and t.user_account = t1.user_account
+        where 1 = 1
+        <if test="vo.allDownAgentNum != null">
+            AND t.agent_acct IN
+            <foreach collection="vo.allDownAgentNum" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null">
+            AND t.settle_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND t.settle_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        group by t.user_account
+    </select>
+    <select id="getTotalAmountByUserId"
+            resultType="com.cloud.baowang.wallet.api.vo.userCoin.UserWithdrawRunningWaterVO">
+        select sum(t.valid_amount) AS completedRunningWater
+        from order_record t
+        where t.user_id = #{userId}
+        AND t.bet_time <![CDATA[ >= ]]> #{startTime}
+        AND t.bet_time <![CDATA[ <= ]]> #{endTime}
+    </select>
+
+    <select id="selectUserRebate" resultType="com.cloud.baowang.wallet.api.vo.rebate.UserRebateVO">
+        select a.siteCode,a.userId, a.validBetAmount,a.currency from (
+        SELECT site_code as siteCode,
+        user_id as userId,
+        sum(valid_amount) as validBetAmount,
+        currency as currency
+        FROM order_record
+        where first_settle_time  <![CDATA[ >= ]]> #{beginDate}
+        and first_settle_time  <![CDATA[ <= ]]> #{endDate}
+        and order_classify in (1, 3)
+        <if test="siteVOList != null and siteVOList.size() > 0">
+            AND site_code IN
+            <foreach collection="siteVOList" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="venueType != null">
+            AND venue_type = #{venueType}
+        </if>
+        GROUP BY site_code, user_id, currency) a where a.userId not in (
+        select user_id from site_vip_award_record where award_type = #{code}
+        and record_start_time  <![CDATA[ >= ]]> #{beginDate}
+        and record_end_time <![CDATA[ <= ]]> #{endDate} )
+    </select>
+
+    <select id="getOrderCountAndSumGroupByGameId"
+            resultType="com.cloud.baowang.play.api.vo.order.OrderRecordAggregationDTO">
+        SELECT game_id, SUM(bet_amount) as betAmount
+        FROM order_record
+        where game_id is not null
+        <if test=" dto.userAccount != null and dto.userAccount != ''">
+            user_account = #{dto.userAccount}
+        </if>
+        GROUP BY game_id
+        order by betAmount desc limit 3
+    </select>
+
+
+    <select id="agentLowerLevelInfoVenueStatistical"
+            resultType="com.cloud.baowang.agent.api.vo.agent.agentLowerLevelManager.AgentLowerLevelInfoVenueStatisticalVO">
+        SELECT
+        a.venue_code as venueCode,
+        b.venue_name as venueName,
+        a.currency as currency,
+        sum(a.bet_amount) as betAmount,
+        sum(a.win_loss_amount) as winLossAmount
+        from order_record a JOIN venue_info b on a.venue_code=b.venue_code
+        where a.account_type=2
+        and a.agent_acct=#{vo.agentAccount}
+        <if test="vo.startTime !=null">
+            and first_settle_time &gt;= #{vo.startTime}
+        </if>
+        <if test="vo.endTime !=null">
+            and first_settle_time &lt;= #{vo.endTime}
+        </if>
+        group by a.venue_code,b.venue_name,a.currency
+    </select>
+    <select id="classGameWinLossSum" resultType="java.math.BigDecimal">
+        SELECT SUM(a.win_loss_amount) as winLossAmount
+        from order_record a
+        where a.user_id = #{userId}
+        and a.venue_code = #{venueCode}
+        <if test="thirdGameCode !=null and thirdGameCode!=''">
+            and a.third_game_code = #{thirdGameCode}
+        </if>
+    </select>
+
+    <select id="getUserOrderAmountByAgent"
+            resultType="com.cloud.baowang.play.api.vo.user.PlayUserBetAmountSumVO">
+        SELECT
+        user_id as userId,
+        currency as currency,
+        sum(valid_amount) as validAmount,
+        sum(win_loss_amount) as winLossAmount
+        FROM
+        `order_record`
+        WHERE 1=1
+        <if test="vo.startTime != null">
+             and first_settle_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            and first_settle_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+
+        <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+            AND agent_id IN
+            <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        and order_classify IN (1, 3)
+
+        GROUP BY
+        userId, currency
+    </select>
+    <select id="clientOrderTotal" resultType="com.cloud.baowang.play.api.vo.order.client.ClientOrderTotalVO">
+        select
+        IFNULL(SUM(bet_amount),0) betAmount,
+        IFNULL(SUM(win_loss_amount),0) winLoseAmount,
+        IFNULL(SUM(valid_amount),0) validAmount,
+        IFNULL(count(id),0)betNum
+        from order_record
+        where site_code = #{vo.siteCode}
+        and user_id = #{vo.userId}
+        and venue_type = #{vo.venueType}
+        <if test="vo.betStartTime != null">
+            and bet_time <![CDATA[ >= ]]> #{vo.betStartTime}
+        </if>
+        <if test="vo.betEndTime != null">
+            and bet_time <![CDATA[ <= ]]> #{vo.betEndTime}
+        </if>
+        <if test="vo.orderClassifyList != null and vo.orderClassifyList.size() > 0">
+            AND order_classify IN
+            <foreach collection="vo.orderClassifyList" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.venueCodes != null and vo.venueCodes.size() > 0">
+            AND venue_code IN
+            <foreach collection="vo.venueCodes" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+    </select>
+    <select id="getDistinctByTimeSiteCodeCurrencyCode" resultType="java.lang.Long">
+        SELECT
+        COUNT(DISTINCT user_account)
+        FROM order_record
+        WHERE site_code = #{siteCode}
+        AND currency = #{currencyCode}
+        AND bet_time BETWEEN #{startTime} AND #{endTime}
+
+    </select>
+    <select id="venueWinLoseRecalculatePage"
+            resultType="com.cloud.baowang.play.api.vo.order.report.VenueWinLoseRecalculateVO">
+        select
+        site_code as siteCode,
+        user_id as userId,
+        user_account as userAccount,
+        account_type as accountType,
+        agent_id as agentId,
+        agent_acct as agentAccount,
+        currency as currency,
+        venue_type as venueType,
+        venue_code as venueCode,
+        third_game_code as venueGameType,
+        room_type as roomType,
+        count(1) AS betCount,
+        SUM(bet_amount) AS betAmount,
+        SUM(valid_amount) AS validAmount,
+        SUM(win_loss_amount)-SUM(CASE WHEN play_type = 'TIPS' THEN bet_amount ELSE 0 END) AS winLossAmount,
+        SUM(win_loss_amount) AS userWinLossAmount,
+        SUM(CASE WHEN play_type = 'TIPS' THEN bet_amount ELSE 0 END) AS tipsAmount
+        from order_record
+        where settle_time <![CDATA[ >= ]]> #{vo.startTime}
+        and settle_time <![CDATA[ <= ]]> #{vo.endTime}
+        <if test="vo.siteCode != null and vo.siteCode !=''">
+            and site_code = #{vo.siteCode}
+        </if>
+        and ( ex_id1 != 'free_spin' or ex_id1 IS NULL  )
+        group by
+        site_code,user_id,account_type,user_account,currency,agent_id,agent_acct,venue_type,venue_code,third_game_code,room_type
+        order by
+        site_code,user_id,account_type,user_account,currency,agent_id,agent_acct,venue_type,venue_code,third_game_code,room_type
+    </select>
+
+    <select id="getUserOrderAmountByUserId"
+            resultType="com.cloud.baowang.play.api.vo.user.PlayUserBetAmountSumVO">
+        SELECT
+        currency as currency,
+        sum(valid_amount) as validAmount,
+        sum(win_loss_amount) as winLossAmount
+        FROM
+        `order_record`
+        WHERE order_classify IN (1, 3)
+          and user_id = #{vo.userId}
+        <if test="vo.agentId != null and vo.agentId != ''">
+            AND agent_id = #{vo.agentId}
+        </if>
+        <if test="vo.startTime != null">
+            and first_settle_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            and first_settle_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        GROUP BY currency
+    </select>
+
+    <select id="getBetUserCount" resultType="java.lang.Integer">
+        SELECT
+        IFNULL(count(distinct user_id), 0)
+        FROM
+        `order_record`
+        WHERE order_classify IN (1, 3)
+        <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+            AND agent_id IN
+            <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null">
+            and first_settle_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            and first_settle_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+    </select>
+
+    <select id="winLoseRecalculatePage"
+            resultType="com.cloud.baowang.play.api.vo.order.report.WinLoseRecalculateVO">
+        select
+        site_code as siteCode,
+        user_id as userId,
+        user_account as userAccount,
+        agent_id as agentId,
+        agent_acct as superAgentAccount,
+        currency as mainCurrency,
+
+        count(1) AS betNum,
+        SUM(bet_amount) AS betAmount,
+        SUM(CASE WHEN play_type = 'TIPS' THEN bet_amount ELSE 0 END) AS tipsAmount,
+        SUM(valid_amount) AS validBetAmount,
+        SUM(win_loss_amount) AS betWinLose,
+        ANY_VALUE(account_type) AS accountType
+        from order_record
+        where settle_time <![CDATA[ >= ]]> #{vo.startTime}
+        and settle_time <![CDATA[ <= ]]> #{vo.endTime}
+        <if test="vo.siteCode != null and vo.siteCode !=''">
+            and site_code = #{vo.siteCode}
+        </if>
+        and  ( ex_id1 != 'free_spin' or ex_id1 IS NULL  )
+        group by
+        site_code,user_id,user_account,currency,agent_id,agent_acct
+        order by
+        site_code,user_id,user_account,currency,agent_id,agent_acct
+    </select>
+
+    <select id="winLoseRecalculateFreeSpinPage" resultType="com.cloud.baowang.play.api.vo.order.report.WinLoseRecalculateFeelSpinVO">
+        select
+        site_code as siteCode,
+        user_id as userId,
+        user_account as userAccount,
+        agent_id as agentId,
+        agent_acct as superAgentAccount,
+        currency as mainCurrency,
+        ANY_VALUE(account_type) AS accountType,
+        SUM(win_loss_amount) AS freeSpinAmount
+        from order_record
+        where settle_time <![CDATA[ >= ]]> #{vo.startTime}
+        and settle_time <![CDATA[ <= ]]> #{vo.endTime}
+        <if test="vo.siteCode != null and vo.siteCode !=''">
+            and site_code = #{vo.siteCode}
+        </if>
+        and ex_id1 = 'free_spin'
+        group by
+        site_code,user_id,user_account,currency,agent_id,agent_acct
+        order by
+        site_code,user_id,user_account,currency,agent_id,agent_acct
+    </select>
+
+</mapper>

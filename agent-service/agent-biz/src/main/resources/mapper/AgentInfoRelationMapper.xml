@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentInfoRelationRepository">
+
+
+    <insert id="insertSelfIfAbsent">
+        INSERT INTO agent_info_relation (
+            id,
+            site_code,
+            ancestor_agent_id,
+            descendant_agent_id,
+            agent_depth,
+            creator,
+            updater,
+            created_time,
+            updated_time
+        )
+        VALUES (
+                   #{id},
+                   #{siteCode},
+                   #{nodeId},
+                   #{nodeId},
+                   0,
+                   #{operator},
+                   #{operator},
+                   #{now},
+                   #{now}
+               )
+            ON DUPLICATE KEY UPDATE
+                                 updated_time = updated_time
+    </insert>
+
+    <!-- 基于 parent_node_id 复制祖先链到 child_node_id -->
+    <insert id="insertByParent">
+        INSERT INTO agent_info_relation (
+            id,
+            site_code,
+            parent_node_id,
+            child_node_id,
+            distance,
+            creator,
+            updater,
+            created_time,
+            updated_time
+        )
+        SELECT
+            REPLACE(UUID(), '-', ''),
+            #{siteCode},
+            parent_node_id,
+            #{childNodeId},
+            distance + 1,
+            #{operator},
+            #{operator},
+            #{now},
+            #{now}
+        FROM agent_info_relation
+        WHERE child_node_id = #{parentNodeId}
+          AND site_code = #{siteCode}
+            ON DUPLICATE KEY UPDATE
+                                 updated_time = updated_time
+    </insert>
+
+</mapper>

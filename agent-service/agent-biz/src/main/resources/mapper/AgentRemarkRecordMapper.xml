@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentRemarkRecordRepository">
+
+    <select id="getAgentRemarkPage" resultType="com.cloud.baowang.agent.api.vo.remark.AgentRemarkRecordVO">
+        SELECT
+            operator as operator,
+            remark as remark,
+            site_code as siteCode,
+            updated_time as updateTime
+        FROM agent_remark_record
+        where status = 1
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            AND site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.agentAccount != null and vo.agentAccount != ''">
+            AND agent_account = #{vo.agentAccount}
+        </if>
+        order by updated_time desc
+    </select>
+</mapper>

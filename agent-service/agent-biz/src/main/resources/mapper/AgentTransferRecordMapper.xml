@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentTransferRecordRepository">
+    <select id="queryAgentTransferRecord" resultType="com.cloud.baowang.agent.api.vo.agentCoin.AgentTransferPageRecordVO">
+        select
+
+            transfer_type as transferType,
+            agent_account as agentAccount,
+            transfer_account as transferAccount,
+            transfer_amount as transferAmount,
+            order_no as orderNo,
+            remark as remark,
+            transfer_time as transferTime,
+            transfer_status as transferStatus
+            from agent_transfer_record
+        where 1 = 1
+        <if test="vo.transferType != null and vo.transferType != ''">
+            AND transfer_type = #{vo.transferType}
+        </if>
+        <if test = "vo.direction == 0 and vo.isMe == true">
+            <if test = "vo.agentAccount != null and vo.agentAccount != ''">
+                AND transfer_account = #{vo.agentAccount}
+            </if>
+        </if>
+        <if test = "vo.direction == 1 and vo.isMe == true">
+            <if test = "vo.agentAccount != null and vo.agentAccount != ''">
+                AND agent_account = #{vo.agentAccount}
+            </if>
+        </if>
+        <if test = "vo.direction == 1 and vo.isMe == false">
+            <if test = "vo.agentAccount != null and vo.agentAccount != ''">
+                AND transfer_account = #{vo.agentAccount}
+            </if>
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND transfer_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND transfer_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        order by transfer_time desc
+    </select>
+
+    <select id="queryAgentTransferRecordPage" resultType="com.cloud.baowang.agent.api.vo.agentCoin.AgentTransferRecordPageVO">
+        select
+            t.order_no as orderNo,
+            t.agent_account as fromTransAccount,
+            IF(t.agent_account = 'players', 0, (select t1.level from agent_info t1
+            where t.agent_account = t1.agent_account and t1.site_code = #{vo.siteCode})) as fromTransLevel,
+            t.transfer_account as toTransAccount,
+            t.transfer_type as agentWalletType,
+            t.transfer_status as orderStatus,
+            t.transfer_amount as transferAmount,
+            t.transfer_time as transferTime,
+            t.remark as remark
+        from agent_transfer_record t
+        where site_code = #{vo.siteCode}
+        <if test="vo.orderNo != null and vo.orderNo != ''">
+            AND t.order_no = #{vo.orderNo}
+        </if>
+        <if test = "vo.fromAgentAccount != null and vo.fromAgentAccount != ''">
+            AND t.agent_account = #{vo.fromAgentAccount}
+        </if>
+        <if test = "vo.toAgentAccount != null and vo.toAgentAccount != ''">
+            AND t.transfer_account = #{vo.toAgentAccount}
+        </if>
+        <if test = "vo.walletType != null and vo.walletType != ''">
+            AND t.transfer_type = #{vo.walletType}
+        </if>
+        <if test = "vo.orderStatus != null and vo.orderStatus != ''">
+            AND t.transfer_status = #{vo.orderStatus}
+        </if>
+        <if test = "vo.transferStartAmount != null ">
+            AND t.transfer_amount <![CDATA[ >= ]]> #{vo.transferStartAmount}
+        </if>
+        <if test = "vo.transferEndAmount != null ">
+            AND t.transfer_amount <![CDATA[ <= ]]> #{vo.transferEndAmount}
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND t.transfer_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND t.transfer_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+
+        <choose>
+            <when test="vo.orderField == 'transferAmount' and vo.orderType == 'asc'">
+                ORDER BY transferAmount asc
+            </when>
+            <when test="vo.orderField == 'transferAmount' and vo.orderType == 'desc'">
+                ORDER BY transferAmount desc
+            </when>
+
+            <when test="vo.orderField == 'transferTime' and vo.orderType == 'asc'">
+                ORDER BY transferTime asc
+            </when>
+            <when test="vo.orderField == 'transferTime' and vo.orderType == 'desc'">
+                ORDER BY transferTime desc
+            </when>
+
+            <otherwise>
+                order by t.transfer_time desc
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="siteQueryAgentTransferRecordCount" resultType="java.lang.Long">
+        select
+        count(1)
+        from agent_transfer_record t
+        where site_code = #{vo.siteCode}
+        <if test="vo.orderNo != null and vo.orderNo != ''">
+            AND t.order_no = #{vo.orderNo}
+        </if>
+        <if test = "vo.fromAgentAccount != null and vo.fromAgentAccount != ''">
+            AND t.agent_account = #{vo.fromAgentAccount}
+        </if>
+        <if test = "vo.toAgentAccount != null and vo.toAgentAccount != ''">
+            AND t.transfer_account = #{vo.toAgentAccount}
+        </if>
+        <if test = "vo.walletType != null and vo.walletType != ''">
+            AND t.transfer_type = #{vo.walletType}
+        </if>
+        <if test = "vo.orderStatus != null and vo.orderStatus != ''">
+            AND t.transfer_status = #{vo.orderStatus}
+        </if>
+        <if test = "vo.transferStartAmount != null ">
+            AND t.transfer_amount <![CDATA[ >= ]]> #{vo.transferStartAmount}
+        </if>
+        <if test = "vo.transferEndAmount != null ">
+            AND t.transfer_amount <![CDATA[ <= ]]> #{vo.transferEndAmount}
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND t.transfer_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND t.transfer_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+    </select>
+
+    <select id="queryTotalTransferRecord" resultType="java.math.BigDecimal">
+        select sum(transfer_amount) from agent_transfer_record
+        where  site_code = #{vo.siteCode}
+        <if test="vo.orderNo != null and vo.orderNo != ''">
+            AND order_no = #{vo.orderNo}
+        </if>
+        <if test = "vo.fromAgentAccount != null and vo.fromAgentAccount != ''">
+            AND agent_account = #{vo.fromAgentAccount}
+        </if>
+        <if test = "vo.toAgentAccount != null and vo.toAgentAccount != ''">
+            AND transfer_account = #{vo.toAgentAccount}
+        </if>
+        <if test = "vo.walletType != null and vo.walletType != ''">
+            AND transfer_type = #{vo.walletType}
+        </if>
+        <if test = "vo.orderStatus != null and vo.orderStatus != ''">
+            AND transfer_status = #{vo.orderStatus}
+        </if>
+        <if test = "vo.transferStartAmount != null ">
+            AND transfer_amount <![CDATA[ >= ]]> #{vo.transferStartAmount}
+        </if>
+        <if test = "vo.transferEndAmount != null ">
+            AND transfer_amount <![CDATA[ <= ]]> #{vo.transferEndAmount}
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND transfer_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND transfer_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+    </select>
+
+
+
+
+    <select id="getProxyTransferSalaryTotal" resultType="java.math.BigDecimal">
+        select sum(transfer_amount) as amount
+        from agent_transfer_record s
+                 left join agent_info a on a.agent_account = s.agent_account
+        where s.transfer_time between #{beginTime} and #{endTime}
+                  and s.transfer_type=#{subordType}
+                  and a.agent_type in (1,2)
+    </select>
+
+
+
+    <select id="getProxyTransferSalaryTimeCount" resultType="String">
+        select s.agent_account
+        from agent_transfer_record s
+                 left join agent_info a on a.agent_account = s.agent_account
+        where s.transfer_time between #{beginTime} and #{endTime}
+                  and s.transfer_type=#{subordType}
+                  and a.agent_type in (1,2)
+    </select>
+    <select id="distributeLog" resultType="com.cloud.baowang.agent.api.vo.agent.agentLowerLevelManager.AgentDistributeLogPageVO">
+        select
+        s.agent_account AS transferAccount,
+        s.transfer_account AS collectionAccount,
+        s.transfer_time AS distributeTime,
+        a.coin_from AS beforeDistributionAmount,
+        a.coin_to AS afterDistributionAmount,
+        a.coin_amount AS distributionAmount,
+        a.wallet_type AS walletType
+        from agent_transfer_record s
+        left join agent_coin_record a on a.order_no = s.order_no
+        and s.transfer_status = 0
+        and a.balance_type = #{vo.transferType}
+        and s.transfer_time <![CDATA[ >= ]]> #{vo.startTime}
+        and s.transfer_time <![CDATA[ <= ]]> #{vo.endTime}
+        <where>
+            <!--转入-->
+            <if test= "vo.transferType == 1" >
+                and s.transfer_account = #{vo.agentAccount}
+                and s.agent_account != #{vo.agentAccount}
+                <if test="vo.searchAccount != null and vo.searchAccount != ''">
+                    and s.agent_account = #{vo.searchAccount}
+                </if>
+            </if>
+            <!--转出-->
+            <if test= "vo.transferType == 2" >
+                and s.agent_account = #{vo.agentAccount}
+                and s.transfer_account != #{vo.agentAccount}
+                <if test="vo.searchAccount != null and vo.searchAccount != ''">
+                    and s.transfer_account = #{vo.searchAccount}
+                </if>
+            </if>
+            and s.transfer_time <![CDATA[ >= ]]> #{vo.startTime}
+            and s.transfer_time <![CDATA[ <= ]]> #{vo.endTime}
+        </where>
+        order by s.transfer_time desc
+    </select>
+
+</mapper>

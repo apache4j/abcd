@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.report.repositories.ReportAgentStaticBetRepository">
+
+
+    <select id="staticBetUserNum" resultType="java.lang.Long">
+        SELECT
+        count( distinct `user_account` ) AS userBetNum
+        FROM
+        report_agent_static_bet
+        ${ew.customSqlSegment}
+    </select>
+</mapper>

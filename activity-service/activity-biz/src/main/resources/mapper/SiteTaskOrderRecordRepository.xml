@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.activity.repositories.SiteTaskOrderRecordRepository">
+
+
+    <select id="reportList" resultType="com.cloud.baowang.activity.api.vo.task.ReportTaskOrderRecordResVO">
+        SELECT
+        site_code AS siteCode,
+        ANY_VALUE(task_id) AS taskId,
+        task_type AS taskType,
+        sub_task_type AS subTaskType,
+        SUM( CASE WHEN receive_status = 1 THEN 1 ELSE 0 END ) AS receiveCount,
+        COUNT(DISTINCT user_id) AS allCount,
+        SUM( task_amount ) AS sendAmount,
+        SUM( CASE WHEN receive_status = 1 THEN task_amount ELSE 0 END ) AS receiveAmount,
+        currency_code as currencyCode,
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.created_time/1000), @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d') as staticDate,
+        FROM
+        site_task_order_record
+        where 1=1
+        <if test="startTime != null">
+            AND created_time <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND created_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="siteCode != null and siteCode !=''">
+            AND site_code = #{siteCode}
+        </if>
+        GROUP BY
+        site_code,
+        task_type,
+        sub_task_type,
+        currency_code,
+        staticDate
+    </select>
+
+    <select id="reportReceivedList" resultType="com.cloud.baowang.activity.api.vo.task.ReportTaskOrderRecordResVO">
+        SELECT
+        site_code AS siteCode,
+        ANY_VALUE(task_id) AS taskId,
+        task_type AS taskType,
+        sub_task_type AS subTaskType,
+        COUNT(DISTINCT CASE WHEN receive_status = 1 THEN user_id ELSE NULL END) AS receiveCount,
+        COUNT(DISTINCT user_id) AS allCount,
+        SUM( task_amount ) AS sendAmount,
+        SUM( CASE WHEN receive_status = 1 THEN task_amount ELSE 0 END ) AS receiveAmount,
+        currency_code as currencyCode,
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.created_time/1000), @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d') as staticDate,
+        FROM
+        site_task_order_record
+        where 1=1
+        <if test="startTime != null">
+            AND receive_time <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND receive_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="siteCode != null and siteCode !=''">
+            AND site_code = #{siteCode}
+        </if>
+        GROUP BY
+        site_code,
+        task_type,
+        sub_task_type,
+        currency_code,
+        staticDate
+    </select>
+
+    <select id="noReceivedList" resultType="java.lang.String">
+        SELECT
+        order_no AS orderNo
+        FROM
+        site_task_order_record
+        where 1=1
+
+        <if test="siteCode != null and siteCode !=''">
+            AND site_code = #{siteCode}
+        </if>
+        AND receive_status = 0
+
+    </select>
+
+
+    <select id="reportListPage" resultType="com.cloud.baowang.activity.api.vo.task.ReportTaskOrderRecordResVO">
+        select
+        abc.siteCode AS siteCode,
+        abc.taskId AS taskId,
+        abc.taskType AS taskType,
+        abc.subTaskType AS subTaskType,
+        abc.staticDate as staticDate,
+        abc.currencyCode as currencyCode,
+        sum(abc.allCount) as allCount,
+        SUM( abc.sendAmount ) AS sendAmount,
+        sum(abc.receiveCount) AS receiveCount,
+        sum(abc.receiveAmount) AS receiveAmount
+        from (
+        SELECT
+        a.site_code AS siteCode,
+        a.task_id AS taskId,
+        a.task_type AS taskType,
+        a.sub_task_type AS subTaskType,
+        COUNT(DISTINCT  a.user_id) AS allCount,
+        SUM(  a.task_amount ) AS sendAmount,
+        0 AS receiveCount,
+        0 AS receiveAmount,
+        a.currency_code as currencyCode,
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME( a.created_time/1000),
+        @@session.time_zone,#{vo.timezoneDb}),'%Y-%m-%d') as staticDate
+        FROM
+        site_task_order_record a left join user_info b on a.user_id = b.user_id
+        where 1=1
+          and b.account_type = '2'
+        <if test="vo.startTime != null">
+            AND  a.created_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTme != null">
+            AND  a.created_time <![CDATA[ <= ]]> #{vo.endTme}
+        </if>
+        <if test="vo.siteCode != null and vo.siteCode !=''">
+            AND  a.site_code = #{vo.siteCode}
+        </if>
+        <!--<if test="vo.taskName != null and vo.taskName !=''">
+            AND sub_task_type = #{vo.taskName}
+        </if>-->
+        <if test="vo.taskId != null and vo.taskId !=''">
+            AND  a.task_id = #{vo.taskId}
+        </if>
+        <if test="vo.taskType != null and vo.taskType !=''">
+            AND  a.task_type = #{vo.taskType}
+        </if>
+
+        <if test="vo.taskIds != null and vo.taskIds.size() > 0">
+            AND  a.task_id IN
+            <foreach item="item" collection="vo.taskIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY
+        a.site_code,
+        a.task_type,
+        a.sub_task_type,
+        a.currency_code,
+        staticDate,
+        a.task_id
+
+        union all
+
+        SELECT
+        a.site_code AS siteCode,
+        a.task_id AS taskId,
+        a.task_type AS taskType,
+        a.sub_task_type AS subTaskType,
+        0 AS allCount,
+        0 AS sendAmount,
+        COUNT(DISTINCT CASE WHEN  a.receive_status = 1 THEN  a.user_id ELSE NULL END) AS receiveCount,
+        SUM( CASE WHEN  a.receive_status = 1 THEN  a.task_amount ELSE 0 END ) AS receiveAmount,
+        a.currency_code as currencyCode,
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME( a.receive_time/1000),
+        @@session.time_zone,#{vo.timezoneDb}),'%Y-%m-%d') as staticDate
+        FROM
+        site_task_order_record a left join user_info b on a.user_id = b.user_id
+        where 1=1
+        and b.account_type = '2'
+        <if test="vo.startTime != null">
+            AND a.receive_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTme != null">
+            AND a.receive_time <![CDATA[ <= ]]> #{vo.endTme}
+        </if>
+        <if test="vo.siteCode != null and vo.siteCode !=''">
+            AND a.site_code = #{vo.siteCode}
+        </if>
+        <!--<if test="vo.taskName != null and vo.taskName !=''">
+            AND sub_task_type = #{vo.taskName}
+        </if>-->
+        <if test="vo.taskId != null and vo.taskId !=''">
+            AND a.task_id = #{vo.taskId}
+        </if>
+        <if test="vo.taskType != null and vo.taskType !=''">
+            AND a.task_type = #{vo.taskType}
+        </if>
+        <if test="vo.taskIds != null and vo.taskIds.size() > 0">
+            AND a.task_id IN
+            <foreach item="item" collection="vo.taskIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        GROUP BY
+        a.site_code,
+        a.task_type,
+        a.sub_task_type,
+        a.currency_code,
+        staticDate,
+        a.task_id
+        ) abc
+        group by
+        abc.siteCode,
+        abc.taskType,
+        abc.subTaskType,
+        abc.currencyCode,
+        abc.staticDate,
+        abc.taskId
+        order by staticDate desc
+
+    </select>
+
+    <select id="reportListPageTotal" resultType="com.cloud.baowang.activity.api.vo.task.ReportTaskOrderRecordResVO">
+
+
+        select
+        abc.siteCode AS siteCode,
+        ANY_VALUE(abc.taskId) AS taskId,
+        ANY_VALUE(abc.currencyCode) as currencyCode,
+        sum(abc.allCount) as allCount,
+        SUM( abc.sendAmount ) AS sendAmount,
+        sum(abc.receiveCount) AS receiveCount,
+        sum(abc.receiveAmount) AS receiveAmount
+        from (
+        SELECT
+        ANY_VALUE(a.site_code) AS siteCode,
+        ANY_VALUE(a.task_id) AS taskId,
+        COUNT(DISTINCT a.user_id) AS allCount,
+        SUM( a.task_amount ) AS sendAmount,
+        0 AS receiveCount,
+        0 AS receiveAmount,
+        ANY_VALUE(a.currency_code) as currencyCode
+        FROM
+        site_task_order_record a left join user_info b on a.user_id = b.user_id
+        where 1=1
+          and b.account_type = '2'
+        <if test="vo.startTime != null">
+            AND a.created_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTme != null">
+            AND a.created_time <![CDATA[ <= ]]> #{vo.endTme}
+        </if>
+        <if test="vo.siteCode != null and vo.siteCode !=''">
+            AND a.site_code = #{vo.siteCode}
+        </if>
+        <!--<if test="vo.taskName != null and vo.taskName !=''">
+            AND sub_task_type = #{vo.taskName}
+        </if>-->
+        <if test="vo.taskId != null and vo.taskId !=''">
+            AND a.task_id = #{vo.taskId}
+        </if>
+        <if test="vo.taskType != null and vo.taskType !=''">
+            AND a.task_type = #{vo.taskType}
+        </if>
+
+        <if test="vo.taskIds != null and vo.taskIds.size() > 0">
+            AND a.task_id IN
+            <foreach item="item" collection="vo.taskIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+
+        union all
+
+        SELECT
+        ANY_VALUE(a.site_code) AS siteCode,
+        ANY_VALUE(a.task_id) AS taskId,
+        0 AS allCount,
+        0 AS sendAmount,
+        COUNT(DISTINCT CASE WHEN a.receive_status = 1 THEN a.user_id ELSE NULL END) AS receiveCount,
+        SUM( CASE WHEN a.receive_status = 1 THEN a.task_amount ELSE 0 END ) AS receiveAmount,
+        ANY_VALUE(a.currency_code) as currencyCode
+        FROM
+        site_task_order_record a left join user_info b on a.user_id = b.user_id
+        where 1=1
+        and b.account_type = '2'
+        <if test="vo.startTime != null">
+            AND a.receive_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTme != null">
+            AND a.receive_time <![CDATA[ <= ]]> #{vo.endTme}
+        </if>
+        <if test="vo.siteCode != null and vo.siteCode !=''">
+            AND a.site_code = #{vo.siteCode}
+        </if>
+        <!--<if test="vo.taskName != null and vo.taskName !=''">
+            AND sub_task_type = #{vo.taskName}
+        </if>-->
+        <if test="vo.taskId != null and vo.taskId !=''">
+            AND a.task_id = #{vo.taskId}
+        </if>
+        <if test="vo.taskType != null and vo.taskType !=''">
+            AND a.task_type = #{vo.taskType}
+        </if>
+        <if test="vo.taskIds != null and vo.taskIds.size() > 0">
+            AND a.task_id IN
+            <foreach item="item" collection="vo.taskIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        ) abc
+
+
+
+    </select>
+
+
+    <select id="reportListAll" resultType="com.cloud.baowang.activity.api.vo.task.ReportTaskOrderRecordResVO">
+        select
+
+        sum(allCount) as allCount,
+        SUM( sendAmount ) AS sendAmount,
+        sum(receiveCount) AS receiveCount,
+        sum(receiveAmount) AS receiveAmount
+        from (
+        SELECT
+        COUNT(DISTINCT a.user_id) AS allCount,
+        SUM( a.task_amount ) AS sendAmount,
+        0 AS receiveCount,
+        0 AS receiveAmount
+        FROM
+        site_task_order_record a left join user_info b on a.user_id = b.user_id
+        where 1=1
+        and b.account_type = '2'
+        <if test="vo.startTime != null">
+            AND a.created_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTme != null">
+            AND a.created_time <![CDATA[ <= ]]> #{vo.endTme}
+        </if>
+        <if test="vo.siteCode != null and vo.siteCode !=''">
+            AND a.site_code = #{vo.siteCode}
+        </if>
+        <!--<if test="vo.taskName != null and vo.taskName !=''">
+            AND sub_task_type = #{vo.taskName}
+        </if>-->
+        <if test="vo.taskId != null and vo.taskId !=''">
+            AND a.task_id = #{vo.taskId}
+        </if>
+        <if test="vo.taskType != null and vo.taskType !=''">
+            AND a.task_type = #{vo.taskType}
+        </if>
+        <if test="vo.taskIds != null and vo.taskIds.size() > 0">
+            AND a.task_id IN
+            <foreach item="item" collection="vo.taskIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        union all
+
+        SELECT
+
+        0 AS allCount,
+        0 AS sendAmount,
+        COUNT(DISTINCT CASE WHEN a.receive_status = 1 THEN a.user_id ELSE NULL END) AS receiveCount,
+        SUM( CASE WHEN a.receive_status = 1 THEN a.task_amount ELSE 0 END ) AS receiveAmount
+        FROM
+        site_task_order_record a left join user_info b on a.user_id = b.user_id
+        where 1=1
+        and b.account_type = '2'
+        <if test="vo.startTime != null">
+            AND a.receive_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTme != null">
+            AND a.receive_time <![CDATA[ <= ]]> #{vo.endTme}
+        </if>
+        <if test="vo.siteCode != null and vo.siteCode !=''">
+            AND a.site_code = #{vo.siteCode}
+        </if>
+        <!--<if test="vo.taskName != null and vo.taskName !=''">
+            AND sub_task_type = #{vo.taskName}
+        </if>-->
+        <if test="vo.taskId != null and vo.taskId !=''">
+            AND a.task_id = #{vo.taskId}
+        </if>
+        <if test="vo.taskType != null and vo.taskType !=''">
+            AND a.task_type = #{vo.taskType}
+        </if>
+        <if test="vo.taskIds != null and vo.taskIds.size() > 0">
+            AND a.task_id IN
+            <foreach item="item" collection="vo.taskIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+
+        ) abc
+
+
+    </select>
+    <select id="getTotalCountReport" resultType="java.lang.Long">
+        select count(1) as totalCount from (
+
+        select
+        abc.siteCode AS siteCode,
+        abc.taskId AS taskId,
+        abc.taskType AS taskType,
+        abc.subTaskType AS subTaskType,
+        abc.staticDate as staticDate,
+        abc.currencyCode as currencyCode,
+        sum(abc.allCount) as allCount,
+        SUM( abc.sendAmount ) AS sendAmount,
+        sum(abc.receiveCount) AS receiveCount,
+        sum(abc.receiveAmount) AS receiveAmount
+        from (
+        SELECT
+        a.site_code AS siteCode,
+        a.task_id AS taskId,
+        a.task_type AS taskType,
+        a.sub_task_type AS subTaskType,
+        COUNT(DISTINCT a.user_id) AS allCount,
+        SUM( a.task_amount ) AS sendAmount,
+        0 AS receiveCount,
+        0 AS receiveAmount,
+        a.currency_code as currencyCode,
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.created_time/1000),
+        @@session.time_zone,#{vo.timezoneDb}),'%Y-%m-%d') as staticDate
+        FROM
+        site_task_order_record a left join user_info b on a.user_id = b.user_id
+        where 1=1
+        and b.account_type = '2'
+        <if test="vo.startTime != null">
+            AND a.created_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTme != null">
+            AND a.created_time <![CDATA[ <= ]]> #{vo.endTme}
+        </if>
+        <if test="vo.siteCode != null and vo.siteCode !=''">
+            AND a.site_code = #{vo.siteCode}
+        </if>
+        <!--<if test="vo.taskName != null and vo.taskName !=''">
+            AND sub_task_type = #{vo.taskName}
+        </if>-->
+        <if test="vo.taskId != null and vo.taskId !=''">
+            AND a.task_id = #{vo.taskId}
+        </if>
+        <if test="vo.taskType != null and vo.taskType !=''">
+            AND a.task_type = #{vo.taskType}
+        </if>
+        <if test="vo.taskIds != null and vo.taskIds.size() > 0">
+            AND a.task_id IN
+            <foreach item="item" collection="vo.taskIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY
+        a.site_code,
+        a.task_type,
+        a.sub_task_type,
+        a.currency_code,
+        staticDate,
+        a.task_id
+
+        union all
+
+        SELECT
+        a.site_code AS siteCode,
+        a.task_id AS taskId,
+        a.task_type AS taskType,
+        a.sub_task_type AS subTaskType,
+        0 AS allCount,
+        0 AS sendAmount,
+        COUNT(DISTINCT CASE WHEN a.receive_status = 1 THEN a.user_id ELSE NULL END) AS receiveCount,
+        SUM( CASE WHEN a.receive_status = 1 THEN a.task_amount ELSE 0 END ) AS receiveAmount,
+        a.currency_code as currencyCode,
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.created_time/1000),
+        @@session.time_zone,#{vo.timezoneDb}),'%Y-%m-%d') as staticDate
+        FROM
+        site_task_order_record a left join user_info b on a.user_id = b.user_id
+        where 1=1
+        and b.account_type = '2'
+        <if test="vo.startTime != null">
+            AND a.receive_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTme != null">
+            AND a.receive_time <![CDATA[ <= ]]> #{vo.endTme}
+        </if>
+        <if test="vo.siteCode != null and vo.siteCode !=''">
+            AND a.site_code = #{vo.siteCode}
+        </if>
+        <!--<if test="vo.taskName != null and vo.taskName !=''">
+            AND sub_task_type = #{vo.taskName}
+        </if>-->
+        <if test="vo.taskId != null and vo.taskId !=''">
+            AND a.task_id = #{vo.taskId}
+        </if>
+        <if test="vo.taskType != null and vo.taskType !=''">
+            AND a.task_type = #{vo.taskType}
+        </if>
+        <if test="vo.taskIds != null and vo.taskIds.size() > 0">
+            AND a.task_id IN
+            <foreach item="item" collection="vo.taskIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        GROUP BY
+        a.site_code,
+        a.task_type,
+        a.sub_task_type,
+        a.currency_code,
+        staticDate,
+        a.task_id
+        ) abc
+        group by
+        abc.siteCode,
+        abc.taskType,
+        abc.subTaskType,
+        abc.currencyCode,
+        abc.staticDate,
+        abc.taskId
+        order by staticDate desc
+        ) aaaa
+
+    </select>
+
+
+</mapper>

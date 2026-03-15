@@ -1,0 +1,2 @@
+com.cloud.baowang.common.sentinel.config.DefaultRequestOriginParser
+com.cloud.baowang.common.sentinel.config.ServiceBlockExceptionHandler

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.wallet.repositories.UserPlatformTransferRecordRepository">
+
+    <select id="tradeRecordPlatformList"
+            resultType="com.cloud.baowang.wallet.api.vo.userwallet.UserTradeRecordResponseVO">
+        SELECT
+            '3' AS tradeType,
+            uptr.order_no AS orderNo,
+            uptr.created_time AS tradeTime,
+            uptr.target_amount AS tradeAmout,
+            '1' AS tradeStatus,
+            'platform_transfer' AS tradeWayType,
+            uptr.transfer_rate AS exchangeRate
+        FROM
+            user_platform_transfer_record uptr
+        WHERE
+            uptr.user_id = #{vo.userId}
+          AND uptr.updated_time &gt;= #{vo.startTime}
+        AND uptr.updated_time &lt;= #{vo.endTime}
+
+
+    </select>
+
+    <select id="getTransferAmountByAgentIds" resultType="java.math.BigDecimal">
+        select IFNULL(sum(transfer_amount),0) as transferAmount
+        from user_platform_transfer_record
+        where agent_id is not null
+        and agent_id != ''
+        <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+            and agent_id IN
+            <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND order_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND order_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+    </select>
+    <select id="getTransferAmountByUserAccount" resultType="java.math.BigDecimal">
+        select IFNULL(sum(target_amount),0) as transferAmount
+        from user_platform_transfer_record
+        where user_account = #{userAccount}
+          and site_code = #{siteCode}
+    </select>
+
+    <select id="existsTransferRecordByUserId" resultType="java.lang.Integer">
+        select count(*) as count
+        from user_platform_transfer_record
+        where user_id = #{userId}
+            limit 1
+    </select>
+
+</mapper>

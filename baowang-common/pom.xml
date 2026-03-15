@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.cloud.baowang</groupId>
+        <artifactId>parent-pom</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <groupId>com.cloud.baowang</groupId>
+    <artifactId>baowang-common</artifactId>
+    <version>2025.10.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <description>公共聚合模块</description>
+
+    <modules>
+        <module>common-core</module>
+        <module>common-log</module>
+        <module>common-feign</module>
+        <module>common-mybatis</module>
+        <module>common-redis</module>
+        <module>common-test</module>
+        <module>common-excel</module>
+        <module>common-es</module>
+        <module>common-kafka</module>
+        <module>common-auth</module>
+        <module>common-sentinel</module>
+        <module>common-push</module>
+    </modules>
+
+
+
+    <scm>
+        <connection>scm:git:https://code.mogm.top/oversea-baowang/baowang-common.git</connection>
+        <developerConnection>scm:git:https://oauth2:${gitlab.token}@code.mogm.top/oversea-baowang/baowang-common.git</developerConnection>
+        <url>https://code.mogm.top/oversea-baowang/baowang-common</url>
+        <tag>HEAD</tag>
+    </scm>
+
+</project>
+

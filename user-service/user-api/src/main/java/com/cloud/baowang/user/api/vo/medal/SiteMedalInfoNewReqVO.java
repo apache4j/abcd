@@ -1,0 +1,87 @@
+package com.cloud.baowang.user.api.vo.medal;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import java.math.BigDecimal;
+
+/**
+ * @Desciption:
+ * @Author: Ford
+ * @Date: 2024/7/29 09:52
+ * @Version: V1.0
+ **/
+@Data
+@Schema(description = "站点勋章新增")
+public class SiteMedalInfoNewReqVO {
+    @Schema(description = "操作人 ")
+    private String operatorUserNo;
+
+    /**
+     * 站点代码
+     */
+    @Schema(description = "站点代码")
+    private String siteCode;
+
+    /**
+     * 勋章代码
+     */
+    @Schema(description = "勋章代码")
+    private String medalCode;
+
+    /**
+     * 勋章名称
+     */
+    @Schema(description = "勋章名称")
+    private String medalName;
+
+    /**
+     * 解锁条件
+     */
+    @Schema(description = "解锁条件")
+    private String unlockCond;
+
+
+    /**
+     * 奖励金额
+     */
+    @Schema(description = "奖励金额")
+    private BigDecimal rewardAmount;
+
+    /**
+     * 打码倍数
+     */
+    @Schema(description = "打码倍数")
+    private BigDecimal typingMultiple;
+
+    /**
+     * 达成条件1 N
+     */
+    @Schema(description = "达成条件1 N")
+    private String condNum1;
+
+
+    /**
+     * 达成条件2 N
+     */
+    @Schema(description = "达成条件2 N")
+    private String condNum2;
+
+    /**
+     * 解锁条件说明
+     */
+    @Schema(description = "解锁条件说明")
+    private String medalDesc;
+
+    /**
+     * 激活图片
+     */
+    @Schema(description = "激活图片")
+    private String activatedPic;
+
+    /**
+     * 未激活图片
+     */
+    @Schema(description = "未激活图片")
+    private String inactivatedPic;
+}

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentInfoChangeRecordRepository">
+
+    <select id="shortRecordPageList" resultType="com.cloud.baowang.agent.api.vo.agentreview.info.ShortUrlChangeRecordPageVO">
+        SELECT
+        t2.change_after shortAfter,
+        t2.agent_account agentAccount,
+        t2.operator,
+        t2.operator_time operatorTime
+        from  agent_info_change_record t2
+        <where>
+            t2.change_after is not null and t2.change_after <![CDATA[ <> ]]>''
+            <if test="vo.agentAccount != '' and vo.agentAccount != null">
+                AND  t2.agent_account =  #{vo.agentAccount}
+            </if>
+            <if test="vo.shortUrl != '' and vo.shortUrl != null">
+                AND t2.change_after like concat('%', #{vo.shortUrl}, '%')
+            </if>
+            <if test="vo.operator != '' and vo.operator != null">
+                AND t2.operator = #{vo.operator}
+            </if>
+        </where>
+        order by t2.operator_time asc
+    </select>
+
+
+</mapper>

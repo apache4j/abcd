@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.wallet.repositories.SiteWithdrawChannelRepository">
+
+    <select id="queryWithdrawPlatformAuthorize"
+            resultType="com.cloud.baowang.wallet.api.vo.withdraw.WithdrawChannelResVO">
+        SELECT
+        t.id,
+        t.channel_type AS channelType,
+        t.withdraw_way_id AS withdrawWayId,
+        sww.withdraw_way_i18 AS withdrawWayI18,
+        t.channel_name AS channelName,
+        t.channel_code AS channelCode,
+        t.withdraw_min AS withdrawMin,
+        t.withdraw_max AS withdrawMax,
+        t.use_scope AS useScope,
+        t.weight AS weight,
+        t.memo AS memo,
+        t.status AS status,
+
+        CASE
+        WHEN t1.updated_time IS NOT NULL THEN t1.updated_time
+        ELSE t.updated_time
+        END AS updatedTime,
+
+        CASE
+        WHEN t1.updater IS NOT NULL THEN t1.updater
+        ELSE t.updater
+        END AS updater,
+
+        CASE
+        WHEN t.id = t1.channel_id THEN 1
+        ELSE 0
+        END AS chooseFlag
+
+        FROM
+        system_withdraw_channel t
+        LEFT JOIN site_withdraw_channel t1
+        ON t.id = t1.channel_id AND t1.site_code = #{vo.siteCode}
+        LEFT JOIN system_withdraw_way sww
+        ON t.withdraw_way_id = sww.id
+        WHERE
+        t.withdraw_way_id = #{vo.withdrawWayId}
+        <if test="vo.channelName != '' and vo.channelName != null">
+            AND t.channel_name = #{vo.channelName}
+        </if>
+        <if test="vo.channelCode != '' and vo.channelCode != null">
+            AND t.channel_code = #{vo.channelCode}
+        </if>
+        <if test="vo.status != null and vo.status != ''">
+            AND t.status = #{vo.status}
+        </if>
+        ORDER BY
+        chooseFlag desc,
+        t.status DESC, t.sort_order DESC
+
+    </select>
+    <select id="selectSiteWithdrawChannelList"
+            resultType="com.cloud.baowang.wallet.api.vo.withdraw.SiteWithdrawChannelVO">
+        select
+        swc.site_code as siteCode ,
+        swc.channel_id as channelId ,
+        swc.status ,
+        swc2.withdraw_way_id as withdrawWayId
+        from
+        site_withdraw_channel swc
+        join system_withdraw_channel swc2 on
+        swc.channel_id = swc2.id
+        where
+        swc.site_code = #{siteCode}
+        and swc2.withdraw_way_id in
+        <foreach collection="wayList" item="wayId" close=")" open="(" separator=",">
+            #{wayId}
+        </foreach>
+        <if test="status != null">
+            and swc.status = #{status} and swc2.status = #{status}
+        </if>
+    </select>
+    <select id="selectWithdrawPage"
+            resultType="com.cloud.baowang.wallet.api.vo.withdraw.SiteWithdrawChannelResponseVO">
+        SELECT
+        a.id AS id,
+        b.currency_code AS currencyCode,
+        b.withdraw_channel_no AS withdrawChannelNo,
+        a.channel_id AS channelId,
+        b.channel_code AS channelCode,
+        b.channel_type AS channelType,
+        b.channel_name AS channelName,
+        c.id AS withdrawWayId,
+        c.withdraw_way_i18 AS withdrawWayI18,
+        a.status AS status,
+        a.sort_order AS sortOrder,
+        a.creator AS creator,
+        a.created_time AS createdTime,
+        a.updater AS updater,
+        a.updated_time AS updatedTime
+        FROM
+        site_withdraw_channel a
+        LEFT JOIN system_withdraw_channel b ON b.id = a.channel_id
+        LEFT JOIN system_withdraw_way c ON c.id = b.withdraw_way_id
+        WHERE
+        a.site_code = #{vo.siteCode}
+        <if test="vo.channelType != null and vo.channelType != ''">
+            AND b.channel_type = #{vo.channelType}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode != ''">
+            AND b.currency_code = #{vo.currencyCode}
+        </if>
+        <if test="vo.channelName != null and vo.channelName != ''">
+            AND b.channel_name LIKE CONCAT('%', #{vo.channelName}, '%')
+        </if>
+        <if test="vo.status != null ">
+            AND a.status = #{vo.status}
+        </if>
+        <if test="vo.withdrawWayId != null and vo.withdrawWayId != ''">
+            AND b.withdraw_way_id = #{vo.withdrawWayId}
+        </if>
+        ORDER BY  a.status DESC, a.updated_time DESC
+
+
+    </select>
+    <select id="selectBySort"
+            resultType="com.cloud.baowang.wallet.api.vo.withdraw.SiteWithdrawChannelResponseVO">
+
+        SELECT
+        a.id AS id,
+        b.currency_code AS currencyCode,
+        b.withdraw_channel_no AS withdrawChannelNo,
+        a.channel_id AS channelId,
+        b.channel_code AS channelCode,
+        b.channel_type AS channelType,
+        b.channel_name AS channelName,
+        c.id AS withdrawWayId,
+        c.withdraw_way_i18 AS withdrawWayI18,
+        a.status AS status,
+        a.sort_order AS sortOrder,
+        a.creator AS creator,
+        a.created_time AS createdTime,
+        a.updater AS updater,
+        a.updated_time AS updatedTime
+        FROM
+        site_withdraw_channel a
+        LEFT JOIN system_withdraw_channel b ON b.id = a.channel_id
+        LEFT JOIN system_withdraw_way c ON c.id = b.withdraw_way_id
+        WHERE
+        a.site_code = #{vo.siteCode}
+        <if test="vo.channelType != null and vo.channelType != ''">
+            AND b.id = #{vo.channelType}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode != ''">
+            AND b.currency_code = #{vo.currencyCode}
+        </if>
+        <if test="vo.channelName != null and vo.channelName != ''">
+            AND b.channel_name LIKE CONCAT('%', #{vo.channelName}, '%')
+        </if>
+        <if test="vo.status != null ">
+            AND a.status = #{vo.status}
+        </if>
+        <if test="vo.withdrawWayId != null and vo.withdrawWayId != ''">
+            AND b.withdraw_way_id = #{vo.withdrawWayId}
+        </if>
+        ORDER BY a.sort_order ASC
+    </select>
+
+    <select id="getWithdrawChannelBySiteCode" resultType="com.cloud.baowang.wallet.api.vo.recharge.SiteWithdrawChannelChangeVO">
+        select
+        c.channel_id channelId,
+        s.withdraw_way_id withdrawWayId,
+        s.channel_code channelCode
+        from site_withdraw_channel c
+        left join system_withdraw_channel s on s.id = c.channel_id
+        where c.site_code = #{siteCode}
+    </select>
+
+
+</mapper>

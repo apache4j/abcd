@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentInfoModifyReviewRepository">
+    <select id="pageList" resultType="com.cloud.baowang.agent.api.vo.agentreview.info.AgentInfoModifyReviewPageVO">
+        select
+        id,
+        application_time applicationTime,
+        first_review_time firstReviewTime,
+        review_order_number reviewOrderNumber,
+        review_operation reviewOperation,
+        review_status reviewStatus,
+        applicant,
+        first_instance firstInstance,
+        lock_status lockStatus,
+        review_application_type reviewApplicationType,
+        agent_account agentAccount,
+        agent_type agentType,
+        before_fixing beforeFixing,
+        after_modification afterModification,
+        locker,
+        IF(locker = #{vo.adminName}, -1, 5) reviewOperation1,
+        review_remark reviewRemark,
+        application_information applicationInformation,
+        creator,
+        created_time createdTime,
+        updater,
+        updated_time updatedTime
+        from
+        agent_info_modify_review
+        <where>
+            <if test="vo.applyStartTime != null">
+                AND application_time <![CDATA[ >= ]]> #{vo.applyStartTime}
+            </if>
+            <if test="vo.applyEndTime != null">
+                AND application_time <![CDATA[ <= ]]> #{vo.applyEndTime}
+            </if>
+            <if test="vo.firstFinishStartTime != null">
+                AND first_review_time <![CDATA[ >= ]]> #{vo.firstFinishStartTime}
+            </if>
+            <if test="vo.firstFinishEndTime != null">
+                AND first_review_time <![CDATA[ <= ]]> #{vo.firstFinishEndTime}
+            </if>
+            <if test="vo.agentAccount != null and vo.agentAccount != ''">
+                AND agent_account = #{vo.agentAccount}
+            </if>
+            <if test="vo.agentType != null">
+                AND agent_type = #{vo.agentType}
+            </if>
+            <if test="vo.reviewOperation != null and vo.reviewOperation != ''">
+                AND review_operation = #{vo.reviewOperation}
+            </if>
+            <if test="vo.reviewStatus != null and vo.reviewStatus != ''">
+                AND review_status = #{vo.reviewStatus}
+            </if>
+            <if test="vo.applicant != null and vo.applicant != ''">
+                AND applicant = #{vo.applicant}
+            </if>
+            <if test="vo.firstInstance != null and vo.firstInstance != ''">
+                AND first_instance = #{vo.firstInstance}
+            </if>
+            <if test="vo.lockStatus != null and vo.lockStatus != ''">
+                AND lock_status = #{vo.lockStatus}
+            </if>
+            <if test="vo.agentReviewOrderNo != null and vo.agentReviewOrderNo != ''">
+                AND review_order_number = #{vo.agentReviewOrderNo}
+            </if>
+        </where>
+        <choose>
+            <when test="vo.orderField == 'applicationTime' and vo.orderType == 'asc'">
+                ORDER BY applicationTime asc
+            </when>
+            <when test="vo.orderField == 'applicationTime' and vo.orderType == 'desc'">
+                ORDER BY applicationTime desc
+            </when>
+
+            <when test="vo.orderField == 'firstReviewTime' and vo.orderType == 'asc'">
+                ORDER BY firstReviewTime asc
+            </when>
+            <when test="vo.orderField == 'firstReviewTime' and vo.orderType == 'desc'">
+                ORDER BY firstReviewTime desc
+            </when>
+
+            <otherwise>
+                ORDER BY reviewOperation1 ASC, review_operation ASC, review_status ASC, application_time ASC
+            </otherwise>
+        </choose>
+    </select>
+    <select id="selectUseCount" resultType="java.lang.Long">
+        select
+        count(id)
+        from
+        agent_info_modify_review
+        where
+        site_code = #{siteCode}
+        and review_application_type = #{code}
+        and review_status in
+        <foreach collection="reviewStatusArr" separator="," open="(" close=")" item="reviewStatus">
+            #{reviewStatus}
+        </foreach>
+        and
+        FIND_IN_SET(#{afterValue}, after_modification)>0
+    </select>
+</mapper>

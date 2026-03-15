@@ -1,0 +1,2 @@
+com.cloud.baowang.common.excel.handler.SimpleCellWriteHandler
+com.cloud.baowang.common.excel.handler.SimpleSheetWriteHandler

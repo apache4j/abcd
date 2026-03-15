@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.play.repositories.TransferRecordDetailRepository">
+    <select id="queryUnConfirmErrorOrder"
+            resultType="com.cloud.baowang.play.api.vo.transferRecordVO.DbSportTransferRecordDetailVO">
+        SELECT tr.trans_id, de.*
+        FROM db_sport_transfer_record tr
+                 INNER JOIN db_sport_transfer_record_detail de ON de.bet_id = tr.bet_id
+        where tr.venue_code = 'DB_PANDA_SPORT'
+          AND tr.venue_code = de.venue_code
+          AND tr.order_status = de.order_status
+          AND tr.transfer_type = de.transfer_type
+          AND tr.amount = de.amount
+          and de.type = 0
+          AND tr.amount > 0
+          AND de.settle_count <![CDATA[ < ]]>  3
+        -- 当前时间 大于 created_time + 3分钟 且 小于 created_time + 1小时
+        AND UNIX_TIMESTAMP(NOW(3)) * 1000 <![CDATA[ > ]]> tr.created_time + 3 * 60 * 1000
+        AND UNIX_TIMESTAMP(NOW(3)) * 1000 <![CDATA[ < ]]> tr.created_time + 60 * 60 * 1000
+        LIMIT 100;
+
+
+    </select>
+</mapper>

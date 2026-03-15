@@ -1,0 +1,3202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.wallet.repositories.UserDepositWithdrawalRepository">
+
+    <select id="getAllUserDepositRecordPage"
+            resultType="com.cloud.baowang.wallet.api.vo.fundadjust.UserDepositRecordResponseVO">
+        SELECT
+        a.order_no orderNo,
+        a.site_code siteCode,
+        a.user_account userAccount,
+        a.device_type deviceType,
+        a.status ,
+        a.customer_status customerStatus,
+        a.apply_ip applyIp,
+        a.device_no deviceNo,
+        a.apply_amount applyAmount,
+        a.currency_code currencyCode,
+        a.exchange_rate exchangeRate,
+        a.arrive_amount tradeCurrencyAmount,
+        a.created_time createdTime,
+        a.updated_time updatedTime,
+        a.remark,
+        a.cash_flow_remark as cashFlowRemark,
+        a.deposit_withdraw_name AS depositWithdrawName
+        FROM user_deposit_withdrawal a
+        <where>
+            AND a.type = 1
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                and a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.finishStartTime != null">
+                and a.updated_time <![CDATA[ >= ]]> #{vo.finishStartTime}
+            </if>
+            <if test="vo.finishEndTime != null">
+                and a.updated_time <![CDATA[ <= ]]> #{vo.finishEndTime}
+            </if>
+            <if test="vo.depositWithdrawChannelCode != null and vo.depositWithdrawChannelCode != ''">
+                and a.deposit_withdraw_channel_code = #{vo.depositWithdrawChannelCode}
+            </if>
+            <if test="vo.depositWithdrawChannelName != null and vo.depositWithdrawChannelName != ''">
+                and a.deposit_withdraw_channel_name = #{vo.depositWithdrawChannelName}
+            </if>
+            <if test="vo.createStartTime != null">
+                AND a.created_time <![CDATA[ >= ]]> #{vo.createStartTime}
+            </if>
+            <if test="vo.createEndTime != null">
+                AND a.created_time <![CDATA[ <= ]]> #{vo.createEndTime}
+            </if>
+            <if test="vo.orderNo != null and vo.orderNo != ''">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.userAccount != null and vo.userAccount != ''">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.deviceType != null">
+                AND a.device_type = #{vo.deviceType}
+            </if>
+            <if test="vo.currencyCode != null and vo.currencyCode != ''">
+                and a.currency_code = #{vo.currencyCode}
+            </if>
+            <if test="vo.applyIp != null and vo.applyIp != ''">
+                AND a.apply_ip = #{vo.applyIp}
+            </if>
+            <if test="vo.status != null">
+                AND a.status = #{vo.status}
+            </if>
+            <if test="vo.customerStatus != null">
+                and a.customer_status = #{vo.customerStatus}
+            </if>
+
+            <if test="vo.depositWithdrawWay != null and vo.depositWithdrawWay != ''">
+                AND a.deposit_withdraw_way_id IN
+                <foreach item="item" index="index" collection="vo.depositWithdrawWay.split(',')" open="(" separator=","
+                         close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+        </where>
+        ORDER BY a.created_time DESC
+    </select>
+    <select id="getUserDepositRecordPage"
+            resultType="com.cloud.baowang.wallet.api.vo.fundadjust.UserDepositRecordResponseVO">
+        SELECT
+        a.order_no orderNo,
+        a.site_code siteCode,
+        a.user_account userAccount,
+        a.device_type deviceType,
+        a.status ,
+        a.customer_status customerStatus,
+        a.apply_ip applyIp,
+        a.device_no deviceNo,
+        a.apply_amount applyAmount,
+        a.currency_code currencyCode,
+        a.exchange_rate exchangeRate,
+        a.trade_currency_amount tradeCurrencyAmount,
+        a.created_time createdTime,
+        a.updated_time updatedTime,
+        a.pay_audit_time as payAuditTime,
+        a.deposit_withdraw_way as depositWithdrawWay,
+        a.deposit_withdraw_channel_name as depositWithdrawChannelName,
+        a.device_no as deviceNo,
+        a.arrive_amount as arriveAmount,
+        a.remark,
+        a.recharge_withdraw_time_consuming as rechargeWithdrawTimeConsuming,
+        a.cash_flow_file as cashFlowFile,
+        a.file_key as fileKey,
+        a.cash_flow_remark as cashFlowRemark,
+        a.deposit_withdraw_name AS depositWithdrawName
+        FROM user_deposit_withdrawal a
+        <where>
+            AND a.type = 1
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                and a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.finishStartTime != null">
+                and a.updated_time <![CDATA[ >= ]]> #{vo.finishStartTime}
+            </if>
+            <if test="vo.finishEndTime != null">
+                and a.updated_time <![CDATA[ <= ]]> #{vo.finishEndTime}
+            </if>
+            <if test="vo.depositWithdrawChannelCode != null and vo.depositWithdrawChannelCode != ''">
+                and a.deposit_withdraw_channel_code = #{vo.depositWithdrawChannelCode}
+            </if>
+            <if test="vo.depositWithdrawChannelName != null and vo.depositWithdrawChannelName != ''">
+                and a.deposit_withdraw_channel_name = #{vo.depositWithdrawChannelName}
+            </if>
+            <if test="vo.createStartTime != null">
+                AND a.created_time <![CDATA[ >= ]]> #{vo.createStartTime}
+            </if>
+            <if test="vo.createEndTime != null">
+                AND a.created_time <![CDATA[ <= ]]> #{vo.createEndTime}
+            </if>
+            <if test="vo.orderNo != null and vo.orderNo != ''">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.userAccount != null and vo.userAccount != ''">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.deviceType != null">
+                AND a.device_type = #{vo.deviceType}
+            </if>
+            <if test="vo.currencyCode != null and vo.currencyCode != ''">
+                and a.currency_code = #{vo.currencyCode}
+            </if>
+            <if test="vo.applyIp != null and vo.applyIp != ''">
+                AND a.apply_ip = #{vo.applyIp}
+            </if>
+            <if test="vo.status != null">
+                AND a.status = #{vo.status}
+            </if>
+            <if test="vo.customerStatus != null">
+                and a.customer_status = #{vo.customerStatus}
+            </if>
+
+            <if test="vo.depositWithdrawWay != null and vo.depositWithdrawWay != ''">
+                AND a.deposit_withdraw_way_id IN
+                <foreach item="item" index="index" collection="vo.depositWithdrawWay.split(',')" open="(" separator=","
+                         close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        <choose>
+            <when test="vo.orderField != null and vo.orderField != ''">
+                <choose>
+                    <when test="vo.orderField == 'payAuditTime' and vo.orderType == 'asc'">
+                        order by a.pay_audit_time asc
+                    </when>
+                    <when test="vo.orderField == 'payAuditTime' and vo.orderType == 'desc'">
+                        order by a.pay_audit_time desc
+                    </when>
+                </choose>
+            </when>
+            <otherwise>
+                order by a.created_time desc
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="getUserDepositRecordPageCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM user_deposit_withdrawal a
+        <where>
+            AND a.type = 1
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                and a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.finishStartTime != null">
+                and a.updated_time <![CDATA[ >= ]]> #{vo.finishStartTime}
+            </if>
+            <if test="vo.finishEndTime != null">
+                and a.updated_time <![CDATA[ <= ]]> #{vo.finishEndTime}
+            </if>
+            <if test="vo.depositWithdrawChannelCode != null and vo.depositWithdrawChannelCode != ''">
+                and a.deposit_withdraw_channel_code = #{vo.depositWithdrawChannelCode}
+            </if>
+            <if test="vo.depositWithdrawChannelName != null and vo.depositWithdrawChannelName != ''">
+                and a.deposit_withdraw_channel_name = #{vo.depositWithdrawChannelName}
+            </if>
+            <if test="vo.createStartTime != null">
+                AND a.created_time <![CDATA[ >= ]]> #{vo.createStartTime}
+            </if>
+            <if test="vo.createEndTime != null">
+                AND a.created_time <![CDATA[ <= ]]> #{vo.createEndTime}
+            </if>
+            <if test="vo.orderNo != null and vo.orderNo != ''">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.userAccount != null and vo.userAccount != ''">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.deviceType != null">
+                AND a.device_type = #{vo.deviceType}
+            </if>
+            <if test="vo.currencyCode != null and vo.currencyCode != ''">
+                and a.currency_code = #{vo.currencyCode}
+            </if>
+            <if test="vo.applyIp != null and vo.applyIp != ''">
+                AND a.apply_ip = #{vo.applyIp}
+            </if>
+            <if test="vo.status != null">
+                AND a.status = #{vo.status}
+            </if>
+            <if test="vo.customerStatus != null">
+                and a.customer_status = #{vo.customerStatus}
+            </if>
+
+            <if test="vo.depositWithdrawWay != null and vo.depositWithdrawWay != ''">
+                AND a.deposit_withdraw_way_id IN
+                <foreach item="item" index="index" collection="vo.depositWithdrawWay.split(',')" open="(" separator=","
+                         close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY a.created_time DESC
+    </select>
+    <select id="withdrawalRecordPageList"
+            resultType="com.cloud.baowang.wallet.po.UserDepositWithdrawalPO">
+        SELECT
+        a.id,
+        a.site_code siteCode,
+        a.order_no orderNo,
+        a.user_account userAccount,
+        a.device_type deviceType,
+        a.status,
+        a.device_no deviceNo,
+        a.customer_status customerStatus,
+        a.apply_ip applyIp,
+        a.apply_amount applyAmount,
+        a.deposit_withdraw_type_id depositWithdrawTypeId,
+        a.deposit_withdraw_type_code depositWithdrawTypeCode,
+        a.deposit_withdraw_way_id depositWithdrawWayId,
+        a.deposit_withdraw_way depositWithdrawWay,
+        a.deposit_withdraw_channel_name depositWithdrawChannelName,
+        a.deposit_withdraw_address depositWithdrawAddress,
+        a.currency_code currencyCode,
+        a.trade_currency_amount tradeCurrencyAmount,
+        a.exchange_rate exchangeRate,
+        a.account_type accountType,
+        a.account_branch accountBranch,
+        a.deposit_withdraw_address depositWithdrawAddress,
+        a.deposit_withdraw_name depositWithdrawName,
+        a.deposit_withdraw_surname depositWithdrawSurname,
+        a.area_code areaCode,
+        a.telephone,
+        a.email,
+        a.cpf,
+        a.address,
+        a.province,
+        a.city,
+        a.postal_code postalCode,
+        a.country,
+        a.ifsc_code ifscCode,
+        a.is_big_money isBigMoney,
+        a.is_first_out isFirstOut,
+        a.created_time createdTime,
+        a.updated_time updatedTime,
+        a.remark,
+        a.collect_info collectInfo,
+        a.fee_amount as feeAmount,
+        a.arrive_amount as arriveAmount,
+        a.pay_audit_user as payAuditUser,
+        a.pay_audit_time AS payAuditTime,
+        a.recharge_withdraw_time_consuming as rechargeWithdrawTimeConsuming,
+        a.cpf as cpf
+        FROM user_deposit_withdrawal a
+        <where>
+            AND a.type = 2
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                and a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.customerStatus != null ">
+                and a.customer_status = #{vo.customerStatus}
+            </if>
+            <if test="vo.applyIp != null and vo.applyIp != '' ">
+                and a.apply_ip = #{vo.applyIp}
+            </if>
+            <if test="vo.deviceName != null and vo.deviceName != ''">
+                and a.device_no = #{vo.deviceName}
+            </if>
+            <if test="vo.createStartTime != null and vo.createStartTime !=''">
+                and a.created_time <![CDATA[ >= ]]> #{vo.createStartTime}
+            </if>
+            <if test="vo.createEndTime != null and vo.createEndTime !=''">
+                and a.created_time <![CDATA[ <= ]]> #{vo.createEndTime}
+            </if>
+            <if test="vo.depositWithdrawChannelCode != null and vo.depositWithdrawChannelCode != ''">
+                and a.deposit_withdraw_channel_code = #{vo.depositWithdrawChannelCode}
+            </if>
+            <if test="vo.depositWithdrawChannelName != null and vo.depositWithdrawChannelName != ''">
+                and a.deposit_withdraw_channel_name = #{vo.depositWithdrawChannelName}
+            </if>
+            <if test="vo.finishStartTime != null and vo.finishStartTime !=''">
+                AND a.updated_time <![CDATA[ >= ]]> #{vo.finishStartTime}
+            </if>
+            <if test="vo.finishEndTime != null and vo.finishEndTime !=''">
+                AND a.updated_time <![CDATA[ <= ]]> #{vo.finishEndTime}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.currencyCode != '' and vo.currencyCode != null">
+                AND a.currency_code = #{vo.currencyCode}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+
+            <if test="vo.deviceType != '' and vo.deviceType != null">
+                AND a.device_type = #{vo.deviceType}
+            </if>
+            <if test="vo.status != null">
+                AND a.status = #{vo.status}
+            </if>
+            <if test="vo.isBigMoney != null">
+                AND a.is_big_money = #{vo.isBigMoney}
+            </if>
+            <if test="vo.isFirstOut != null">
+                AND a.is_first_out = #{vo.isFirstOut}
+            </if>
+            <if test="vo.depositWithdrawWay != null and vo.depositWithdrawWay != ''">
+                AND a.deposit_withdraw_way_id IN
+                <foreach item="item" index="index" collection="vo.depositWithdrawWay.split(',')" open="(" separator=","
+                         close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        <choose>
+            <when test="vo.orderField != null and vo.orderField != ''">
+                <choose>
+                    <when test="vo.orderField == 'payAuditTime' and vo.orderType == 'asc'">
+                        order by a.pay_audit_time asc
+                    </when>
+                    <when test="vo.orderField == 'payAuditTime' and vo.orderType == 'desc'">
+                        order by a.pay_audit_time desc
+                    </when>
+                </choose>
+            </when>
+            <otherwise>
+                order by a.created_time desc
+            </otherwise>
+        </choose>
+    </select>
+    <select id="withdrawalRecordTotalList"
+            resultType="com.cloud.baowang.wallet.api.vo.userWithdrawRecord.UserWithdrawRecordVO">
+        SELECT
+        a.id,
+        a.site_code siteCode,
+        a.order_no orderNo,
+        a.user_account userAccount,
+        a.device_type deviceType,
+        a.status,
+        a.customer_status customerStatus,
+        a.apply_ip applyIp,
+        a.apply_amount applyAmount,
+        a.deposit_withdraw_type_id depositWithdrawTypeId,
+        a.deposit_withdraw_type_code depositWithdrawTypeCode,
+        a.deposit_withdraw_way_id depositWithdrawWayId,
+        a.deposit_withdraw_way depositWithdrawWay,
+        a.currency_code currencyCode,
+        a.trade_currency_amount tradeCurrencyAmount,
+        a.exchange_rate exchangeRate,
+        a.account_type accountType,
+        a.account_branch accountBranch,
+        a.deposit_withdraw_address depositWithdrawAddress,
+        a.deposit_withdraw_name depositWithdrawName,
+        a.deposit_withdraw_surname depositWithdrawSurname,
+        a.area_code areaCode,
+        a.telephone,
+        a.email,
+        a.cpf,
+        a.address,
+        a.province,
+        a.city,
+        a.postal_code,
+        a.country,
+        a.is_big_money isBigMoney,
+        a.is_first_out isFirstOut,
+        a.created_time createdTime,
+        a.updated_time updatedTime,
+        a.remark,
+        a.fee_amount as feeAmount,
+        a.arrive_amount as arriveAmount,
+        a.collect_info collectInfo,
+        a.cpf as cpf
+        FROM user_deposit_withdrawal a
+        <where>
+            AND a.type = 2
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                and a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.createStartTime != null and vo.createStartTime !=''">
+                and a.created_time <![CDATA[ >= ]]> #{vo.createStartTime}
+            </if>
+            <if test="vo.createEndTime != null and vo.createEndTime !=''">
+                and a.created_time <![CDATA[ <= ]]> #{vo.createEndTime}
+            </if>
+            <if test="vo.depositWithdrawChannelName != null and vo.depositWithdrawChannelName != ''">
+                and a.deposit_withdraw_channel_name = #{vo.depositWithdrawChannelName}
+            </if>
+            <if test="vo.finishStartTime != null and vo.finishStartTime !=''">
+                AND a.updated_time <![CDATA[ >= ]]> #{vo.finishStartTime}
+            </if>
+            <if test="vo.finishEndTime != null and vo.finishEndTime !=''">
+                AND a.updated_time <![CDATA[ <= ]]> #{vo.finishEndTime}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.currencyCode != '' and vo.currencyCode != null">
+                AND a.currency_code = #{vo.currencyCode}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+
+            <if test="vo.deviceType != '' and vo.deviceType != null">
+                AND a.device_type = #{vo.deviceType}
+            </if>
+            <if test="vo.status != null">
+                AND a.status = #{vo.status}
+            </if>
+            <if test="vo.isBigMoney != null">
+                AND a.is_big_money = #{vo.isBigMoney}
+            </if>
+            <if test="vo.isFirstOut != null">
+                AND a.is_first_out = #{vo.isFirstOut}
+            </if>
+            <if test="vo.depositWithdrawWay != null and vo.depositWithdrawWay != ''">
+                AND a.deposit_withdraw_way_id IN
+                <foreach item="item" index="index" collection="vo.depositWithdrawWay.split(',')" open="(" separator=","
+                         close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY a.created_time DESC
+    </select>
+
+    <select id="withdrawalRecordPageCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM user_deposit_withdrawal a
+        <where>
+            AND a.type = 2
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                and a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.customerStatus != null ">
+                and a.customer_status = #{vo.customerStatus}
+            </if>
+            <if test="vo.applyIp != null and vo.applyIp != '' ">
+                and a.apply_ip = #{vo.applyIp}
+            </if>
+            <if test="vo.deviceName != null and vo.deviceName != ''">
+                and a.device_no = #{vo.deviceName}
+            </if>
+            <if test="vo.createStartTime != null and vo.createStartTime !=''">
+                and a.created_time <![CDATA[ >= ]]> #{vo.createStartTime}
+            </if>
+            <if test="vo.createEndTime != null and vo.createEndTime !=''">
+                and a.created_time <![CDATA[ <= ]]> #{vo.createEndTime}
+            </if>
+            <if test="vo.depositWithdrawChannelCode != null and vo.depositWithdrawChannelCode != ''">
+                and a.deposit_withdraw_channel_code = #{vo.depositWithdrawChannelCode}
+            </if>
+            <if test="vo.depositWithdrawChannelName != null and vo.depositWithdrawChannelName != ''">
+                and a.deposit_withdraw_channel_name = #{vo.depositWithdrawChannelName}
+            </if>
+            <if test="vo.finishStartTime != null">
+                AND a.updated_time <![CDATA[ >= ]]> #{vo.finishStartTime}
+            </if>
+            <if test="vo.finishEndTime != null">
+                AND a.updated_time <![CDATA[ <= ]]> #{vo.finishEndTime}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.currencyCode != '' and vo.currencyCode != null">
+                AND a.currency_code = #{vo.currencyCode}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+
+            <if test="vo.deviceType != '' and vo.deviceType != null">
+                AND a.device_type = #{vo.deviceType}
+            </if>
+            <if test="vo.status != null">
+                AND a.status = #{vo.status}
+            </if>
+            <if test="vo.isBigMoney != null">
+                AND a.is_big_money = #{vo.isBigMoney}
+            </if>
+            <if test="vo.isFirstOut != null">
+                AND a.is_first_out = #{vo.isFirstOut}
+            </if>
+            <if test="vo.depositWithdrawWay != null and vo.depositWithdrawWay != ''">
+                AND a.deposit_withdraw_way_id IN
+                <foreach item="item" index="index" collection="vo.depositWithdrawWay.split(',')" open="(" separator=","
+                         close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="vo.areaCode != '' and vo.areaCode != null">
+                AND a.area_code = #{vo.areaCode}
+            </if>
+            <if test="vo.telephone != '' and vo.telephone != null">
+                AND a.telephone = #{vo.telephone}
+            </if>
+            <if test="vo.email != '' and vo.email != null">
+                AND a.email = #{vo.email}
+            </if>
+        </where>
+    </select>
+    <select id="withdrawReviewPage"
+            resultType="com.cloud.baowang.wallet.api.vo.userWithdrawRecord.UserWithdrawReviewPageResVO">
+        SELECT
+        a.id ,
+        a.site_code siteCode,
+        a.order_no orderNo,
+        a.user_id userId,
+        a.user_account userAccount,
+        a.device_type deviceType,
+        a.status ,
+        a.customer_status customerStatus,
+        a.apply_ip applyIp,
+        a.apply_amount applyAmount,
+        a.deposit_withdraw_type_id depositWithdrawType,
+        a.deposit_withdraw_type_code depositWithdrawTypeCode,
+        a.deposit_withdraw_way_id depositWithdrawWayId,
+        a.deposit_withdraw_way depositWithdrawWay,
+        a.currency_code currencyCode,
+        a.deposit_withdraw_address AS  depositWithdrawAddress,
+        a.trade_currency_amount tradeCurrencyAmount,
+        a.exchange_rate exchangeRate,
+        a.is_big_money isBigMoney,
+        a.is_first_out isFirstOut,
+        a.created_time createdTime,
+        a.updated_time updatedTime,
+        a.remark ,
+        a.locker ,
+        a.lock_status lockStatus,
+        a.lock_time lockTime,
+        IF(a.locker = #{vo.operator}, -1, 1) lockStatus1,
+        a.pay_process_status payProcessStatus,
+        a.device_no as deviceNo,
+        a.cpf as cpf
+        FROM user_deposit_withdrawal a
+        <where>
+            AND a.type = 2
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                and a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.reviewOperation != null">
+                and a.review_operation = #{vo.reviewOperation}
+            </if>
+            <if test="vo.applyTimeStart != null">
+                AND a.created_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.created_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.orderNo != null and vo.orderNo != ''">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.currencyCode != null and vo.currencyCode !=''">
+                AND a.currency_code = #{vo.currencyCode}
+            </if>
+            <if test="vo.lockStatus != null and vo.lockStatus !=''">
+                AND a.lock_status = #{vo.lockStatus}
+            </if>
+            <if test="vo.auditUser != '' and vo.auditUser != null">
+                AND a.locker = #{vo.auditUser}
+            </if>
+        </where>
+        ORDER BY lockStatus1 ASC, a.lock_status desc, a.created_time ASC
+    </select>
+    <select id="withdrawalReviewRecordPageList"
+            resultType="com.cloud.baowang.wallet.api.vo.userWithdrawRecord.UserWithdrawReviewRecordVO">
+        SELECT
+
+        a.id,
+        a.order_no orderNo,
+        a.user_account userAccount,
+        a.status,
+        a.review_operation reviewOperation,
+        a.is_big_money isBigMoney,
+        a.is_first_out isFirstOut,
+        a.apply_amount applyAmount,
+        a.deposit_withdraw_type_id depositWithdrawTypeId,
+        a.deposit_withdraw_type_code depositWithdrawTypeCode,
+        a.deposit_withdraw_way_id depositWithdrawWayId,
+        a.fee_amount feeAmount,
+        a.deposit_withdraw_way depositWithdrawWay,
+        a.deposit_withdraw_channel_type as depositWithdrawChannelType,
+        a.deposit_withdraw_channel_name as depositWithdrawChannelName,
+        a.currency_code currencyCode,
+        a.deposit_withdraw_address AS  depositWithdrawAddress,
+        a.trade_currency_amount tradeCurrencyAmount,
+        a.exchange_rate exchangeRate,
+        a.created_time createdTime,
+        a.updated_time updatedTime,
+        a.remark
+        FROM user_deposit_withdrawal a
+        <where>
+            and a.site_code = #{vo.siteCode}
+            AND a.type = 2
+            AND a.review_operation = #{vo.reviewOperation}
+            <if test="vo.currencyCode != '' and vo.currencyCode != null">
+                AND a.currency_code = #{vo.currencyCode}
+            </if>
+            <if test="vo.applyTimeStart != null">
+                AND a.created_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.created_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.depositWithdrawAddress != null and vo.depositWithdrawAddress != ''">
+                AND a.deposit_withdraw_address = #{vo.depositWithdrawAddress}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.status != null and vo.status !=''">
+                AND a.status = #{vo.status}
+            </if>
+        </where>
+        ORDER BY a.created_time DESC
+
+    </select>
+    <select id="withdrawalReviewRecordPageCount" resultType="java.lang.Long">
+
+        SELECT
+        count(1)
+        FROM user_deposit_withdrawal a
+        <where>
+            and a.site_code = #{vo.siteCode}
+            AND a.type = 2
+            AND a.review_operation = #{vo.reviewOperation}
+            <if test="vo.currencyCode != '' and vo.currencyCode != null">
+                AND a.currency_code = #{vo.currencyCode}
+            </if>
+            <if test="vo.applyTimeStart != null">
+                AND a.created_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.created_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.status != null and vo.status !=''">
+                AND a.status = #{vo.status}
+            </if>
+        </where>
+        ORDER BY a.created_time DESC
+    </select>
+
+
+    <select id="manualConfirmMemberWithdrawPage"
+            resultType="com.cloud.baowang.wallet.api.vo.financeconfirm.FinanceManualConfirmVO">
+        SELECT
+        udw.id id,
+        udwa.audit_user auditUser,
+        udw.order_no orderNo,
+        udw.user_account userAccount,
+        udw.user_register userRegister,
+        udw.apply_amount applyAmount,
+        udw.account_type accountType,
+        udw.account_branch accountBranch,
+        udw.deposit_withdraw_address depositWithdrawAddress,
+        udw.deposit_withdraw_name depositWithdrawName,
+        udw.deposit_withdraw_type depositWithdrawType,
+        udw.deposit_withdraw_method depositWithdrawMethod,
+        udw.currency_code currencyCode,
+        udw.trade_currency_amount tradeCurrencyAmount,
+        udw.exchange_rate exchangeRate,
+        udw.created_time applyTime,
+        udw.status status,
+        udw.locker locker,
+        udw.lock_status lockStatus
+        FROM user_deposit_withdrawal udw
+        Left Join user_deposit_withdrawal_audit udwa
+        ON udw.order_no = udwa.order_no AND udwa.num = 4
+        <where>
+            udw.type = 2
+            AND udw.deposit_withdraw_channel = 1
+            AND udw.status in (11,12)
+            <if test="vo.applyStartTime != null">
+                AND udw.created_time <![CDATA[ >= ]]> #{vo.applyStartTime}
+            </if>
+            <if test="vo.applyEndTime != null">
+                AND udw.created_time <![CDATA[ <= ]]> #{vo.applyEndTime}
+            </if>
+            <if test="vo.orderNo != null and vo.orderNo != ''">
+                AND udw.order_no = #{vo.orderNo}
+            </if>
+
+            <if test="vo.lockStatus != null and vo.lockStatus != ''">
+                AND udw.lock_status = #{vo.lockStatus}
+            </if>
+            <if test="vo.auditUser != null and vo.auditUser != ''">
+                AND udwa.audit_user = #{vo.auditUser}
+            </if>
+            <if test="vo.userAccount != null and vo.userAccount != ''">
+                AND udw.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.userRegister != null and vo.userRegister != ''">
+                AND udw.user_register = #{vo.userRegister}
+            </if>
+            <if test="vo.depositWithdrawType != null and vo.depositWithdrawType != ''">
+                AND udw.deposit_withdraw_type = #{vo.depositWithdrawType}
+            </if>
+            <if test="vo.depositWithdrawMethods != null and vo.depositWithdrawMethods.size > 0">
+                AND udw.deposit_withdraw_method IN
+                <foreach collection="vo.depositWithdrawMethods" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.currencyCode != null and vo.currencyCode != ''">
+                AND udw.currency_code = #{vo.currencyCode}
+            </if>
+        </where>
+        ORDER BY udw.created_time DESC
+    </select>
+
+    <select id="manualConfirmMemberWithdrawRecPage"
+            resultType="com.cloud.baowang.wallet.api.vo.financeconfirm.FinanceManualConfirmRecordVO">
+        SELECT
+        udw.id id,
+        udw.order_no orderNo,
+        udw.user_account userAccount,
+        udw.user_register userRegister,
+        udw.status status,
+        udw.apply_amount applyAmount,
+        udw.arrive_amount arriveAmount,
+        udw.created_time applyTime,
+        udwa.audit_user auditUser,
+        udwa.audit_time auditTime,
+        udwa.audit_time_consuming auditTimeConsuming,
+        udwa.audit_info auditInfo
+        FROM user_deposit_withdrawal udw
+        Left Join user_deposit_withdrawal_audit udwa
+        ON udw.order_no = udwa.order_no AND udwa.num = 4
+        <where>
+            udw.type = 2
+            AND udw.deposit_withdraw_channel = 1
+            AND udw.status  <![CDATA[ > ]]> 11
+            <if test="vo.applyStartTime != null">
+                AND udw.created_time <![CDATA[ >= ]]> #{vo.applyStartTime}
+            </if>
+            <if test="vo.applyEndTime != null">
+                AND udw.created_time <![CDATA[ <= ]]> #{vo.applyEndTime}
+            </if>
+            <if test="vo.orderNo != null and vo.orderNo != ''">
+                AND udw.order_no = #{vo.orderNo}
+            </if>
+
+            <if test="vo.userAccount != null and vo.userAccount != ''">
+                AND udw.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.userRegister != null and vo.userRegister != ''">
+                AND udw.user_register = #{vo.userRegister}
+            </if>
+            <if test="vo.status != null and vo.status != ''">
+                AND udw.status = #{vo.status}
+            </if>
+        </where>
+        ORDER BY udw.created_time DESC
+    </select>
+
+    <select id="manualConfirmMemberWithdrawRecCount"
+            resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM user_deposit_withdrawal udw
+        Left Join user_deposit_withdrawal_audit udwa
+        ON udw.order_no = udwa.order_no AND udwa.num = 4
+        <where>
+            udw.type = 2
+            AND udw.deposit_withdraw_channel = 1
+            AND udw.status  <![CDATA[ > ]]> 11
+            <if test="vo.applyStartTime != null">
+                AND udw.created_time <![CDATA[ >= ]]> #{vo.applyStartTime}
+            </if>
+            <if test="vo.applyEndTime != null">
+                AND udw.created_time <![CDATA[ <= ]]> #{vo.applyEndTime}
+            </if>
+            <if test="vo.orderNo != null and vo.orderNo != ''">
+                AND udw.order_no = #{vo.orderNo}
+            </if>
+
+            <if test="vo.userAccount != null and vo.userAccount != ''">
+                AND udw.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.userRegister != null and vo.userRegister != ''">
+                AND udw.user_register = #{vo.userRegister}
+            </if>
+            <if test="vo.status != null and vo.status != ''">
+                AND udw.status = #{vo.status}
+            </if>
+        </where>
+
+    </select>
+
+    <select id="getUserFundsListByAgent"
+            resultType="com.cloud.baowang.wallet.api.vo.agent.WalletAgentSubLineResVO"
+            parameterType="com.cloud.baowang.wallet.api.vo.agent.WalletAgentSubLineReqVO">
+        select agent_account as agentAccount,
+        IFNULL(sum(fee_amount), 0) as feeAmount,
+        IFNULL(sum(arrive_amount), 0) as amount,
+        currency_code as currency
+        from user_deposit_withdrawal
+        where status = 101
+        <if test="vo.fundsOperateType != null and vo.fundsOperateType != ''">
+            AND type = #{vo.fundsOperateType}
+        </if>
+        <if test="vo.currency != null and vo.currency != ''">
+            AND currency_code = #{vo.currency}
+        </if>
+        <if test="vo.agentAccountList != null and vo.agentAccountList.size() > 0">
+            AND agent_account IN
+            <foreach collection="vo.agentAccountList" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        and updated_time <![CDATA[ >= ]]> #{vo.startTime}
+        and updated_time <![CDATA[ <= ]]> #{vo.endTime}
+        group by agent_account, currency_code
+    </select>
+
+    <select id="getDepositStatisticsByAgentId"
+            resultType="com.cloud.baowang.wallet.api.vo.agent.GetDepositStatisticsByAgentIdVO">
+        SELECT
+        aa.myDay ,
+        aa.currencyCode,
+        IFNULL(sum( aa.depositAmount ), 0) depositAmount,
+        IFNULL(sum( aa.withdrawAmount ), 0) withdrawAmount
+        FROM (
+        SELECT
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(updated_time/1000), @@session.time_zone, #{dbZone}), '%Y-%m-%d') myDay,
+        currency_code currencyCode,
+        IFNULL(sum( arrive_amount ), 0) depositAmount,
+        IFNULL(sum( apply_amount ), 0) withdrawAmount
+        FROM
+        user_deposit_withdrawal
+        <where>
+            <if test="siteCode != null and siteCode != ''">
+                and site_code = #{siteCode}
+            </if>
+            <if test="type != null">
+                AND `type` = #{type}
+            </if>
+            <if test="currencyCode != null and currencyCode!='WTC' ">
+                AND `currency_code` = #{currencyCode}
+            </if>
+            AND `status` = 101
+            AND customer_status = 1
+            <if test="agentId != null">
+                AND agent_id = #{agentId}
+            </if>
+            <if test="start != null">
+                AND updated_time <![CDATA[ >= ]]> #{start}
+            </if>
+            <if test="end != null">
+                AND updated_time <![CDATA[ <= ]]> #{end}
+            </if>
+        </where>
+        GROUP BY myDay,currency_code
+
+        UNION ALL
+
+        SELECT
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(updated_time/1000), @@session.time_zone, #{dbZone}), '%Y-%m-%d') myDay,
+        currency_code currencyCode,
+        IFNULL(sum( adjust_amount ), 0) depositAmount,
+        IFNULL(sum( adjust_amount ), 0) withdrawAmount
+        FROM
+        user_manual_up_down_record
+        <where>
+            <if test="type != null">
+                <if test="type == 1">
+                    AND `adjust_way` = 1
+                    AND `adjust_type` in (4)
+                </if>
+                <if test="type == 2">
+                    AND `adjust_way` = 2
+                    AND `adjust_type` in (4)
+                </if>
+            </if>
+            <if test="currencyCode != null and currencyCode!='WTC' ">
+                AND `currency_code` = #{currencyCode}
+            </if>
+            <if test="agentId != null">
+                AND agent_id = #{agentId}
+            </if>
+            <if test="start != null">
+                AND updated_time <![CDATA[ >= ]]> #{start}
+            </if>
+            <if test="end != null">
+                AND updated_time <![CDATA[ <= ]]> #{end}
+            </if>
+        </where>
+        GROUP BY myDay,currency_code
+
+        <if test="type != null">
+            <if test="type == 1">
+                UNION ALL
+
+                SELECT
+                DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(deposit_time/1000), @@session.time_zone, #{dbZone}), '%Y-%m-%d') as
+                myDay,
+                currency_code as currencyCode,
+                IFNULL(sum( amount ), 0) depositAmount,
+                0 withdrawAmount
+                FROM
+                agent_deposit_subordinates
+                <where>
+                    <if test="agentId != null">
+                        AND agent_id = #{agentId}
+                    </if>
+                    <if test="currencyCode != null and currencyCode!='WTC'  ">
+                        AND currency_code = #{currencyCode}
+                    </if>
+                    <if test="start != null">
+                        AND deposit_time <![CDATA[ >= ]]> #{start}
+                    </if>
+                    <if test="end != null">
+                        AND deposit_time <![CDATA[ <= ]]> #{end}
+                    </if>
+                </where>
+                GROUP BY myDay,currency_code
+            </if>
+        </if>
+        ) aa
+        GROUP BY aa.myDay,aa.currencyCode
+    </select>
+
+    <select id="getDepositStatisticsBySiteCode" resultType="com.cloud.baowang.wallet.api.vo.site.GetDepositStatisticsBySiteCodeVO">
+        SELECT
+            aa.myDay myDay,
+            aa.currencyCode,
+            IFNULL(sum( aa.depositAmount ), 0) depositAmount,
+            IFNULL(sum( aa.withdrawAmount ), 0) withdrawAmount
+        FROM (
+            SELECT
+                DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(updated_time/1000), @@session.time_zone, #{dbZone}), '%Y-%m-%d') myDay,
+                currency_code as currencyCode,
+                IFNULL(apply_amount, 0) depositAmount,
+                IFNULL(apply_amount, 0) withdrawAmount
+            FROM
+            user_deposit_withdrawal
+            <where>
+                <if test="siteCode != null and siteCode != ''">
+                    and site_code = #{siteCode}
+                </if>
+                <if test="type != null">
+                    AND `type` = #{type}
+                </if>
+                <if test="currencyCode != null and currencyCode != '' ">
+                    AND `currency_code` = #{currencyCode}
+                </if>
+                AND `status` = 101
+                <if test="start != null">
+                    AND updated_time <![CDATA[ >= ]]> #{start}
+                </if>
+                <if test="end != null">
+                    AND updated_time <![CDATA[ <= ]]> #{end}
+                </if>
+            </where>
+
+            UNION ALL
+
+            SELECT
+                DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(updated_time/1000), @@session.time_zone, #{dbZone}), '%Y-%m-%d') myDay,
+                currency_code as currencyCode,
+                IFNULL(CASE WHEN adjust_way = 1 THEN adjust_amount ELSE 0 END, 0) AS depositAmount,
+                IFNULL(CASE WHEN adjust_way = 2 THEN adjust_amount ELSE 0 END, 0) AS withdrawAmount
+            FROM
+                user_manual_up_down_record
+             <where>
+                <if test="type != null">
+                    <if test="type == 1">
+                        AND `adjust_way` = 1
+                        AND `adjust_type` in (4)
+                        and balance_change_status = 1
+                    </if>
+                    <if test="type == 2">
+                        AND `adjust_way` = 2
+                        AND `adjust_type` in (4)
+                        and balance_change_status = 1
+                    </if>
+                </if>
+
+                <if test="start != null">
+                    AND updated_time <![CDATA[ >= ]]> #{start}
+                </if>
+                <if test="end != null">
+                    AND updated_time <![CDATA[ <= ]]> #{end}
+                </if>
+                <if test="currencyCode != null and currencyCode != '' ">
+                    AND `currency_code` = #{currencyCode}
+                </if>
+                <if test="siteCode != null and siteCode != ''">
+                    and site_code = #{siteCode}
+                </if>
+
+            </where>
+
+            <if test="type != null">
+                <if test="type == 1">
+                    UNION ALL
+
+                    SELECT
+                        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(deposit_time/1000), @@session.time_zone, #{dbZone}), '%Y-%m-%d') myDay,
+                        currency_code as currencyCode,
+                        IFNULL(amount , 0) depositAmount,
+                        0 withdrawAmount
+                    FROM
+                    agent_deposit_subordinates
+                    <where>
+                        <if test="start != null">
+                            AND deposit_time <![CDATA[ >= ]]> #{start}
+                        </if>
+                        <if test="end != null">
+                            AND deposit_time <![CDATA[ <= ]]> #{end}
+                        </if>
+                        <if test="siteCode != null and siteCode != ''">
+                            and site_code = #{siteCode}
+                        </if>
+
+                        <if test="currencyCode != null and currencyCode != '' ">
+                            AND `currency_code` = #{currencyCode}
+                        </if>
+                    </where>
+                </if>
+            </if>
+        ) aa
+        GROUP BY aa.myDay,aa.currencyCode
+    </select>
+
+    <select id="getDepositWithdrawnUserCountBySiteCode" resultType="com.cloud.baowang.wallet.api.vo.site.GetDepositStatisticsBySiteCodeVO">
+        SELECT
+            aa.myDay myDay,
+            count(DISTINCT user_id) userCount
+        FROM (
+            SELECT
+                DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(updated_time/1000), @@session.time_zone, #{dbZone}), '%Y-%m-%d') myDay,
+                user_id
+            FROM
+                user_deposit_withdrawal
+            <where>
+                <if test="siteCode != null and siteCode != ''">
+                    and site_code = #{siteCode}
+                </if>
+                <if test="type != null">
+                    AND `type` = #{type}
+                </if>
+                AND `status` = 101
+                <if test="start != null">
+                    AND updated_time <![CDATA[ >= ]]> #{start}
+                </if>
+                <if test="end != null">
+                    AND updated_time <![CDATA[ <= ]]> #{end}
+                </if>
+            </where>
+            GROUP BY myDay,user_id
+
+            UNION ALL
+
+            SELECT
+                DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(updated_time/1000), @@session.time_zone, #{dbZone}), '%Y-%m-%d') myDay,
+                user_id
+            FROM
+                user_manual_up_down_record
+            <where>
+                <if test="type != null">
+                    <if test="type == 1">
+                        AND `adjust_way` = 1
+                        AND `adjust_type` in (4)
+                        and balance_change_status = 1
+                    </if>
+                    <if test="type == 2">
+                        AND `adjust_way` = 2
+                        AND `adjust_type` in (4)
+                        and balance_change_status = 1
+                    </if>
+                </if>
+
+                <if test="start != null">
+                    AND updated_time <![CDATA[ >= ]]> #{start}
+                </if>
+                <if test="end != null">
+                    AND updated_time <![CDATA[ <= ]]> #{end}
+                </if>
+                <if test="siteCode != null and siteCode != ''">
+                    and site_code = #{siteCode}
+                </if>
+
+            </where>
+            GROUP BY myDay,user_id
+
+            <if test="type != null and type == 1">
+                UNION ALL
+
+                SELECT
+                    DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(deposit_time/1000), @@session.time_zone, #{dbZone}), '%Y-%m-%d') as myDay,
+                    user_id
+                FROM
+                    agent_deposit_subordinates
+                <where>
+                    <if test="start != null">
+                        AND deposit_time <![CDATA[ >= ]]> #{start}
+                    </if>
+                    <if test="end != null">
+                        AND deposit_time <![CDATA[ <= ]]> #{end}
+                    </if>
+                    <if test="siteCode != null and siteCode != ''">
+                        and site_code = #{siteCode}
+                    </if>
+                </where>
+                GROUP BY myDay,user_id
+
+            </if>
+        ) aa
+        GROUP BY aa.myDay
+    </select>
+
+    <select id="getAllArriveAmountByAgentUser"
+            resultType="com.cloud.baowang.wallet.api.vo.userWithdrawRecord.GetAllArriveAmountByAgentUserResponseVO">
+        SELECT
+        IFNULL(sum( arrive_amount ), 0) arriveAmount,
+        IFNULL(sum( apply_amount ), 0) applyAmount
+        FROM
+        user_deposit_withdrawal
+        <where>
+            <if test="siteCode != null and siteCode != ''">
+                and site_code = #{siteCode}
+            </if>
+            <if test="agentAccount != null and agentAccount != ''">
+                AND agent_account = #{agentAccount}
+            </if>
+            <if test="userAccount != null and userAccount != ''">
+                AND user_account = #{userAccount}
+            </if>
+            <if test="type != null">
+                AND `type` = #{type}
+            </if>
+            AND `status` = 101
+            AND customer_status = 1
+            <if test="startTime != null">
+                AND updated_time <![CDATA[ >= ]]> #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND updated_time <![CDATA[ <= ]]> #{endTime}
+            </if>
+        </where>
+    </select>
+
+    <select id="getAllArriveAmountBySiteCode"
+            resultType="com.cloud.baowang.wallet.api.vo.site.GetAllArriveAmountBySiteCodeResponseVO">
+        SELECT
+        aa.currencyCode,
+        IFNULL(sum( aa.depositAmount ), 0) depositAmount,
+        IFNULL(sum( aa.withdrawAmount ), 0) withdrawAmount
+        FROM (
+        SELECT
+        currency_code as currencyCode,
+        IFNULL(sum(CASE WHEN type = 1 then apply_amount else 0 end ), 0) depositAmount,
+        IFNULL(sum(CASE when type = 2 then apply_amount else 0 end ), 0) withdrawAmount
+        FROM
+        user_deposit_withdrawal
+        <where>
+            <if test="siteCode != null and siteCode != ''">
+                and site_code = #{siteCode}
+            </if>
+            AND `status` = 101
+            <if test="start != null">
+                AND updated_time <![CDATA[ >= ]]> #{start}
+            </if>
+            <if test="end != null">
+                AND updated_time <![CDATA[ <= ]]> #{end}
+            </if>
+        </where>
+        GROUP BY currencyCode
+
+        UNION ALL
+
+        SELECT
+        currency_code as currencyCode,
+        IFNULL(sum( adjust_amount ), 0) depositAmount,
+        0 withdrawAmount
+        FROM
+        user_manual_up_down_record
+        <where>
+            AND `adjust_way` = 1
+            AND `adjust_type` in (4)
+            and balance_change_status = 1
+            <if test="start != null">
+                AND updated_time <![CDATA[ >= ]]> #{start}
+            </if>
+            <if test="end != null">
+                AND updated_time <![CDATA[ <= ]]> #{end}
+            </if>
+            <if test="siteCode != null and siteCode != ''">
+                and site_code = #{siteCode}
+            </if>
+        </where>
+        GROUP BY currencyCode
+        UNION ALL
+        SELECT
+        currency_code as currencyCode,
+        0 withdrawAmount,
+        IFNULL(sum( adjust_amount ), 0) depositAmount
+        FROM
+        user_manual_up_down_record
+        <where>
+            AND `adjust_way` = 2
+            AND `adjust_type` in (4)
+            and balance_change_status = 1
+            <if test="start != null">
+                AND updated_time <![CDATA[ >= ]]> #{start}
+            </if>
+            <if test="end != null">
+                AND updated_time <![CDATA[ <= ]]> #{end}
+            </if>
+            <if test="siteCode != null and siteCode != ''">
+                and site_code = #{siteCode}
+            </if>
+        </where>
+        GROUP BY currencyCode
+        UNION ALL
+        SELECT
+        currency_code as currencyCode,
+        IFNULL(sum( amount ), 0) depositAmount,
+        0 withdrawAmount
+        FROM
+        agent_deposit_subordinates
+        <where>
+            <if test="start != null">
+                AND deposit_time <![CDATA[ >= ]]> #{start}
+            </if>
+            <if test="end != null">
+                AND deposit_time <![CDATA[ <= ]]> #{end}
+            </if>
+            <if test="siteCode != null and siteCode != ''">
+                and site_code = #{siteCode}
+            </if>
+        </where>
+        GROUP BY currencyCode
+
+        ) aa
+        GROUP BY aa.currencyCode
+
+    </select>
+
+
+    <select id="getAllArriveAmountByAgentId"
+            resultType="com.cloud.baowang.wallet.api.vo.userWithdrawRecord.GetAllArriveAmountByAgentIdVO">
+        SELECT
+        user_account as userAccount,
+        IFNULL(sum( arrive_amount ), 0) as arriveAmount
+        FROM
+        user_deposit_withdrawal
+        <where>
+            <if test="siteCode != null and siteCode != ''">
+                and site_code = #{siteCode}
+            </if>
+            <if test="agentAccount != null and agentAccount != ''">
+                AND agent_account = #{agentAccount}
+            </if>
+            AND `type` = 1
+            AND `status` = 101
+            AND customer_status = 1
+            <if test="startTime != null">
+                AND updated_time <![CDATA[ >= ]]> #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND updated_time <![CDATA[ <= ]]> #{endTime}
+            </if>
+        </where>
+        group by user_account
+    </select>
+
+    <select id="getAllWithdrawAmountByAgentId"
+            resultType="com.cloud.baowang.wallet.api.vo.userWithdrawRecord.GetAllWithdrawAmountByAgentIdVO">
+        SELECT
+        user_account as userAccount,
+        IFNULL(sum( apply_amount ), 0) as applyAmount
+        FROM
+        user_deposit_withdrawal
+        <where>
+            <if test="siteCode != null and siteCode != ''">
+                and site_code = #{siteCode}
+            </if>
+            <if test="agentAccount != null and agentAccount != ''">
+                AND agent_account = #{agentAccount}
+            </if>
+            AND `type` = 2
+            AND `status` = 101
+            AND customer_status = 1
+            <if test="startTime != null">
+                AND updated_time <![CDATA[ >= ]]> #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND updated_time <![CDATA[ <= ]]> #{endTime}
+            </if>
+        </where>
+        group by user_account
+    </select>
+    <select id="selectLastSuccessOrder" resultType="com.cloud.baowang.wallet.po.UserDepositWithdrawalPO">
+        SELECT *
+        FROM user_deposit_withdrawal
+        WHERE `type` = 2
+        AND `status` = 101
+        AND user_id = #{userId}
+        AND deposit_withdraw_way_id = #{withdrawWayId}
+        ORDER BY created_time DESC LIMIT 1
+    </select>
+    <select id="selectLastRechargeOrder" resultType="com.cloud.baowang.wallet.po.UserDepositWithdrawalPO">
+        SELECT *
+        FROM user_deposit_withdrawal
+        WHERE `type` = 1
+        AND user_id = #{userId}
+        ORDER BY created_time DESC LIMIT 1
+    </select>
+
+    <select id="getUserDepositRecordMonthReport" resultType="com.cloud.baowang.wallet.po.UserDepositWithdrawalPO">
+        SELECT site_code,
+        user_id,
+        user_account,
+        currency_code,
+        sum(arrive_amount) arrive_amount
+        from user_deposit_withdrawal
+        where `status` = '101'
+        and type = '1'
+        and site_code = #{siteCode,jdbcType=VARCHAR}
+        and deposit_withdraw_type_code = #{rechargeWithdrawCode}
+        and updated_time &gt;= #{startTime,jdbcType=BIGINT}
+        and updated_time &lt;= #{endTime,jdbcType=BIGINT}
+        group by site_code, user_id, user_account, currency_code
+    </select>
+
+    <select id="getUserNormalDepositRecordMonthReport" resultType="com.cloud.baowang.wallet.po.UserDepositWithdrawalPO">
+        SELECT site_code,
+        user_id,
+        user_account,
+        currency_code,
+        sum(arrive_amount) as arrive_amount
+        FROM (SELECT site_code,
+        user_id,
+        user_account,
+        currency_code,
+        arrive_amount
+        from user_deposit_withdrawal
+        where `status` = '101'
+        and type = '1'
+        and site_code = #{siteCode,jdbcType=VARCHAR}
+        and deposit_withdraw_type_code <![CDATA[ <> ]]> #{rechargeWithdrawCode}
+        and updated_time &gt;= #{startTime,jdbcType=BIGINT}
+        and updated_time &lt;= #{endTime,jdbcType=BIGINT}
+        union all
+        SELECT site_code,
+        user_id,
+        user_account,
+        currency_code,
+        adjust_amount
+        from user_manual_up_down_record
+        where adjust_way = 1
+        and site_code = #{siteCode,jdbcType=VARCHAR}
+        and audit_status = 3
+        and adjust_type = 4
+        and audit_datetime &gt;= #{startTime,jdbcType=BIGINT}
+        and audit_datetime &lt;= #{endTime,jdbcType=BIGINT}
+        UNION ALL
+        SELECT site_code, user_id, user_account, currency_code, amount
+        from agent_deposit_subordinates
+        WHERE site_code = #{siteCode,jdbcType=VARCHAR}
+        and deposit_time &gt;= #{startTime,jdbcType=BIGINT}
+        and deposit_time &lt;= #{endTime,jdbcType=BIGINT}) AS T
+        group by site_code, user_id, user_account, currency_code
+    </select>
+
+
+    <select id="getUserWithdrawRecordMonthReport" resultType="com.cloud.baowang.wallet.po.UserDepositWithdrawalPO">
+        SELECT site_code,
+        user_id,
+        user_account,
+        currency_code,
+        sum(arrive_amount) as arrive_amount
+        FROM (SELECT site_code,
+        user_id,
+        user_account,
+        currency_code,
+        arrive_amount
+        from user_deposit_withdrawal
+        where `status` = '101'
+        and type = '2'
+        and site_code = #{siteCode,jdbcType=VARCHAR}
+        and pay_audit_time &gt;= #{startTime,jdbcType=BIGINT}
+        and pay_audit_time &lt;= #{endTime,jdbcType=BIGINT}
+        union all
+        SELECT site_code,
+        user_id,
+        user_account,
+        currency_code,
+        adjust_amount
+        from user_manual_up_down_record
+        where adjust_way = 2
+        and audit_status = 3
+        and adjust_type = 4
+        and site_code = #{siteCode,jdbcType=VARCHAR}
+        and audit_datetime &gt;= #{startTime,jdbcType=BIGINT}
+        and audit_datetime &lt;= #{endTime,jdbcType=BIGINT}) as t
+        group by site_code, user_id, user_account, currency_code
+    </select>
+    <!--
+      DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.created_time/1000), @@session.time_zone,'-5:00'),'%Y-%m-%d') as staticDate,
+    -->
+    <select id="staticDepositChannelReport"
+            resultType="com.cloud.baowang.wallet.api.vo.report.DepositChannelDataReportRespVO">
+        select staticDate,channelCode,channelType,channelName,siteCode,siteName,currencyCode,
+        depositWithdrawTypeCode,depositWithdrawWay,rechargeRange,feeRate,feeFixedAmount,feeAmount,depositNum,depositUserNum,depositSumAmount,
+        depositSuccessNum,depositSuccessUserNum,depositSuccessSumAmount,(depositSuccessNum/depositNum) as
+        depositSuccessRate
+        from (
+        SELECT
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.updated_time/1000),
+        @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d') as staticDate,
+        a.deposit_withdraw_channel_code as channelCode,
+        a.deposit_withdraw_channel_type as channelType,
+        b.channel_name as channelName,
+        a.site_code as siteCode,
+        c.site_name as siteName,
+        a.currency_code as currencyCode,
+        a.deposit_withdraw_type_code as depositWithdrawTypeCode,
+        a.deposit_withdraw_way as depositWithdrawWay,
+        CONCAT(b.recharge_min,'-',b.recharge_max) as rechargeRange ,
+        ANY_VALUE(d.way_fee) as feeRate,
+        ANY_VALUE(d.way_fee_fixed_amount) as feeFixedAmount,
+        sum( a.fee_amount) as feeAmount,
+        count(a.id) as depositNum,
+        count(DISTINCT a.user_id ) as depositUserNum,
+        sum(a.arrive_amount) as depositSumAmount,
+        sum(case when a.`status` =101 then 1 else 0 end ) as depositSuccessNum,
+        count(distinct case when a.`status`=101 then a.user_id end) as depositSuccessUserNum,
+        sum(case when a.`status` =101 then a.arrive_amount else 0 end) as depositSuccessSumAmount
+        from (
+        select
+        x.updated_time,
+        x.deposit_withdraw_way_id,
+        x.deposit_withdraw_channel_id,
+        x.deposit_withdraw_channel_code,
+        x.deposit_withdraw_channel_type,
+        x.site_code,
+        x.currency_code,
+        x.deposit_withdraw_type_code,
+        x.deposit_withdraw_way,
+        x.fee_rate,
+        x.fee_fixed_amount,
+        x.id,
+        x.user_id,
+        x.arrive_amount,
+        x.fee_amount,
+        x.status
+        from user_deposit_withdrawal x join user_info y on x.user_id=y.user_id and y.account_type='2'
+        where 1=1
+        and x.type=1
+          and x.deposit_withdraw_channel_type != 'SITE_CUSTOM'
+        <if test="dataReportReqVO.beginTime!=null">
+            and x.updated_time &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and x.updated_time &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.currencyCode!=null and dataReportReqVO.currencyCode!='' ">
+            and x.currency_code = #{dataReportReqVO.currencyCode}
+        </if>
+        <if test="dataReportReqVO.channelCode!=null and dataReportReqVO.channelCode!='' ">
+            and x.deposit_withdraw_channel_code = #{dataReportReqVO.channelCode}
+        </if>
+        <if test="dataReportReqVO.channelId!=null and dataReportReqVO.channelId!='' ">
+            and x.deposit_withdraw_channel_id = #{dataReportReqVO.channelId}
+        </if>
+        <if test="dataReportReqVO.siteCode!=null and dataReportReqVO.siteCode!=''">
+            and x.site_code =#{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        </if>
+        <if test="dataReportReqVO.rechargeType!=null and dataReportReqVO.rechargeType!=''">
+            and x.deposit_withdraw_type_id =#{dataReportReqVO.rechargeType,jdbcType=VARCHAR}
+        </if>
+        <if test="dataReportReqVO.rechargeWay!=null and dataReportReqVO.rechargeWay!=''">
+            and x.deposit_withdraw_way_id =#{dataReportReqVO.rechargeWay,jdbcType=VARCHAR}
+        </if>
+        union all
+        select
+        y.updated_time,
+        y.deposit_withdraw_way_id,
+        y.deposit_withdraw_channel_id,
+        y.deposit_withdraw_channel_code,
+        y.deposit_withdraw_channel_type,
+        y.site_code,
+        y.currency_code,
+        y.deposit_withdraw_type_code,
+        y.deposit_withdraw_way,
+        y.fee_rate,
+        y.fee_fixed_amount,
+        y.id,
+        y.agent_id,
+        y.arrive_amount,
+        y.fee_amount,
+        y.status
+        from agent_deposit_withdrawal y
+        where 1=1
+        and type=1
+        and y.deposit_withdraw_channel_type != 'SITE_CUSTOM'
+        <if test="dataReportReqVO.beginTime!=null">
+            and y.updated_time &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and y.updated_time &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.currencyCode!=null and dataReportReqVO.currencyCode!='' ">
+            and y.currency_code = #{dataReportReqVO.currencyCode}
+        </if>
+        <if test="dataReportReqVO.channelCode!=null and dataReportReqVO.channelCode!='' ">
+            and y.deposit_withdraw_channel_code = #{dataReportReqVO.channelCode}
+        </if>
+        <if test="dataReportReqVO.channelId!=null and dataReportReqVO.channelId!='' ">
+            and y.deposit_withdraw_channel_id = #{dataReportReqVO.channelId}
+        </if>
+        <if test="dataReportReqVO.siteCode!=null and dataReportReqVO.siteCode!=''">
+            and y.site_code =#{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        </if>
+        <if test="dataReportReqVO.rechargeType!=null and dataReportReqVO.rechargeType!=''">
+            and y.deposit_withdraw_type_id =#{dataReportReqVO.rechargeType,jdbcType=VARCHAR}
+        </if>
+        <if test="dataReportReqVO.rechargeWay!=null and dataReportReqVO.rechargeWay!=''">
+            and y.deposit_withdraw_way_id =#{dataReportReqVO.rechargeWay,jdbcType=VARCHAR}
+        </if>
+
+        ) as a
+        join system_recharge_channel b on a.deposit_withdraw_channel_id=b.id
+        join site_info c on a.site_code=c.site_code
+        LEFT JOIN site_recharge_way d on a.deposit_withdraw_way_id = d.recharge_way_id and d.site_code = a.site_code
+        group by DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.updated_time/1000),
+        @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d'),
+        a.deposit_withdraw_channel_code,
+        a.deposit_withdraw_channel_type,
+        b.channel_name,
+        a.site_code,
+        c.site_name,
+        a.currency_code,
+        a.deposit_withdraw_type_code,
+        a.deposit_withdraw_way,
+        CONCAT(b.recharge_min,'-',b.recharge_max)
+        ) t
+        <if test="dataReportReqVO.orderField==null">
+            order by staticDate desc
+        </if>
+        <if test="dataReportReqVO.orderField=='depositNum' and dataReportReqVO.orderType=='asc' ">
+            order by depositNum
+        </if>
+        <if test="dataReportReqVO.orderField=='depositNum' and dataReportReqVO.orderType=='desc' ">
+            order by depositNum desc
+        </if>
+        <if test="dataReportReqVO.orderField=='depositUserNum' and dataReportReqVO.orderType=='asc' ">
+            order by depositUserNum
+        </if>
+        <if test="dataReportReqVO.orderField=='depositUserNum' and dataReportReqVO.orderType=='desc' ">
+            order by depositUserNum desc
+        </if>
+
+        <if test="dataReportReqVO.orderField=='depositSumAmount' and dataReportReqVO.orderType=='asc' ">
+            order by depositSumAmount
+        </if>
+        <if test="dataReportReqVO.orderField=='depositSumAmount' and dataReportReqVO.orderType=='desc' ">
+            order by depositSumAmount desc
+        </if>
+
+        <if test="dataReportReqVO.orderField=='depositSuccessNum' and dataReportReqVO.orderType=='asc' ">
+            order by depositSuccessNum
+        </if>
+        <if test="dataReportReqVO.orderField=='depositSuccessNum' and dataReportReqVO.orderType=='desc' ">
+            order by depositSuccessNum desc
+        </if>
+
+        <if test="dataReportReqVO.orderField=='depositSuccessUserNum' and dataReportReqVO.orderType=='asc' ">
+            order by depositSuccessUserNum
+        </if>
+        <if test="dataReportReqVO.orderField=='depositSuccessUserNum' and dataReportReqVO.orderType=='desc' ">
+            order by depositSuccessUserNum desc
+        </if>
+        <if test="dataReportReqVO.orderField=='depositSuccessSumAmount' and dataReportReqVO.orderType=='asc' ">
+            order by depositSuccessSumAmount
+        </if>
+        <if test="dataReportReqVO.orderField=='depositSuccessSumAmount' and dataReportReqVO.orderType=='desc' ">
+            order by depositSuccessSumAmount desc
+        </if>
+
+        <if test="dataReportReqVO.orderField=='depositSuccessRate' and dataReportReqVO.orderType=='asc' ">
+            order by depositSuccessRate
+        </if>
+        <if test="dataReportReqVO.orderField=='depositSuccessRate' and dataReportReqVO.orderType=='desc' ">
+            order by depositSuccessRate desc
+        </if>
+
+    </select>
+
+
+    <select id="staticAllDepositChannelReport"
+            resultType="com.cloud.baowang.wallet.api.vo.report.DepositChannelDataReportRespVO">
+        SELECT
+        count(a.id) as depositNum,
+        count(DISTINCT a.user_id ) as depositUserNum,
+        sum(a.arrive_amount) as depositSumAmount,
+        sum(case when a.`status` =101 then 1 else 0 end ) as depositSuccessNum,
+        count(distinct case when a.`status`=101 then a.user_id end) as depositSuccessUserNum,
+        sum(case when a.`status` =101 then a.arrive_amount else 0 end) as depositSuccessSumAmount,
+        0 as depositSuccessRate
+        from (
+        select
+        x.updated_time,
+        x.deposit_withdraw_channel_code,
+        x.deposit_withdraw_channel_type,
+        x.site_code,
+        x.currency_code,
+        x.deposit_withdraw_type_code,
+        x.deposit_withdraw_way,
+        x.fee_rate,
+        x.id,
+        x.user_id,
+        x.arrive_amount,
+        x.fee_amount,
+        x.status
+        from user_deposit_withdrawal x join user_info u on x.user_id=u.user_id and u.account_type='2'
+        where 1=1
+        and x.type=1
+        and x.deposit_withdraw_channel_type != 'SITE_CUSTOM'
+        <if test="dataReportReqVO.beginTime!=null">
+            and x.updated_time &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and x.updated_time &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.currencyCode!=null and dataReportReqVO.currencyCode!='' ">
+            and x.currency_code = #{dataReportReqVO.currencyCode}
+        </if>
+        <if test="dataReportReqVO.channelCode!=null and dataReportReqVO.channelCode!='' ">
+            and x.deposit_withdraw_channel_code = #{dataReportReqVO.channelCode}
+        </if>
+        <if test="dataReportReqVO.channelId!=null and dataReportReqVO.channelId!='' ">
+            and x.deposit_withdraw_channel_id = #{dataReportReqVO.channelId}
+        </if>
+        <if test="dataReportReqVO.siteCode!=null and dataReportReqVO.siteCode!=''">
+            and x.site_code =#{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        </if>
+        <if test="dataReportReqVO.rechargeType!=null and dataReportReqVO.rechargeType!=''">
+            and x.deposit_withdraw_type_id =#{dataReportReqVO.rechargeType,jdbcType=VARCHAR}
+        </if>
+        <if test="dataReportReqVO.rechargeWay!=null and dataReportReqVO.rechargeWay!=''">
+            and x.deposit_withdraw_way_id =#{dataReportReqVO.rechargeWay,jdbcType=VARCHAR}
+        </if>
+        union all
+        select
+        y.updated_time,
+        y.deposit_withdraw_channel_code,
+        y.deposit_withdraw_channel_type,
+        y.site_code,
+        y.currency_code,
+        y.deposit_withdraw_type_code,
+        y.deposit_withdraw_way,
+        y.fee_rate,
+        y.id,
+        y.agent_id,
+        y.arrive_amount,
+        y.fee_amount,
+        y.status
+        from agent_deposit_withdrawal y
+        where 1=1
+        and type=1
+        and y.deposit_withdraw_channel_type != 'SITE_CUSTOM'
+        <if test="dataReportReqVO.beginTime!=null">
+            and y.created_time &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and y.created_time &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.currencyCode!=null and dataReportReqVO.currencyCode!='' ">
+            and y.currency_code = #{dataReportReqVO.currencyCode}
+        </if>
+        <if test="dataReportReqVO.channelCode!=null and dataReportReqVO.channelCode!='' ">
+            and y.deposit_withdraw_channel_code = #{dataReportReqVO.channelCode}
+        </if>
+        <if test="dataReportReqVO.channelId!=null and dataReportReqVO.channelId!='' ">
+            and y.deposit_withdraw_channel_id = #{dataReportReqVO.channelId}
+        </if>
+        <if test="dataReportReqVO.siteCode!=null and dataReportReqVO.siteCode!=''">
+            and y.site_code =#{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        </if>
+        <if test="dataReportReqVO.rechargeType!=null and dataReportReqVO.rechargeType!=''">
+            and y.deposit_withdraw_type_id =#{dataReportReqVO.rechargeType,jdbcType=VARCHAR}
+        </if>
+        <if test="dataReportReqVO.rechargeWay!=null and dataReportReqVO.rechargeWay!=''">
+            and y.deposit_withdraw_way_id =#{dataReportReqVO.rechargeWay,jdbcType=VARCHAR}
+        </if>
+
+        ) a
+
+    </select>
+
+
+    <select id="staticWithDrawChannelReport"
+            resultType="com.cloud.baowang.wallet.api.vo.report.WithdrawChannelDataReportRespVO">
+        select
+        staticDate,channelCode,channelType,channelName,siteCode,siteName,currencyCode,withdrawWithdrawTypeCode,withdrawWithdrawWay,
+        withdrawRange,feeRate,feeFixedAmount,withdrawNum,withdrawBigNum,withdrawUserNum,withdrawBigUserNum,withdrawSumAmount,withdrawSuccessNum,withdrawBigSuccessNum,
+        withdrawSuccessUserNum,withdrawBigSuccessUserNum,withdrawSuccessSumAmount, (withdrawSuccessNum/withdrawNum) as
+        withdrawSuccessRate
+        from (
+        SELECT
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.updated_time/1000),
+        @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d') as staticDate,
+        a.deposit_withdraw_channel_code as channelCode,
+        a.deposit_withdraw_channel_type as channelType,
+        b.channel_name as channelName,
+        a.site_code as siteCode,
+        c.site_name as siteName,
+        a.currency_code as currencyCode,
+        a.deposit_withdraw_type_code as withdrawWithdrawTypeCode,
+        a.deposit_withdraw_way as withdrawWithdrawWay,
+        CONCAT(b.withdraw_min,'-',b.withdraw_max) as withdrawRange ,
+        ANY_VALUE(d.way_fee) as feeRate,
+        ANY_VALUE(d.way_fee_fixed_amount) as feeFixedAmount,
+        sum( a.fee_amount) as feeAmount,
+        count(a.id) as withdrawNum,
+        sum(case when a.is_big_money='1' then 1 else 0 end) as withdrawBigNum,
+        count(DISTINCT a.user_id ) as withdrawUserNum,
+        count(DISTINCT case when a.is_big_money='1' then a.user_id end) as withdrawBigUserNum,
+        sum(a.arrive_amount) as withdrawSumAmount,
+        sum(case when a.`status` =101 then 1 else 0 end ) as withdrawSuccessNum,
+        sum(case when (a.`status` =101 and a.is_big_money='1' ) then 1 else 0 end ) as withdrawBigSuccessNum,
+        count(distinct case when a.`status`=101 then a.user_id end) as withdrawSuccessUserNum,
+        count(distinct case when ( a.`status`=101 and a.is_big_money='1' ) then a.user_id end) as
+        withdrawBigSuccessUserNum,
+        sum(case when a.`status` =101 then a.arrive_amount else 0 end) as withdrawSuccessSumAmount
+        from (
+        select
+        t.is_big_money,
+        t.updated_time,
+        t.deposit_withdraw_way_id,
+        t.deposit_withdraw_channel_id,
+        t.deposit_withdraw_channel_code,
+        t.deposit_withdraw_channel_type,
+        t.site_code,
+        t.currency_code,
+        t.deposit_withdraw_type_code,
+        t.deposit_withdraw_way,
+        t.fee_rate,
+        t.fee_fixed_amount,
+        t.id,
+        t.user_id,
+        t.arrive_amount,
+        t.fee_amount,
+        t.status
+        from user_deposit_withdrawal t join user_info u on t.user_id=u.user_id and u.account_type='2'
+        where 1=1
+        and type=2
+        and t.deposit_withdraw_channel_code is not null
+        <if test="dataReportReqVO.beginTime!=null">
+            and t.updated_time &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and t.updated_time &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.currencyCode!=null and dataReportReqVO.currencyCode!=''">
+            and t.currency_code =#{dataReportReqVO.currencyCode,jdbcType=VARCHAR}
+        </if>
+        <if test="dataReportReqVO.channelCode!=null and dataReportReqVO.channelCode!='' ">
+            and t.deposit_withdraw_channel_code = #{dataReportReqVO.channelCode}
+        </if>
+        <if test="dataReportReqVO.channelId!=null and dataReportReqVO.channelId!='' ">
+            and t.deposit_withdraw_channel_id = #{dataReportReqVO.channelId}
+        </if>
+        <if test="dataReportReqVO.siteCode!=null and dataReportReqVO.siteCode!=''">
+            and t.site_code =#{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        </if>
+        <if test="dataReportReqVO.rechargeType!=null and dataReportReqVO.rechargeType!=''">
+            and t.deposit_withdraw_type_id =#{dataReportReqVO.rechargeType,jdbcType=VARCHAR}
+        </if>
+        <if test="dataReportReqVO.rechargeWay!=null and dataReportReqVO.rechargeWay!=''">
+            and t.deposit_withdraw_way_id =#{dataReportReqVO.rechargeWay,jdbcType=VARCHAR}
+        </if>
+        union all
+        select
+        y.is_big_money,
+        y.updated_time,
+        y.deposit_withdraw_way_id,
+        y.deposit_withdraw_channel_id,
+        y.deposit_withdraw_channel_code,
+        y.deposit_withdraw_channel_type,
+        y.site_code,
+        y.currency_code,
+        y.deposit_withdraw_type_code,
+        y.deposit_withdraw_way,
+        y.fee_rate,
+        y.fee_fixed_amount,
+        y.id,
+        y.agent_id,
+        y.arrive_amount,
+        y.fee_amount,
+        y.status
+        from agent_deposit_withdrawal y
+        where 1=1
+        and type=2
+        and y.deposit_withdraw_channel_code is not null
+        <if test="dataReportReqVO.beginTime!=null">
+            and y.updated_time &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and y.updated_time &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.currencyCode!=null and dataReportReqVO.currencyCode!=''">
+            and y.currency_code =#{dataReportReqVO.currencyCode,jdbcType=VARCHAR}
+        </if>
+        <if test="dataReportReqVO.channelCode!=null and dataReportReqVO.channelCode!='' ">
+            and y.deposit_withdraw_channel_code = #{dataReportReqVO.channelCode}
+        </if>
+        <if test="dataReportReqVO.channelId!=null and dataReportReqVO.channelId!='' ">
+            and y.deposit_withdraw_channel_id = #{dataReportReqVO.channelId}
+        </if>
+        <if test="dataReportReqVO.siteCode!=null and dataReportReqVO.siteCode!=''">
+            and y.site_code =#{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        </if>
+        <if test="dataReportReqVO.rechargeType!=null and dataReportReqVO.rechargeType!=''">
+            and y.deposit_withdraw_type_id =#{dataReportReqVO.rechargeType,jdbcType=VARCHAR}
+        </if>
+        <if test="dataReportReqVO.rechargeWay!=null and dataReportReqVO.rechargeWay!=''">
+            and y.deposit_withdraw_way_id =#{dataReportReqVO.rechargeWay,jdbcType=VARCHAR}
+        </if>
+        ) a
+        join system_withdraw_channel b on a.deposit_withdraw_channel_id=b.id
+        join site_info c on a.site_code=c.site_code
+        LEFT JOIN site_withdraw_way d on a.deposit_withdraw_way_id = d.withdraw_id and d.site_code = a.site_code
+        group by DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(a.updated_time/1000),
+        @@session.time_zone,#{dataReportReqVO.timeZoneDb}),'%Y-%m-%d'),a.deposit_withdraw_channel_code,
+        a.deposit_withdraw_channel_type,
+        b.channel_name,
+        a.site_code,
+        c.site_name,
+        a.currency_code,
+        a.deposit_withdraw_type_code,
+        a.deposit_withdraw_way,
+        CONCAT(b.withdraw_min,'-',b.withdraw_max)
+        ) as T
+
+        <if test="dataReportReqVO.orderField==null ">
+            order by staticDate desc
+        </if>
+        <if test="dataReportReqVO.orderField=='withdrawNum' and dataReportReqVO.orderType=='asc' ">
+            order by withdrawNum
+        </if>
+        <if test="dataReportReqVO.orderField=='withdrawNum' and dataReportReqVO.orderType=='desc' ">
+            order by withdrawNum desc
+        </if>
+        <if test="dataReportReqVO.orderField=='withdrawBigNum' and dataReportReqVO.orderType=='asc' ">
+            order by withdrawBigNum
+        </if>
+        <if test="dataReportReqVO.orderField=='withdrawBigNum' and dataReportReqVO.orderType=='desc' ">
+            order by withdrawBigNum desc
+        </if>
+
+        <if test="dataReportReqVO.orderField=='withdrawUserNum' and dataReportReqVO.orderType=='asc' ">
+            order by withdrawUserNum
+        </if>
+        <if test="dataReportReqVO.orderField=='withdrawUserNum' and dataReportReqVO.orderType=='desc' ">
+            order by withdrawUserNum desc
+        </if>
+
+        <if test="dataReportReqVO.orderField=='withdrawBigUserNum' and dataReportReqVO.orderType=='asc' ">
+            order by withdrawBigUserNum
+        </if>
+        <if test="dataReportReqVO.orderField=='withdrawBigUserNum' and dataReportReqVO.orderType=='desc' ">
+            order by withdrawBigUserNum desc
+        </if>
+
+        <if test="dataReportReqVO.orderField=='withdrawSumAmount' and dataReportReqVO.orderType=='asc' ">
+            order by withdrawSumAmount
+        </if>
+        <if test="dataReportReqVO.orderField=='withdrawSumAmount' and dataReportReqVO.orderType=='desc' ">
+            order by withdrawSumAmount desc
+        </if>
+
+
+        <if test="dataReportReqVO.orderField=='withdrawSuccessNum' and dataReportReqVO.orderType=='asc' ">
+            order by withdrawSuccessNum
+        </if>
+        <if test="dataReportReqVO.orderField=='withdrawSuccessNum' and dataReportReqVO.orderType=='desc' ">
+            order by withdrawSuccessNum desc
+        </if>
+
+        <if test="dataReportReqVO.orderField=='withdrawBigSuccessNum' and dataReportReqVO.orderType=='asc' ">
+            order by withdrawBigSuccessNum
+        </if>
+        <if test="dataReportReqVO.orderField=='withdrawBigSuccessNum' and dataReportReqVO.orderType=='desc' ">
+            order by withdrawBigSuccessNum desc
+        </if>
+
+        <if test="dataReportReqVO.orderField=='withdrawSuccessUserNum' and dataReportReqVO.orderType=='asc' ">
+            order by withdrawSuccessUserNum
+        </if>
+        <if test="dataReportReqVO.orderField=='withdrawSuccessUserNum' and dataReportReqVO.orderType=='desc' ">
+            order by withdrawSuccessUserNum desc
+        </if>
+        <if test="dataReportReqVO.orderField=='withdrawBigSuccessUserNum' and dataReportReqVO.orderType=='asc' ">
+            order by withdrawBigSuccessUserNum
+        </if>
+        <if test="dataReportReqVO.orderField=='withdrawBigSuccessUserNum' and dataReportReqVO.orderType=='desc' ">
+            order by withdrawBigSuccessUserNum desc
+        </if>
+
+        <if test="dataReportReqVO.orderField=='withdrawSuccessSumAmount' and dataReportReqVO.orderType=='asc' ">
+            order by withdrawSuccessSumAmount
+        </if>
+        <if test="dataReportReqVO.orderField=='withdrawSuccessSumAmount' and dataReportReqVO.orderType=='desc' ">
+            order by withdrawSuccessSumAmount desc
+        </if>
+
+        <if test="dataReportReqVO.orderField=='withdrawSuccessRate' and dataReportReqVO.orderType=='asc' ">
+            order by withdrawSuccessRate
+        </if>
+        <if test="dataReportReqVO.orderField=='withdrawSuccessRate' and dataReportReqVO.orderType=='desc' ">
+            order by withdrawSuccessRate desc
+        </if>
+
+    </select>
+
+
+    <select id="staticAllWithdrawChannelReport"
+            resultType="com.cloud.baowang.wallet.api.vo.report.WithdrawChannelDataReportRespVO">
+        SELECT
+        avg(a.fee_rate) as feeRate,
+        sum( a.fee_amount) as feeAmount,
+        count(a.id) as withdrawNum,
+        sum(case when a.is_big_money='1' then 1 else 0 end) as withdrawBigNum,
+        count(DISTINCT a.user_id ) as withdrawUserNum,
+        count(DISTINCT case when a.is_big_money='1' then a.user_id end) as withdrawBigUserNum,
+        sum(a.arrive_amount) as withdrawSumAmount,
+        sum(case when a.`status` =101 then 1 else 0 end ) as withdrawSuccessNum,
+        sum(case when (a.`status` =101 and a.is_big_money='1' ) then 1 else 0 end ) as withdrawBigSuccessNum,
+        count(distinct case when a.`status`=101 then a.user_id end) as withdrawSuccessUserNum,
+        count(distinct case when ( a.`status`=101 and a.is_big_money='1' ) then a.user_id end) as
+        withdrawBigSuccessUserNum,
+        sum(case when a.`status` =101 then a.arrive_amount else 0 end) as withdrawSuccessSumAmount,
+        0 as withdrawSuccessRate
+        from (
+        select
+        t.is_big_money,
+        t.updated_time,
+        t.deposit_withdraw_channel_id,
+        t.deposit_withdraw_channel_code,
+        t.deposit_withdraw_channel_type,
+        t.site_code,
+        t.currency_code,
+        t.deposit_withdraw_type_code,
+        t.deposit_withdraw_way,
+        t.fee_rate,
+        t.id,
+        t.user_id,
+        t.arrive_amount,
+        t.fee_amount,
+        t.status
+        from user_deposit_withdrawal t join user_info u on t.user_id=u.user_id and u.account_type='2'
+        where 1=1
+        and type=2
+        and t.deposit_withdraw_channel_code is not null
+        <if test="dataReportReqVO.beginTime!=null">
+            and t.updated_time &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and t.updated_time &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.currencyCode!=null and dataReportReqVO.currencyCode!=''">
+            and t.currency_code =#{dataReportReqVO.currencyCode,jdbcType=VARCHAR}
+        </if>
+        <if test="dataReportReqVO.channelCode!=null and dataReportReqVO.channelCode!='' ">
+            and t.deposit_withdraw_channel_code = #{dataReportReqVO.channelCode}
+        </if>
+        <if test="dataReportReqVO.channelId!=null and dataReportReqVO.channelId!='' ">
+            and t.deposit_withdraw_channel_id = #{dataReportReqVO.channelId}
+        </if>
+        <if test="dataReportReqVO.siteCode!=null and dataReportReqVO.siteCode!=''">
+            and t.site_code =#{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        </if>
+        <if test="dataReportReqVO.rechargeType!=null and dataReportReqVO.rechargeType!=''">
+            and t.deposit_withdraw_type_id =#{dataReportReqVO.rechargeType,jdbcType=VARCHAR}
+        </if>
+        <if test="dataReportReqVO.rechargeWay!=null and dataReportReqVO.rechargeWay!=''">
+            and t.deposit_withdraw_way_id =#{dataReportReqVO.rechargeWay,jdbcType=VARCHAR}
+        </if>
+        union all
+        select
+        y.is_big_money,
+        y.updated_time,
+        y.deposit_withdraw_channel_id,
+        y.deposit_withdraw_channel_code,
+        y.deposit_withdraw_channel_type,
+        y.site_code,
+        y.currency_code,
+        y.deposit_withdraw_type_code,
+        y.deposit_withdraw_way,
+        y.fee_rate,
+        y.id,
+        y.agent_id,
+        y.arrive_amount,
+        y.fee_amount,
+        y.status
+        from agent_deposit_withdrawal y
+        where 1=1
+        and type=2
+        and y.deposit_withdraw_channel_code is not null
+        <if test="dataReportReqVO.beginTime!=null">
+            and y.updated_time &gt;= #{dataReportReqVO.beginTime}
+        </if>
+        <if test="dataReportReqVO.endTime!=null">
+            and y.updated_time &lt;= #{dataReportReqVO.endTime}
+        </if>
+        <if test="dataReportReqVO.currencyCode!=null and dataReportReqVO.currencyCode!=''">
+            and y.currency_code =#{dataReportReqVO.currencyCode,jdbcType=VARCHAR}
+        </if>
+        <if test="dataReportReqVO.channelCode!=null and dataReportReqVO.channelCode!='' ">
+            and y.deposit_withdraw_channel_code = #{dataReportReqVO.channelCode}
+        </if>
+        <if test="dataReportReqVO.siteCode!=null and dataReportReqVO.siteCode!=''">
+            and y.site_code =#{dataReportReqVO.siteCode,jdbcType=VARCHAR}
+        </if>
+        <if test="dataReportReqVO.rechargeType!=null and dataReportReqVO.rechargeType!=''">
+            and y.deposit_withdraw_type_id =#{dataReportReqVO.rechargeType,jdbcType=VARCHAR}
+        </if>
+        <if test="dataReportReqVO.rechargeWay!=null and dataReportReqVO.rechargeWay!=''">
+            and y.deposit_withdraw_way_id =#{dataReportReqVO.rechargeWay,jdbcType=VARCHAR}
+        </if>
+        ) a
+    </select>
+    <select id="tradeRecordRechargeList"
+            resultType="com.cloud.baowang.wallet.api.vo.userwallet.UserTradeRecordResponseVO">
+
+        SELECT * FROM (SELECT
+        udw.type AS tradeType,
+        udw.order_no AS orderNo,
+        udw.created_time AS tradeTime,
+        udw.apply_amount AS tradeAmount,
+        udw.arrive_amount AS arriveAmount,
+        udw.customer_status AS tradeStatus,
+        CASE
+        WHEN udw.type = 1 and udw.deposit_withdraw_type_code = 'bank_card' THEN 'bank_card_recharge'
+        WHEN udw.type = 1 and udw.deposit_withdraw_type_code = 'electronic_wallet' THEN 'electronic_wallet_recharge'
+        WHEN udw.type = 1 and udw.deposit_withdraw_type_code = 'crypto_currency' THEN 'crypto_currency_recharge'
+        WHEN udw.type = 2 and udw.deposit_withdraw_type_code = 'bank_card' THEN 'bank_card_withdraw'
+        WHEN udw.type = 2 and udw.deposit_withdraw_type_code = 'electronic_wallet' THEN 'electronic_wallet_withdraw'
+        WHEN udw.type = 2 and udw.deposit_withdraw_type_code = 'crypto_currency' THEN 'crypto_currency_withdraw'
+        WHEN udw.type = 2 and udw.deposit_withdraw_type_code = 'manual_withdraw' THEN 'manual_withdraw'
+        ELSE ''
+        END AS tradeWayType,
+        '0' AS exchangeRate,
+        udw.deposit_withdraw_way AS tradeWay,
+        IF(udw.type = 1,srw.way_icon,sww.way_icon) AS tradeWayIcon
+        FROM
+        user_deposit_withdrawal udw
+        LEFT JOIN system_recharge_way srw ON srw.id = udw.deposit_withdraw_way_id
+        LEFT JOIN system_withdraw_way sww ON sww.id = udw.deposit_withdraw_way_id
+        WHERE
+        udw.user_id = #{vo.userId}
+        AND udw.created_time &gt;= #{vo.startTime}
+        AND udw.created_time &lt;= #{vo.endTime}
+        UNION ALL
+        SELECT
+        umdr.adjust_way AS tradeType,
+        umdr.order_no AS orderNo,
+        umdr.created_time AS tradeTime,
+        umdr.adjust_amount AS tradeAmount,
+        umdr.adjust_amount AS arriveAmount,
+        IF(umdr.balance_change_status = '0','2','1') AS tradeStatus,
+        IF(umdr.adjust_way = '1','manual_up','manual_down') AS tradeWayType,
+        '0' AS exchangeRate,
+        '' AS tradeWay,
+        '' AS tradeWayIcon
+        FROM
+        user_manual_up_down_record umdr
+        WHERE
+        umdr.user_id = #{vo.userId}
+        AND umdr.audit_status = 3
+        AND umdr.created_time &gt;= #{vo.startTime}
+        AND umdr.created_time &lt;= #{vo.endTime} UNION ALL
+        SELECT
+        '1' AS tradeType,
+        ads.order_no AS orderNo,
+        ads.created_time AS tradeTime,
+        ads.amount AS tradeAmount,
+        ads.amount AS arriveAmount,
+        '1' AS tradeStatus,
+        'superior_transfer' AS tradeWayType,
+        '0' AS exchangeRate,
+        '' AS tradeWay,
+        '' AS tradeWayIcon
+        FROM
+        agent_deposit_subordinates ads
+        WHERE
+        ads.user_id = #{vo.userId}
+        AND ads.deposit_time &gt;= #{vo.startTime}
+
+        ) tradeRecord
+        WHERE 1=1
+        <if test="vo.tradeStatus != null and vo.tradeStatus != ''">
+            AND tradeRecord.tradeStatus = #{vo.tradeStatus}
+        </if>
+        <if test="vo.tradeType != null and vo.tradeType != ''">
+            AND tradeRecord.tradeType = #{vo.tradeType}
+        </if>
+        ORDER BY tradeRecord.tradeTime DESC
+
+
+    </select>
+    <select id="tradeRecordWithdrawList"
+            resultType="com.cloud.baowang.wallet.api.vo.userwallet.UserTradeRecordResponseVO">
+        SELECT * FROM (SELECT
+        '2' AS tradeType,
+        udw.order_no AS orderNo,
+        udw.updated_time AS tradeTime,
+        udw.apply_amount AS tradeAmout,
+        udw.customer_status AS tradeStatus,
+        CASE
+        WHEN udw.type = 1 and udw.deposit_withdraw_type_code = 'bank_card' THEN 'bank_card_recharge'
+        WHEN udw.type = 1 and udw.deposit_withdraw_type_code = 'electronic_wallet' THEN 'electronic_wallet_recharge'
+        WHEN udw.type = 1 and udw.deposit_withdraw_type_code = 'crypto_currency' THEN 'crypto_currency_recharge'
+        WHEN udw.type = 2 and udw.deposit_withdraw_type_code = 'bank_card' THEN 'bank_card_withdraw'
+        WHEN udw.type = 2 and udw.deposit_withdraw_type_code = 'electronic_wallet' THEN 'electronic_wallet_withdraw'
+        WHEN udw.type = 2 and udw.deposit_withdraw_type_code = 'crypto_currency' THEN 'crypto_currency_withdraw'
+        ELSE ''
+        END AS tradeWayType
+        FROM
+        user_deposit_withdrawal udw
+        WHERE
+        udw.user_id = #{vo.userId}
+        AND udw.type = '2'
+        AND udw.updated_time &gt;= #{vo.startTime}
+        AND udw.updated_time &lt;= #{vo.endTime}
+        UNION ALL
+        SELECT
+        '2' AS tradeType,
+        umdr.order_no AS orderNo,
+        umdr.updated_time AS tradeTime,
+        umdr.adjust_amount AS tradeAmout,
+        '1' AS tradeStatus,
+        'manual_down' AS tradeWayType
+        FROM
+        user_manual_up_down_record umdr
+        WHERE
+        umdr.user_id = #{vo.userId}
+        AND umdr.adjust_type = '4'
+        AND umdr.adjust_way = '2'
+        AND umdr.audit_status = 3
+        AND umdr.updated_time &gt;= #{vo.startTime}
+        AND umdr.updated_time &lt;= #{vo.endTime} ) tradeRecord
+        WHERE 1=1
+        <if test="vo.tradeStatus != null and vo.tradeStatus != ''">
+            AND tradeRecord.tradeStatus = #{vo.tradeStatus}
+        </if>
+        ORDER BY tradeRecord.tradeTime DESC
+
+    </select>
+
+    <select id="queryAgentUserDepByWay"
+            resultType="com.cloud.baowang.wallet.api.vo.userWithdrawRecord.AgentDepositWithResVO">
+        SELECT
+        deposit_withdraw_way_id as depositWithdrawWayId,
+        sum(arrive_amount) as arriveAmount
+        FROM
+        `user_deposit_withdrawal`
+        WHERE
+        type = #{vo.type}
+        and status = #{vo.status}
+        <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+            AND agent_id IN
+            <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            and updated_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            and updated_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        GROUP BY
+        deposit_withdraw_way_id
+    </select>
+
+    <select id="queryAgentUserDepFee"
+            resultType="com.cloud.baowang.wallet.api.vo.userWithdrawRecord.AgentDepositWithFeeVO">
+        SELECT
+        sum(way_fee_amount) as wayFeeAmount,
+        currency_code as currencyCode
+        FROM
+        `user_deposit_withdrawal`
+        WHERE status = #{vo.status}
+        <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+            AND agent_id IN
+            <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            and updated_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            and updated_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        group by currency_code
+    </select>
+
+    <select id="getUserDepositAmount" resultType="com.cloud.baowang.agent.api.vo.agent.winLoss.UserDepositSumVO">
+        SELECT
+        user_id as userId,
+        currency_code as currencyCode,
+        sum(arrive_amount) as depositAmount
+        FROM
+        `user_deposit_withdrawal`
+        WHERE
+        type = 1
+        and status = '101'
+        <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+            AND agent_id IN
+            <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            and updated_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            and updated_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        GROUP BY
+        userId, currencyCode
+    </select>
+
+
+    <select id="getAllDepositWithdrawRecord"
+            resultType="com.cloud.baowang.wallet.api.vo.report.DepositWithdrawAllRecordVO">
+        SELECT
+        '1' AS type,
+        udw.site_code AS siteCode,
+        udw.user_id AS userId,
+        udw.user_account AS userAccount,
+        ui.account_type AS accountType,
+        udw.agent_id AS agentId,
+        udw.agent_account AS agentAccount,
+        udw.currency_code AS currencyCode,
+        udw.arrive_amount AS amount,
+        udw.deposit_withdraw_way_id AS depositWithdrawWayId,
+        udw.fee_amount AS feeAmount,
+        udw.way_fee_amount AS wayFeeAmount,
+        udw.settlement_fee_amount AS settlementFeeAmount,
+        0 AS large_amount,
+        0 AS depositSubordinatesAmount,
+        udw.updated_time AS recordTime
+        FROM
+        user_deposit_withdrawal udw
+        LEFT JOIN user_info ui ON ui.user_id = udw.user_id
+        WHERE
+        udw.type = 1
+        AND udw.`status` = 101
+        AND udw.updated_time <![CDATA[ >= ]]> #{startTime}
+        AND udw.updated_time <![CDATA[ <= ]]> #{endTime}
+        AND udw.site_code in
+        <foreach collection="siteCodes" item="value" separator="," open="(" close=")">
+            #{value}
+        </foreach>
+        UNION ALL
+        SELECT
+        '2' AS type,
+        udw.site_code AS siteCode,
+        udw.user_id AS userId,
+        udw.user_account AS userAccount,
+        ui.account_type AS accountType,
+        udw.agent_id AS agentId,
+        udw.agent_account AS agentAccount,
+        udw.currency_code AS currencyCode,
+        udw.apply_amount AS amount,
+        udw.deposit_withdraw_way_id AS depositWithdrawWayId,
+        udw.fee_amount AS feeAmount,
+        udw.way_fee_amount AS wayFeeAmount,
+        udw.settlement_fee_amount AS settlementFeeAmount,
+        IF(udw.is_big_money = 1,udw.apply_amount,0) AS large_amount,
+        0 AS depositSubordinatesAmount,
+        udw.updated_time AS recordTime
+        FROM
+        user_deposit_withdrawal udw
+        LEFT JOIN user_info ui ON ui.user_id = udw.user_id
+        WHERE
+        udw.type = 2
+        AND udw.`status` = 101
+        AND udw.updated_time <![CDATA[ >= ]]> #{startTime}
+        AND udw.updated_time <![CDATA[ <= ]]> #{endTime}
+        AND udw.site_code in
+        <foreach collection="siteCodes" item="value" separator="," open="(" close=")">
+            #{value}
+        </foreach>
+        UNION ALL
+        SELECT
+        '1' AS type,
+        umud.site_code AS siteCode,
+        umud.user_id AS userId,
+        umud.user_account AS userAccount,
+        ui.account_type AS accountType,
+        umud.agent_id AS agentId,
+        umud.agent_account AS agentAccount,
+        umud.currency_code AS currencyCode,
+        umud.adjust_amount AS amount,
+        null AS depositWithdrawWayId,
+        0 AS feeAmount,
+        0 AS wayFeeAmount,
+        0 AS settlementFeeAmount,
+        0 AS large_amount,
+        0 AS depositSubordinatesAmount,
+        umud.updated_time AS recordTime
+        FROM
+        user_manual_up_down_record umud
+        LEFT JOIN user_info ui ON ui.user_id = umud.user_id
+        WHERE
+        umud.adjust_way = 1
+        AND umud.adjust_type = 4
+        AND umud.audit_status = 3
+        AND umud.balance_change_status = 1
+        AND umud.updated_time <![CDATA[ >= ]]> #{startTime}
+        AND umud.updated_time <![CDATA[ <= ]]> #{endTime}
+        AND umud.site_code in
+        <foreach collection="siteCodes" item="value" separator="," open="(" close=")">
+            #{value}
+        </foreach>
+        UNION ALL
+        SELECT
+        '2' AS type,
+        umud.site_code AS siteCode,
+        umud.user_id AS userId,
+        umud.user_account AS userAccount,
+        ui.account_type AS accountType,
+        umud.agent_id AS agentId,
+        umud.agent_account AS agentAccount,
+        umud.currency_code AS currencyCode,
+        umud.adjust_amount AS amount,
+        null AS depositWithdrawWayId,
+        0 AS feeAmount,
+        0 AS wayFeeAmount,
+        0 AS settlementFeeAmount,
+        IF(umud.is_big_money = 1,umud.adjust_amount,0) AS large_amount,
+        0 AS depositSubordinatesAmount,
+        umud.updated_time AS recordTime
+        FROM
+        user_manual_up_down_record umud
+        LEFT JOIN user_info ui ON ui.user_id = umud.user_id
+        WHERE
+        umud.adjust_way = 2
+        AND umud.adjust_type = 4
+        AND umud.audit_status = 3
+        AND umud.balance_change_status = 1
+        AND umud.updated_time <![CDATA[ >= ]]> #{startTime}
+        AND umud.updated_time <![CDATA[ <= ]]> #{endTime}
+        AND umud.site_code in
+        <foreach collection="siteCodes" item="value" separator="," open="(" close=")">
+            #{value}
+        </foreach>
+        UNION ALL
+        SELECT
+        '1' AS type,
+        ads.site_code AS siteCode,
+        ads.user_id AS userId,
+        ads.user_account AS userAccount,
+        ui.account_type AS accountType,
+        ads.agent_id AS agentId,
+        ads.agent_account AS agentAccount,
+        ads.currency_code AS currencyCode,
+        ads.amount AS amount,
+        null AS depositWithdrawWayId,
+        0 AS feeAmount,
+        0 AS wayFeeAmount,
+        0 AS settlementFeeAmount,
+        0 AS large_amount,
+        ads.amount AS depositSubordinatesAmount,
+        ads.deposit_time AS recordTime
+        FROM
+        agent_deposit_subordinates ads
+        LEFT JOIN user_info ui ON ui.user_id = ads.user_id
+        WHERE
+        ads.deposit_time <![CDATA[ >= ]]> #{startTime}
+        AND ads.deposit_time <![CDATA[ <= ]]> #{endTime}
+        AND ads.site_code in
+        <foreach collection="siteCodes" item="value" separator="," open="(" close=")">
+            #{value}
+        </foreach>
+    </select>
+
+    <select id="findDepositWithdrawPage"
+            resultType="com.cloud.baowang.wallet.api.vo.report.DepositWithdrawAllRecordVO">
+        SELECT
+        udw.site_code AS siteCode,
+        udw.user_id AS userId,
+        udw.user_account AS userAccount,
+        udw.agent_id AS agentId,
+        udw.agent_account AS agentAccount,
+        udw.currency_code AS currencyCode,
+        udw.arrive_amount AS amount,
+        udw.deposit_withdraw_way_id AS depositWithdrawWayId,
+        udw.fee_amount AS feeAmount,
+        udw.way_fee_amount AS wayFeeAmount,
+        udw.settlement_fee_amount AS settlementFeeAmount,
+        0 AS large_amount,
+        0 AS depositSubordinatesAmount,
+        udw.updated_time AS recordTime
+        FROM
+        user_deposit_withdrawal udw
+        WHERE
+        udw.`status` = 101
+        AND udw.updated_time <![CDATA[ >= ]]> #{startTime}
+        AND udw.updated_time <![CDATA[ <= ]]> #{endTime}
+        AND udw.site_code = #{siteCode,jdbcType=VARCHAR}
+    </select>
+
+
+    <select id="listPage" resultType="com.cloud.baowang.wallet.po.UserDepositWithdrawalPO">
+        SELECT
+        udw.*
+        FROM
+        user_deposit_withdrawal udw left join user_info user on udw.user_id=user.user_id
+        WHERE
+        udw.`site_code` = #{vo.siteCode}
+        AND udw.`status` = 101
+        <if test="vo.userAccountType!=null">
+            AND user.account_type = #{vo.userAccountType}
+        </if>
+        <if test="vo.startTime!=null">
+            AND udw.updated_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime!=null">
+            AND udw.updated_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+
+
+    </select>
+
+
+    <select id="getUserDepositRecord"
+            resultType="com.cloud.baowang.wallet.api.vo.fundadjust.UserDepositRecordRespVO">
+        SELECT
+        sum(apply_amount) as totalApplyAmount,
+        sum(if(status = 101,arrive_amount,0)) as totalArriveAmount,
+        count(1) as totalNum,
+        count(if( status = 21, 1, NULL )) as totalApplyNum,
+        count(if(status = 101,1,null)) as totalSuccessNum,
+        count(if(status in (100,98,97,96,9,3,6),1,null)) as totalFailNum,
+        round(count(if(status = 101,1,null))/count(1),4)*100 as totalSuccessRate
+
+        FROM user_deposit_withdrawal a
+        <where>
+            AND a.type = 1
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                and a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.finishStartTime != null">
+                and a.updated_time <![CDATA[ >= ]]> #{vo.finishStartTime}
+            </if>
+            <if test="vo.finishEndTime != null">
+                and a.updated_time <![CDATA[ <= ]]> #{vo.finishEndTime}
+            </if>
+            <if test="vo.depositWithdrawWay != null and vo.depositWithdrawWay != ''">
+                and a.deposit_withdraw_way = #{vo.depositWithdrawWay}
+            </if>
+            <if test="vo.depositWithdrawChannelCode != null and vo.depositWithdrawChannelCode != ''">
+                and a.deposit_withdraw_channel_code = #{vo.depositWithdrawChannelCode}
+            </if>
+            <if test="vo.depositWithdrawChannelName != null and vo.depositWithdrawChannelName != ''">
+                and a.deposit_withdraw_channel_name = #{vo.depositWithdrawChannelName}
+            </if>
+            <if test="vo.createStartTime != null">
+                AND a.created_time <![CDATA[ >= ]]> #{vo.createStartTime}
+            </if>
+            <if test="vo.createEndTime != null">
+                AND a.created_time <![CDATA[ <= ]]> #{vo.createEndTime}
+            </if>
+            <if test="vo.orderNo != null and vo.orderNo != ''">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.userAccount != null and vo.userAccount != ''">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.deviceType != null">
+                AND a.device_type = #{vo.deviceType}
+            </if>
+            <if test="vo.currencyCode != null and vo.currencyCode != ''">
+                and a.currency_code = #{vo.currencyCode}
+            </if>
+            <if test="vo.applyIp != null and vo.applyIp != ''">
+                AND a.apply_ip = #{vo.applyIp}
+            </if>
+            <if test="vo.status != null">
+                AND a.status = #{vo.status}
+            </if>
+            <if test="vo.customerStatus != null">
+                and a.customer_status = #{vo.customerStatus}
+            </if>
+
+            <if test="vo.depositWithdrawWay != null and vo.depositWithdrawWay != ''">
+                AND a.deposit_withdraw_way_id IN
+                <foreach item="item" index="index" collection="vo.depositWithdrawWay.split(',')" open="(" separator=","
+                         close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+        </where>
+    </select>
+    <select id="getWithDrawalRecord"
+            resultType="com.cloud.baowang.wallet.api.vo.fundadjust.UserDepositRecordRespVO">
+        SELECT
+        sum(apply_amount) as totalApplyAmount,
+        sum(if(status = 101,arrive_amount,0)) as totalArriveAmount,
+        count(1) as totalNum,
+        count(if(review_operation !=3 ,1,null)) as totalApplyNum,
+        count(if(status = 101,1,null)) as totalSuccessNum,
+        count(if(status in (100,98,97,96,9,3,6),1,null)) as totalFailNum,
+        round(count(if(status = 101,1,null))/count(1),4)*100 as totalSuccessRate,
+        count(if(status = 21,1,null)) as totalWithdrawNum
+        FROM user_deposit_withdrawal a
+        <where>
+            AND a.type = 2
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                and a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.customerStatus != null ">
+                and a.customer_status = #{vo.customerStatus}
+            </if>
+            <if test="vo.applyIp != null and vo.applyIp != '' ">
+                and a.apply_ip = #{vo.applyIp}
+            </if>
+            <if test="vo.deviceName != null and vo.deviceName != ''">
+                and a.device_no = #{vo.deviceName}
+            </if>
+            <if test="vo.depositWithdrawChannelCode != null and vo.depositWithdrawChannelCode != ''">
+                and a.deposit_withdraw_channel_code = #{vo.depositWithdrawChannelCode}
+            </if>
+            <if test="vo.depositWithdrawChannelName != null and vo.depositWithdrawChannelName != ''">
+                and a.deposit_withdraw_channel_name = #{vo.depositWithdrawChannelName}
+            </if>
+            <if test="vo.finishStartTime != null">
+                and a.updated_time <![CDATA[ >= ]]> #{vo.finishStartTime}
+            </if>
+            <if test="vo.finishEndTime != null">
+                and a.updated_time <![CDATA[ <= ]]> #{vo.finishEndTime}
+            </if>
+            <if test="vo.createStartTime != null">
+                AND a.created_time <![CDATA[ >= ]]> #{vo.createStartTime}
+            </if>
+            <if test="vo.createEndTime != null">
+                AND a.created_time <![CDATA[ <= ]]> #{vo.createEndTime}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.currencyCode != '' and vo.currencyCode != null">
+                AND a.currency_code = #{vo.currencyCode}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+
+            <if test="vo.deviceType != '' and vo.deviceType != null">
+                AND a.device_type = #{vo.deviceType}
+            </if>
+            <if test="vo.status != null">
+                AND a.status = #{vo.status}
+            </if>
+            <if test="vo.isBigMoney != null">
+                AND a.is_big_money = #{vo.isBigMoney}
+            </if>
+            <if test="vo.isFirstOut != null">
+                AND a.is_first_out = #{vo.isFirstOut}
+            </if>
+            <if test="vo.depositWithdrawWay != null and vo.depositWithdrawWay != ''">
+                AND a.deposit_withdraw_way_id IN
+                <foreach item="item" index="index" collection="vo.depositWithdrawWay.split(',')" open="(" separator=","
+                         close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="queryDepositAmountByUserIds"
+            resultType="com.cloud.baowang.wallet.api.vo.fundadjust.UserDepositAmountVO">
+        SELECT a.userId ,IFNULL(sum(a.amount),0) AS amount FROM (
+        SELECT
+        udw.user_id AS userId,
+        udw.arrive_amount AS amount
+        FROM
+        user_deposit_withdrawal udw
+        WHERE
+        udw.type = 1
+        AND udw.`status` = 101
+        AND udw.updated_time <![CDATA[ >= ]]> #{vo.startTime}
+        AND udw.updated_time <![CDATA[ <= ]]> #{vo.endTime}
+        AND udw.user_id in
+        <foreach collection="vo.userIds" item="value" separator="," open="(" close=")">
+            #{value}
+        </foreach>
+        UNION ALL
+        SELECT
+        umud.user_id AS userId,
+        umud.adjust_amount AS amount
+        FROM
+        user_manual_up_down_record umud
+        WHERE
+        umud.adjust_way = 1
+        AND umud.adjust_type = 4
+        AND umud.audit_status = 3
+        AND umud.balance_change_status = 1
+        AND umud.updated_time <![CDATA[ >= ]]> #{vo.startTime}
+        AND umud.updated_time <![CDATA[ <= ]]> #{vo.endTime}
+        AND umud.user_id in
+        <foreach collection="vo.userIds" item="value" separator="," open="(" close=")">
+            #{value}
+        </foreach>
+        UNION ALL
+        SELECT
+        ads.user_id AS userId,
+        ads.amount AS amount
+        FROM
+        agent_deposit_subordinates ads
+        WHERE
+        ads.deposit_time <![CDATA[ >= ]]> #{vo.startTime}
+        AND ads.deposit_time <![CDATA[ <= ]]> #{vo.endTime}
+        AND ads.user_id in
+        <foreach collection="vo.userIds" item="value" separator="," open="(" close=")">
+            #{value}
+        </foreach>) as a GROUP BY a.userId
+
+    </select>
+
+    <select id="getUserWithdrawalRecordsDuplicateList" resultType="com.cloud.baowang.wallet.api.vo.risk.RiskWithdrawRecordVO">
+        WITH grouped_withdrawals AS (
+        SELECT
+        MAX(a.id) AS id
+        FROM user_deposit_withdrawal a
+        <where>
+            AND a.type = 2
+            AND a.STATUS = '101'
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                and a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.finishStartTime != null and vo.finishStartTime !=''">
+                AND a.updated_time <![CDATA[ >= ]]> #{vo.finishStartTime}
+            </if>
+            <if test="vo.finishEndTime != null and vo.finishEndTime !=''">
+                AND a.updated_time <![CDATA[ <= ]]> #{vo.finishEndTime}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.currencyCode != '' and vo.currencyCode != null">
+                AND a.currency_code = #{vo.currencyCode}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.withdrawAccountInfo != '' and vo.withdrawAccountInfo != null">
+                AND a.deposit_withdraw_address LIKE concat('%', #{vo.withdrawAccountInfo}, '%')
+            </if>
+            <if test="vo.areaCode != '' and vo.areaCode != null">
+                AND a.area_code = #{vo.areaCode}
+            </if>
+            <if test="vo.telephone != '' and vo.telephone != null">
+                AND a.telephone = #{vo.telephone}
+            </if>
+            <if test="vo.email != '' and vo.email != null">
+                AND a.email = #{vo.email}
+            </if>
+
+        </where>
+        GROUP BY
+        a.user_id,
+        a.deposit_withdraw_type_code,
+        a.deposit_withdraw_way,
+        a.deposit_withdraw_address,
+        a.user_label_id
+        ),
+        latest_withdrawals AS (
+        SELECT
+        a.user_id userId,
+        a.user_account userAccount,
+        a.STATUS status,
+        a.apply_amount applyAmount,
+        a.deposit_withdraw_type_id depositWithdrawTypeId,
+        a.deposit_withdraw_type_code depositWithdrawTypeCode,
+        a.deposit_withdraw_way_id depositWithdrawWayId,
+        a.deposit_withdraw_way depositWithdrawWay,
+        a.currency_code currencyCode,
+        a.trade_currency_amount tradeCurrencyAmount,
+        a.account_type accountType,
+        a.account_branch accountBranch,
+        a.deposit_withdraw_address depositWithdrawAddress,
+        a.deposit_withdraw_name depositWithdrawName,
+        a.deposit_withdraw_surname depositWithdrawSurname,
+        a.area_code areaCode,
+        a.telephone ,
+        a.email ,
+        a.cpf,
+        a.address,
+        a.province,
+        a.city,
+        a.country,
+        a.updated_time updatedTime,
+        a.arrive_amount AS arriveAmount,
+        a.user_label_id userLabelId
+        FROM user_deposit_withdrawal a JOIN grouped_withdrawals gw ON a.id = gw.id
+        )
+        SELECT
+        lw.*,
+        ui.super_agent_account agentAccount
+        FROM latest_withdrawals lw JOIN user_info ui ON lw.userId = ui.user_id
+        ORDER BY lw.updatedTime DESC
+    </select>
+
+    <select id="getUserWithdrawalRecordsDuplicateCount" resultType="long">
+        WITH grouped_withdrawals AS (
+            SELECT
+                MAX(a.id) AS id
+            FROM
+            user_deposit_withdrawal a
+            <where>
+                AND a.type = 2
+                AND a.STATUS = '101'
+                <if test="vo.siteCode != null and vo.siteCode != ''">
+                    and a.site_code = #{vo.siteCode}
+                </if>
+                <if test="vo.finishStartTime != null and vo.finishStartTime !=''">
+                    AND a.updated_time <![CDATA[ >= ]]> #{vo.finishStartTime}
+                </if>
+                <if test="vo.finishEndTime != null and vo.finishEndTime !=''">
+                    AND a.updated_time <![CDATA[ <= ]]> #{vo.finishEndTime}
+                </if>
+                <if test="vo.orderNo != '' and vo.orderNo != null">
+                    AND a.order_no = #{vo.orderNo}
+                </if>
+                <if test="vo.currencyCode != '' and vo.currencyCode != null">
+                    AND a.currency_code = #{vo.currencyCode}
+                </if>
+                <if test="vo.userAccount != '' and vo.userAccount != null">
+                    AND a.user_account = #{vo.userAccount}
+                </if>
+                <if test="vo.withdrawAccountInfo != '' and vo.withdrawAccountInfo != null">
+                    AND a.deposit_withdraw_address LIKE concat('%', #{vo.withdrawAccountInfo}, '%')
+                </if>
+                <if test="vo.areaCode != '' and vo.areaCode != null">
+                    AND a.area_code = #{vo.areaCode}
+                </if>
+                <if test="vo.telephone != '' and vo.telephone != null">
+                    AND a.telephone = #{vo.telephone}
+                </if>
+                <if test="vo.email != '' and vo.email != null">
+                    AND a.email = #{vo.email}
+                </if>
+            </where>
+            GROUP BY
+                a.user_id,
+                a.deposit_withdraw_type_code,
+                a.deposit_withdraw_way,
+                a.deposit_withdraw_address,
+                a.user_label_id
+        )
+        SELECT
+            count(1) as total
+        FROM
+        grouped_withdrawals
+    </select>
+
+    <select id="withdrawalRiskRecordPageList"
+            resultType="com.cloud.baowang.wallet.api.vo.risk.RiskWithdrawRecordVO">
+        SELECT
+        a.order_no orderNo,
+        a.user_account userAccount,
+        a.apply_amount applyAmount,
+        a.deposit_withdraw_address depositWithdrawAddress,
+        a.currency_code currencyCode,
+        a.trade_currency_amount tradeCurrencyAmount,
+        a.exchange_rate exchangeRate,
+        a.account_type accountType,
+        a.account_branch accountBranch,
+        a.deposit_withdraw_address depositWithdrawAddress,
+        a.deposit_withdraw_name depositWithdrawName,
+        a.deposit_withdraw_surname depositWithdrawSurname,
+        a.deposit_withdraw_type_code depositWithdrawTypeCode,
+        a.deposit_withdraw_way_id depositWithdrawWayId,
+        a.deposit_withdraw_way depositWithdrawWay,
+        a.area_code areaCode,
+        a.telephone ,
+        a.email ,
+        a.cpf,
+        a.address,
+        a.province,
+        a.city,
+        a.postal_code postalCode,
+        a.created_time createdTime,
+        a.updated_time updatedTime,
+        a.arrive_amount as arriveAmount,
+        a.pay_audit_user as payAuditUser,
+        ui.super_agent_account agentAccount,
+        a.user_label_id userLabelId,
+        a.recharge_withdraw_time_consuming as rechargeWithdrawTimeConsuming
+        FROM user_deposit_withdrawal a
+        JOIN user_info ui ON ui.user_id = a.user_id
+        <where>
+            AND a.type = 2
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                and a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.finishStartTime != null and vo.finishStartTime !=''">
+                AND a.updated_time <![CDATA[ >= ]]> #{vo.finishStartTime}
+            </if>
+            <if test="vo.finishEndTime != null and vo.finishEndTime !=''">
+                AND a.updated_time <![CDATA[ <= ]]> #{vo.finishEndTime}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.currencyCode != '' and vo.currencyCode != null">
+                AND a.currency_code = #{vo.currencyCode}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.withdrawAccountInfo != '' and vo.withdrawAccountInfo != null">
+                AND a.deposit_withdraw_address LIKE concat('%', #{vo.withdrawAccountInfo}, '%')
+            </if>
+            <if test="vo.areaCode != '' and vo.areaCode != null">
+                AND a.area_code = #{vo.areaCode}
+            </if>
+            <if test="vo.telephone != '' and vo.telephone != null">
+                AND a.telephone = #{vo.telephone}
+            </if>
+            <if test="vo.email != '' and vo.email != null">
+                AND a.email = #{vo.email}
+            </if>
+            AND a.STATUS = '101'
+        </where>
+        ORDER BY a.updated_time DESC
+    </select>
+
+    <select id="withdrawalRiskRecordPageCount"
+            resultType="long">
+        SELECT
+            count(0)
+        FROM user_deposit_withdrawal a
+        <where>
+            AND a.type = 2
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                and a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.finishStartTime != null and vo.finishStartTime !=''">
+                AND a.updated_time <![CDATA[ >= ]]> #{vo.finishStartTime}
+            </if>
+            <if test="vo.finishEndTime != null and vo.finishEndTime !=''">
+                AND a.updated_time <![CDATA[ <= ]]> #{vo.finishEndTime}
+            </if>
+            <if test="vo.orderNo != '' and vo.orderNo != null">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.currencyCode != '' and vo.currencyCode != null">
+                AND a.currency_code = #{vo.currencyCode}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.userAccount != '' and vo.userAccount != null">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.withdrawAccountInfo != '' and vo.withdrawAccountInfo != null">
+                AND a.deposit_withdraw_address LIKE concat('%', #{vo.withdrawAccountInfo}, '%')
+            </if>
+            AND a.STATUS = '101'
+        </where>
+    </select>
+    <select id="getAddressInfoList"
+            resultType="com.cloud.baowang.wallet.api.vo.userWithdrawRecord.UserWithdrawReviewAddressResponseVO">
+        SELECT * FROM (
+        SELECT
+            user_account AS userAccount,
+            min( created_time ) AS firstUsedTime,
+            max( created_time ) AS lastUsedTime ,
+            COUNT( id ) AS usedNums,
+            ANY_VALUE(currency_code) AS currencyCode
+        FROM
+            user_deposit_withdrawal
+        WHERE
+            deposit_withdraw_address = #{vo.depositWithdrawAddress}
+            AND site_code = #{vo.siteCode}
+            AND id != #{vo.id}
+        GROUP BY
+            user_account) a
+        ORDER BY a.lastUsedTime desc
+
+    </select>
+
+    <select id="userManualDepositPage"
+            resultType="com.cloud.baowang.wallet.api.vo.userWithdrawRecord.UserManualDepositPageResVO">
+        SELECT
+        a.id ,
+        a.site_code siteCode,
+        a.order_no orderNo,
+        a.user_account userAccount,
+        a.device_type deviceType,
+        a.status ,
+        a.customer_status customerStatus,
+        a.apply_ip applyIp,
+        a.apply_amount applyAmount,
+        a.arrive_amount arriveAmount,
+        a.fee_amount feeAmount,
+        a.deposit_withdraw_type_id depositWithdrawType,
+        a.deposit_withdraw_type_code depositWithdrawTypeCode,
+        a.deposit_withdraw_way_id depositWithdrawWayId,
+        a.deposit_withdraw_way depositWithdrawWay,
+        a.currency_code currencyCode,
+        a.deposit_withdraw_address AS  depositWithdrawAddress,
+        a.trade_currency_amount tradeCurrencyAmount,
+        a.exchange_rate exchangeRate,
+        a.is_big_money isBigMoney,
+        a.is_first_out isFirstOut,
+        a.created_time createdTime,
+        a.updated_time updatedTime,
+        a.remark,
+        a.locker,
+        a.lock_status lockStatus,
+        a.lock_time lockTime,
+        IF(a.locker = #{vo.operator}, -1, 1) lockStatus1,
+        IF(a.lock_status = 0, 1, 2) reviewOperation,
+        a.pay_process_status payProcessStatus,
+        a.recv_user_name recvUserName,
+        a.recv_bank_code recvBankCode,
+        a.recv_bank_name recvBankName,
+        a.recv_bank_branch recvBankBranch,
+        a.recv_bank_account recvBankAccount,
+        a.recv_qr_code recvQrCode,
+        a.device_no deviceNo,
+        a.file_key as fileKey,
+        b.network_type networkType,
+        a.cash_flow_file as cashFlowFile,
+        a.way_fee_amount wayFeeAmount,
+        a.settlement_fee_amount settlementFeeAmount,
+        a.coin_code coinCode,
+        a.pay_tx_id payTxId
+        FROM
+        user_deposit_withdrawal a
+        left join system_recharge_way b on a.deposit_withdraw_way_id=b.id
+        <where>
+            a.status = 21
+            and a.type=1
+            and a.deposit_withdraw_channel_type='SITE_CUSTOM'
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                and a.site_code =#{vo.siteCode}
+            </if>
+            <if test="vo.applyTimeStart != null">
+                AND a.created_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.created_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <!--审核时间查询-->
+<!--            <if test="vo.auditTimeStart != null">-->
+<!--                AND adwa.audit_time <![CDATA[ >= ]]> #{vo.auditTimeStart}-->
+<!--            </if>-->
+<!--            <if test="vo.auditTimeEnd != null">-->
+<!--                AND adwa.audit_time <![CDATA[ <= ]]> #{vo.auditTimeEnd}-->
+<!--            </if>-->
+
+            <if test="vo.userAccount != null and vo.userAccount != ''">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.orderNo != null and vo.orderNo !=''">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.lockStatus != null and vo.lockStatus !=''">
+                AND a.lock_status = #{vo.lockStatus}
+            </if>
+            <if test="vo.auditUser != null and vo.auditUser !=''">
+                AND a.locker = #{vo.auditUser}
+            </if>
+            <if test="vo.currencyCode != null and vo.currencyCode != ''">
+                and a.currency_code = #{vo.currencyCode}
+            </if>
+            <if test="vo.depositWayId != null and vo.depositWayId != ''">
+                and a.deposit_withdraw_way_id = #{vo.depositWayId}
+            </if>
+        </where>
+        ORDER BY a.lock_status desc ,lockStatus1 ASC, a.created_time desc
+    </select>
+
+    <select id="userManualDepositCount" resultType="Long">
+        SELECT
+            count(0)
+        FROM
+        user_deposit_withdrawal a
+        <where>
+            a.status = 21
+            and a.type=1
+            and a.deposit_withdraw_channel_type='SITE_CUSTOM'
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                and a.site_code =#{vo.siteCode}
+            </if>
+            <if test="vo.applyTimeStart != null">
+                AND a.created_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.created_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.userAccount != null and vo.userAccount != ''">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.orderNo != null and vo.orderNo !=''">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.lockStatus != null and vo.lockStatus !=''">
+                AND a.lock_status = #{vo.lockStatus}
+            </if>
+            <if test="vo.auditUser != null and vo.auditUser !=''">
+                AND a.locker = #{vo.auditUser}
+            </if>
+            <if test="vo.currencyCode != null and vo.currencyCode != ''">
+                and a.currency_code = #{vo.currencyCode}
+            </if>
+            <if test="vo.depositWayId != null and vo.depositWayId != ''">
+                and a.deposit_withdraw_way_id = #{vo.depositWayId}
+            </if>
+        </where>
+    </select>
+
+    <select id="userManualDepositRecordPage"
+            resultType="com.cloud.baowang.wallet.api.vo.userWithdrawRecord.UserManualDepositRecordPageResVO">
+        SELECT
+        a.id ,
+        a.site_code siteCode,
+        a.order_no orderNo,
+        a.user_account userAccount,
+        a.device_type deviceType,
+        a.status ,
+        a.customer_status customerStatus,
+        a.apply_ip applyIp,
+        a.apply_amount applyAmount,
+        a.arrive_amount arriveAmount,
+        a.fee_amount feeAmount,
+        a.deposit_withdraw_type_id depositWithdrawType,
+        a.deposit_withdraw_type_code depositWithdrawTypeCode,
+        a.deposit_withdraw_way_id depositWithdrawWayId,
+        a.deposit_withdraw_way depositWithdrawWay,
+        a.currency_code currencyCode,
+        a.deposit_withdraw_address AS  depositWithdrawAddress,
+        a.trade_currency_amount tradeCurrencyAmount,
+        a.exchange_rate exchangeRate,
+        a.is_big_money isBigMoney,
+        a.is_first_out isFirstOut,
+        a.created_time createdTime,
+        a.updated_time updatedTime,
+        a.remark,
+        a.locker,
+        a.lock_status lockStatus,
+        a.lock_time lockTime,
+        a.pay_process_status payProcessStatus,
+        a.recv_user_name recvUserName,
+        a.recv_bank_code recvBankCode,
+        a.recv_bank_name recvBankName,
+        a.recv_bank_branch recvBankBranch,
+        a.recv_bank_account recvBankAccount,
+        a.recv_qr_code recvQrCode,
+        a.device_no deviceNo,
+        a.file_key as fileKey,
+        b.network_type networkType,
+        a.cash_flow_file as cashFlowFile,
+        a.way_fee_amount wayFeeAmount,
+        a.settlement_fee_amount settlementFeeAmount,
+        a.coin_code coinCode,
+        a.pay_tx_id payTxId,
+        a.updater updater
+        FROM
+        user_deposit_withdrawal a
+        left join system_recharge_way b on a.deposit_withdraw_way_id=b.id
+        <where>
+            a.status in (100,101)
+            and a.type=1
+            and a.deposit_withdraw_channel_type='SITE_CUSTOM'
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                and a.site_code =#{vo.siteCode}
+            </if>
+            <if test="vo.applyTimeStart != null">
+                AND a.created_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.created_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.userAccount != null and vo.userAccount != ''">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.orderNo != null and vo.orderNo !=''">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.depositWithdrawStatus != null and vo.depositWithdrawStatus != ''">
+                AND a.status = #{vo.depositWithdrawStatus}
+            </if>
+            <if test="vo.auditUser != null and vo.auditUser !=''">
+                AND a.locker = #{vo.auditUser}
+            </if>
+            <if test="vo.currencyCode != null and vo.currencyCode != ''">
+                and a.currency_code = #{vo.currencyCode}
+            </if>
+            <if test="vo.depositWayId != null and vo.depositWayId != ''">
+                and a.deposit_withdraw_way_id = #{vo.depositWayId}
+            </if>
+        </where>
+        ORDER BY  a.created_time desc
+
+
+    </select>
+    <select id="userManualDepositReviewRecordExportCount" resultType="java.lang.Long">
+        SELECT
+            count(a.id)
+        FROM
+        user_deposit_withdrawal a
+        <where>
+            a.status in (100,101)
+            and a.type=1
+            and a.deposit_withdraw_channel_type='SITE_CUSTOM'
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                and a.site_code =#{vo.siteCode}
+            </if>
+            <if test="vo.applyTimeStart != null">
+                AND a.created_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.created_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.userAccount != null and vo.userAccount != ''">
+                AND a.user_account = #{vo.userAccount}
+            </if>
+            <if test="vo.orderNo != null and vo.orderNo !=''">
+                AND a.order_no = #{vo.orderNo}
+            </if>
+            <if test="vo.depositWithdrawStatus != null and vo.depositWithdrawStatus != ''">
+                AND a.deposit_withdraw_status = #{vo.depositWithdrawStatus}
+            </if>
+            <if test="vo.auditUser != null and vo.auditUser !=''">
+                AND a.locker = #{vo.auditUser}
+            </if>
+            <if test="vo.currencyCode != null and vo.currencyCode != ''">
+                and a.currency_code = #{vo.currencyCode}
+            </if>
+            <if test="vo.depositWayId != null and vo.depositWayId != ''">
+                and a.deposit_withdraw_way_id = #{vo.depositWayId}
+            </if>
+        </where>
+
+    </select>
+
+</mapper>

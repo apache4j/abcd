@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.system.repositories.site.change.SiteInfoChangeRecordRepository">
+
+    <select id="allSiteInfo" resultType="com.cloud.baowang.system.api.vo.site.SiteVO">
+        SELECT
+        site_code as siteCode,
+        site_name as siteName,
+        company as company,
+        FROM
+        site_info
+    </select>
+
+</mapper>

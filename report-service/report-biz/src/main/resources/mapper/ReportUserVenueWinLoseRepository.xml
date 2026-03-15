@@ -1,0 +1,1182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.report.repositories.ReportUserVenueWinLoseRepository">
+    <select id="userVenueBets" resultType="com.cloud.baowang.report.api.vo.user.ReportUserVenueTopVO">
+        SELECT venue_code                      as venueCode,
+               IFNULL(SUM(bet_amount), 0)      as betAmount,
+               IFNULL(SUM(win_loss_amount), 0) as winLossAmount,
+               IFNULL(SUM(valid_amount), 0)    as validAmount
+        FROM report_user_venue_win_lose
+        WHERE user_account = #{userAccount}
+          AND site_code = #{siteCode}
+          AND day_hour_millis <![CDATA[ >= ]]> #{startTime}
+          AND day_hour_millis <![CDATA[ <= ]]> #{endTime}
+        GROUP BY venue_code
+    </select>
+    <select id="topPlatformVenue" resultType="com.cloud.baowang.report.api.vo.user.ReportUserVenueTopVO">
+        SELECT t.venueCode,t.betAmount,t.validAmount,t.winLossAmount FROM (
+        SELECT venue_code                      as venueCode,
+        IFNULL(SUM(bet_amount), 0)      as betAmount,
+        IFNULL(SUM(win_loss_amount), 0) as winLossAmount,
+        IFNULL(SUM(valid_amount), 0)    as validAmount
+        FROM report_user_venue_win_lose
+        WHERE user_account = #{vo.userAccount}
+        AND site_code = #{vo.siteCode}
+        AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+        AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+        GROUP BY venue_code) AS t
+
+        <if test="vo.orderType == null || vo.orderType==''">
+            order by t.winLossAmount DESC
+        </if>
+        <if test="vo.orderType=='asc'">
+            <if test="vo.orderField=='betAmount'">
+                order by t.betAmount
+            </if>
+            <if test="vo.orderField=='winLossAmount'">
+                order by t.winLossAmount
+            </if>
+            <if test="vo.orderField=='validAmount'">
+                order by t.validAmount
+            </if>
+        </if>
+        <if test="vo.orderType=='desc'">
+            <if test="vo.orderField=='betAmount'">
+                order by t.betAmount desc
+            </if>
+            <if test="vo.orderField=='winLossAmount'">
+                order by t.winLossAmount desc
+            </if>
+            <if test="vo.orderField=='validAmount'">
+                order by t.validAmount desc
+            </if>
+        </if>
+    </select>
+    <select id="queryUserBetsTop" resultType="com.cloud.baowang.report.api.vo.user.ReportUserVenueBetsTopVO">
+        SELECT
+        userId,
+        userAccount,
+        betAmount,
+        winLossAmount,
+        validAmount,currency
+        FROM
+        (
+        SELECT
+        user_id AS userId,
+        max(user_account) AS userAccount,
+        IFNULL(SUM(bet_amount), 0) AS betAmount,
+        IFNULL(SUM(win_loss_amount), 0) AS winLossAmount,
+        IFNULL(SUM(valid_amount), 0) AS validAmount
+        ,currency
+        FROM
+        report_user_venue_win_lose
+        WHERE
+        site_code = #{vo.siteCode}
+        <if test="vo.venueCode != null and vo.venueCode !=''">
+            AND venue_code = #{vo.venueCode}
+        </if>
+        <if test="vo.userIdList != null and vo.userIdList.size() > 0">
+            AND user_id IN
+            <foreach collection="vo.userIdList" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.venueCodeList != null and vo.venueCodeList.size() > 0">
+            AND venue_code IN
+            <foreach collection="vo.venueCodeList" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.dayMillis != null ">
+            AND day_millis = #{vo.dayMillis}
+        </if>
+
+        <if test="vo.startTime != null ">
+            AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+
+        <if test="vo.endTime != null ">
+            AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+
+        GROUP BY
+        user_id,currency
+        ) t
+        <where>
+            <if test="vo.winLossAmountMin != null">
+                AND t.winLossAmount <![CDATA[ >= ]]> #{vo.winLossAmountMin}
+            </if>
+            <if test="vo.winLossAmountMax != null">
+                AND t.winLossAmount <![CDATA[ <= ]]> #{vo.winLossAmountMax}
+            </if>
+            <if test="vo.betAmountMin != null">
+                AND t.betAmount <![CDATA[ >= ]]> #{vo.betAmountMin}
+            </if>
+            <if test="vo.betAmountMax != null">
+                AND t.betAmount <![CDATA[ <= ]]> #{vo.betAmountMax}
+            </if>
+        </where>
+        <if test="vo.orderField != null and vo.orderField != ''">
+            order by ${vo.orderField}
+            <if test="vo.orderType != null and vo.orderType != ''">
+                ${vo.orderType}
+            </if>
+        </if>
+    </select>
+    <select id="pageListByVenueCode" resultType="java.lang.String">
+        select
+        venue_code
+        from report_user_venue_win_lose
+        <include refid="pageListParam"/>
+        group by venue_code order by venue_code
+    </select>
+
+    <sql id="pageListParam">
+        <where>
+            1= 1
+            <if test="vo.venueCodeList != null and vo.venueCodeList.size() > 0">
+                AND venue_code IN
+                <foreach collection="vo.venueCodeList" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+
+            <if test="vo.siteCode != null and vo.siteCode != ''">
+                AND site_code = #{vo.siteCode}
+            </if>
+
+            <if test="vo.startTime != null">
+                AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+
+            <if test="vo.endTime != null">
+                AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+
+            <if test="vo.currency != null and vo.currency != ''">
+                AND currency = #{vo.currency}
+            </if>
+        </where>
+    </sql>
+
+    <select id="detailList" resultType="com.cloud.baowang.report.api.vo.venuewinlose.VenueWinLossDetailResVO">
+        select
+        venue_code,
+        currency,
+        IFNULL(count(DISTINCT user_id),0) as bettorCount,
+        IFNULL(sum(bet_count),0) as betCount,
+        IFNULL(sum(bet_amount),0) as betAmount,
+        IFNULL(sum(valid_amount),0) as validBetAmount,
+        IFNULL(-sum(win_loss_amount),0) as winlossAmount,
+        IFNULL(-sum(user_win_loss_amount),0) as userWinlossAmount,
+        IFNULL(sum(tips_amount),0) as tipsAmount
+        from report_user_venue_win_lose
+        <include refid="pageListParam"/>
+        group by venue_code,currency
+        <choose>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''
+                            and (vo.orderName == null or vo.orderName == '')
+                            and (vo.orderValue == null or vo.orderValue == '')">
+                ORDER BY ${vo.orderField} ${vo.orderType}
+            </when>
+            <when test="vo.orderName != null and vo.orderName != ''
+                            and vo.orderValue != null and vo.orderValue != ''
+                            and (vo.orderField == null or vo.orderField == '')
+                            and (vo.orderType == null or vo.orderType == '')">
+                ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc
+            </when>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''
+                            and vo.orderName != null and vo.orderName != ''
+                            and vo.orderValue != null and vo.orderValue != ''">
+                ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc, ${vo.orderField} ${vo.orderType}
+            </when>
+            <otherwise>
+                ORDER BY venue_code,currency,winlossAmount desc,validBetAmount desc,betCount desc
+            </otherwise>
+        </choose>
+    </select>
+    <select id="totalByParam"
+            resultType="com.cloud.baowang.report.api.vo.venuewinlose.VenueWinLossDetailResVO">
+        select
+        currency,
+        IFNULL(count(distinct user_id),0) as bettorCount,
+        IFNULL(sum(bet_count),0) as betCount,
+        IFNULL(sum(bet_amount),0) as betAmount,
+        IFNULL(sum(valid_amount),0) as validBetAmount,
+        IFNULL(-sum(win_loss_amount),0) as winlossAmount,
+        IFNULL(-sum(user_win_loss_amount),0) as userWinlossAmount,
+        IFNULL(sum(tips_amount),0) as tipsAmount
+        from report_user_venue_win_lose
+        <include refid="pageListParam"/>
+        group by currency
+    </select>
+
+
+
+
+
+    <select id="queryVenueDayCurrency" resultType="java.lang.String">
+        SELECT tab.currency
+        FROM (
+                 SELECT currency, COUNT(day_millis) AS countDay
+                 FROM report_user_venue_win_lose
+                 WHERE day_millis BETWEEN #{vo.startDayMillisTime} AND #{vo.endDayMillisTime}
+                   AND venue_type = #{vo.venueType}
+                   AND site_code = #{vo.siteCode}
+                 GROUP BY currency
+                 HAVING COUNT(day_millis) >= #{vo.countDay}
+             ) AS tab;
+
+    </select>
+
+    <select id="queryAgentVenueWinLoss" resultType="com.cloud.baowang.report.api.vo.agent.ReportAgentVenueWinLossVO">
+        SELECT venue_code as venueCode,
+               currency as currency,
+               site_code as siteCode,
+               IFNULL(sum(valid_amount),0) as validAmount,
+               IFNULL(sum(win_loss_amount),0) as winLossAmount,
+               IFNULL(sum(user_win_loss_amount),0) as userWinLossAmount
+        FROM `report_user_venue_win_lose`
+        where 1 = 1
+        <if test="vo.siteCode != null">
+            AND site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+            AND agent_id IN
+            <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null">
+            AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        group by site_code,venue_code, currency;
+    </select>
+    <select id="queryByTimeAndAgent"
+            resultType="com.cloud.baowang.report.api.vo.venuewinlose.ReportVenueWinLossAgentVO">
+        select
+        agent_id AS agentId,
+        venue_code AS venueCode,
+        currency AS currency,
+        IFNULL(-SUM(win_loss_amount),0) AS winLoseAmount,
+        IFNULL(SUM(tips_amount),0) AS tipsAmount,
+        IFNULL(SUM(valid_amount),0) AS validBetAmount
+        from report_user_venue_win_lose
+        where
+        site_code = #{vo.siteCode}
+        <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+            AND agent_id IN
+            <foreach item="item" collection="vo.agentIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null">
+            AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        <if test="vo.currency != null and vo.currency != ''">
+            AND currency = #{vo.currency}
+        </if>
+        group by agent_id,venue_code,currency
+    </select>
+
+    <select id="queryByTimeAndSiteCode"
+            resultType="java.lang.Integer">
+        select
+        COUNT(DISTINCT user_id) AS userIdCount
+        from report_user_venue_win_lose
+        where
+        site_code = #{vo.siteCode}
+        <if test="vo.startTime != null">
+            AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+
+    </select>
+
+    <select id="infoList" resultType="com.cloud.baowang.report.api.vo.venuewinlose.VenueWinLossInfoResVO">
+        SELECT
+        day_millis AS dayMillis,
+        currency AS currency,
+        IFNULL(SUM(bet_count), 0) AS betCount,
+        IFNULL(count(DISTINCT user_id),0) as bettorCount,
+        IFNULL(SUM(bet_amount), 0) AS betAmount,
+        IFNULL(-SUM(win_loss_amount), 0) AS winlossAmount,
+        IFNULL(SUM(valid_amount), 0) AS validBetAmount,
+        IFNULL(-SUM(user_win_loss_amount), 0) AS userWinlossAmount,
+        IFNULL(SUM(tips_amount), 0) AS tipsAmount
+        FROM
+        report_user_venue_win_lose
+        where 1 = 1
+        <if test="vo.startTime != null">
+            AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        <if test="vo.siteCode != null and vo.siteCode !='' ">
+            AND site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.venueCode != null and vo.venueCode !='' ">
+            AND venue_code = #{vo.venueCode}
+        </if>
+        <if test="vo.currency != null and vo.currency !='' ">
+            AND currency = #{vo.currency}
+        </if>
+        group by day_millis,currency order by dayMillis desc
+    </select>
+
+
+    <select id="reportGameCenterPageListSum"
+            resultType="com.cloud.baowang.report.api.vo.game.ReportGameQueryCenterVO">
+        <include refid="reportGameCenterPageListSQL"/>
+    </select>
+
+    <select id="reportGameCenterPageListTotalSum"
+            resultType="com.cloud.baowang.report.api.vo.game.ReportGameQueryCenterVO">
+        <include refid="reportGameCenterPageListSQL"/>
+    </select>
+
+
+    <sql id="reportGameCenterPageListSQL">
+
+        SELECT
+        site_code AS siteCode,
+        currency AS currency,
+        IFNULL(SUM(bet_count), 0) AS betNum,
+        IFNULL(count(DISTINCT user_id),0) as bettorNum,
+        IFNULL(SUM(bet_amount), 0) AS betAmount,
+        <!--        IFNULL(-SUM(win_loss_amount), 0) AS winloseAmount,-->
+        IFNULL(-SUM(win_loss_amount), 0) AS winloseAmount,
+        IFNULL(SUM(valid_amount), 0) AS validBetAmount,
+        IFNULL(SUM(tips_amount), 0) AS tipsAmount
+        FROM
+        report_user_venue_win_lose
+        <where>
+            1 = 1
+            <if test="vo.startTime != null">
+                AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+            <if test="vo.siteCodeList != null and vo.siteCodeList.size() > 0">
+                AND site_code in
+                <foreach item="value" collection="vo.siteCodeList" open="(" separator="," close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.currency != null and vo.currency != ''">
+                AND currency = #{vo.currency}
+            </if>
+        </where>
+        group by site_code,currency
+        <choose>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''
+                            and (vo.orderName == null or vo.orderName == '')
+                            and (vo.orderValue == null or vo.orderValue == '')">
+                ORDER BY ${vo.orderField} ${vo.orderType}
+            </when>
+            <when test="vo.orderName != null and vo.orderName != ''
+                            and vo.orderValue != null and vo.orderValue != ''
+                            and (vo.orderField == null or vo.orderField == '')
+                            and (vo.orderType == null or vo.orderType == '')">
+                ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc
+            </when>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''
+                            and vo.orderName != null and vo.orderName != ''
+                            and vo.orderValue != null and vo.orderValue != ''">
+                ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc, ${vo.orderField} ${vo.orderType}
+            </when>
+            <otherwise>
+                ORDER BY site_code,currency DESC
+            </otherwise>
+        </choose>
+
+
+    </sql>
+
+    <select id="reportGameCenterPageList"
+            resultType="com.cloud.baowang.report.api.vo.game.ReportGameQueryCenterVO">
+
+        SELECT
+        site_code AS siteCode,
+        currency AS currency,
+        IFNULL(SUM(bet_count), 0) AS betNum,
+        IFNULL(count(DISTINCT user_id),0) as bettorNum,
+        IFNULL(SUM(bet_amount), 0) AS betAmount,
+        <!--        IFNULL(-SUM(win_loss_amount), 0) AS winloseAmount,-->
+        IFNULL(-SUM(win_loss_amount), 0) AS winloseAmount,
+        IFNULL(SUM(valid_amount), 0) AS validBetAmount,
+        IFNULL(SUM(tips_amount), 0) AS tipsAmount
+        FROM
+        report_user_venue_win_lose
+        <where>
+            1 = 1
+            <if test="vo.startTime != null">
+                AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+            <if test="vo.siteCodeList != null and vo.siteCodeList.size() > 0">
+                AND site_code in
+                <foreach item="value" collection="vo.siteCodeList" open="(" separator="," close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.currency != null and vo.currency != ''">
+                AND currency = #{vo.currency}
+            </if>
+        </where>
+        group by site_code,currency
+        <choose>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''
+                            and (vo.orderName == null or vo.orderName == '')
+                            and (vo.orderValue == null or vo.orderValue == '')">
+                ORDER BY ${vo.orderField} ${vo.orderType}
+            </when>
+            <when test="vo.orderName != null and vo.orderName != ''
+                            and vo.orderValue != null and vo.orderValue != ''
+                            and (vo.orderField == null or vo.orderField == '')
+                            and (vo.orderType == null or vo.orderType == '')">
+                ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc
+            </when>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''
+                            and vo.orderName != null and vo.orderName != ''
+                            and vo.orderValue != null and vo.orderValue != ''">
+                ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc, ${vo.orderField} ${vo.orderType}
+            </when>
+            <otherwise>
+                ORDER BY site_code,currency DESC
+            </otherwise>
+        </choose>
+
+    </select>
+
+
+    <sql id="reportGameSitePageListSQL">
+
+        SELECT
+        currency AS currency,
+        IFNULL(SUM(bet_count), 0) AS betNum,
+        IFNULL(count(DISTINCT user_id),0) as bettorNum,
+        IFNULL(SUM(bet_amount), 0) AS betAmount,
+        IFNULL(-SUM(win_loss_amount), 0) AS winloseAmount,
+        IFNULL(-SUM(user_win_loss_amount), 0) AS betWinLose,
+        IFNULL(SUM(tips_amount), 0) AS tipsAmount,
+        IFNULL(SUM(valid_amount), 0) AS validBetAmount
+        FROM
+        report_user_venue_win_lose
+        <where>
+            1 = 1
+            <if test="vo.startTime != null">
+                AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+            <if test="vo.siteCode != null and vo.siteCode != '' ">
+                AND site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.venueType != null">
+                AND venue_type = #{vo.venueType}
+            </if>
+            <if test="vo.currency != null and vo.currency != ''">
+                AND currency = #{vo.currency}
+            </if>
+        </where>
+        group by currency
+        <choose>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''
+                            and (vo.orderName == null or vo.orderName == '')
+                            and (vo.orderValue == null or vo.orderValue == '')">
+                ORDER BY ${vo.orderField} ${vo.orderType}
+            </when>
+            <when test="vo.orderName != null and vo.orderName != ''
+                            and vo.orderValue != null and vo.orderValue != ''
+                            and (vo.orderField == null or vo.orderField == '')
+                            and (vo.orderType == null or vo.orderType == '')">
+                ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc
+            </when>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''
+                            and vo.orderName != null and vo.orderName != ''
+                            and vo.orderValue != null and vo.orderValue != ''">
+                ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc, ${vo.orderField} ${vo.orderType}
+            </when>
+            <otherwise>
+                ORDER BY currency
+            </otherwise>
+        </choose>
+
+
+
+    </sql>
+
+
+    <select id="reportGameSitePageListALL"
+            resultType="com.cloud.baowang.report.api.vo.game.ReportGameQuerySiteVO">
+        <include refid="reportGameSitePageListSQL"/>
+    </select>
+
+
+    <select id="reportGameSitePageListSum"
+            resultType="com.cloud.baowang.report.api.vo.game.ReportGameQuerySiteVO">
+        <include refid="reportGameSitePageListSQL"/>
+    </select>
+
+    <select id="reportGameSitePageList"
+            resultType="com.cloud.baowang.report.api.vo.game.ReportGameQuerySiteVO">
+        SELECT
+        venue_type AS venueType,
+        currency AS currency,
+        IFNULL(SUM(bet_count), 0) AS betNum,
+        IFNULL(count(DISTINCT user_id),0) as bettorNum,
+        IFNULL(SUM(bet_amount), 0) AS betAmount,
+        IFNULL(-SUM(win_loss_amount), 0) AS winloseAmount,
+        IFNULL(-SUM(user_win_loss_amount), 0) AS betWinLose,
+        IFNULL(SUM(tips_amount), 0) AS tipsAmount,
+        IFNULL(SUM(valid_amount), 0) AS validBetAmount
+        FROM
+        report_user_venue_win_lose
+        <where>
+            1 = 1
+            <if test="vo.startTime != null">
+                AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+            <if test="vo.siteCode != null and vo.siteCode != '' ">
+                AND site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.venueType != null">
+                AND venue_type = #{vo.venueType}
+            </if>
+            <if test="vo.currency != null and vo.currency != ''">
+                AND currency = #{vo.currency}
+            </if>
+        </where>
+        group by venue_type,currency
+        <choose>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''
+                            and (vo.orderName == null or vo.orderName == '')
+                            and (vo.orderValue == null or vo.orderValue == '')">
+                ORDER BY ${vo.orderField} ${vo.orderType}
+            </when>
+            <when test="vo.orderName != null and vo.orderName != ''
+                            and vo.orderValue != null and vo.orderValue != ''
+                            and (vo.orderField == null or vo.orderField == '')
+                            and (vo.orderType == null or vo.orderType == '')">
+                ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc
+            </when>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''
+                            and vo.orderName != null and vo.orderName != ''
+                            and vo.orderValue != null and vo.orderValue != ''">
+                ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc, ${vo.orderField} ${vo.orderType}
+            </when>
+            <otherwise>
+                ORDER BY venue_type,currency
+            </otherwise>
+        </choose>
+    </select>
+
+    <sql id="reportGameVenueTypePageListSQL">
+        SELECT
+        currency AS currency,
+        IFNULL(SUM(bet_count), 0) AS betNum,
+        IFNULL(count(DISTINCT user_id),0) as bettorNum,
+        IFNULL(SUM(bet_amount), 0) AS betAmount,
+        IFNULL(-SUM(win_loss_amount), 0) AS winloseAmount,
+        IFNULL(-SUM(user_win_loss_amount), 0) AS betWinlose,
+        IFNULL(SUM(valid_amount), 0) AS validBetAmount,
+        IFNULL(SUM(tips_amount), 0) AS tipsAmount
+        FROM
+        report_user_venue_win_lose
+        <where>
+            1 = 1
+            <if test="vo.startTime != null">
+                AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+            <if test="vo.currency != null and vo.currency !='' ">
+                AND currency = #{vo.currency}
+            </if>
+            <if test="vo.siteCode != null and vo.siteCode !='' ">
+                AND site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.venueType != null">
+                AND venue_type = #{vo.venueType}
+            </if>
+            <if test="vo.venueCode != null and vo.venueCode !='' ">
+                AND venue_code = #{vo.venueCode}
+            </if>
+        </where>
+        group by currency
+        <choose>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''
+                            and (vo.orderName == null or vo.orderName == '')
+                            and (vo.orderValue == null or vo.orderValue == '')">
+                ORDER BY ${vo.orderField} ${vo.orderType}
+            </when>
+            <when test="vo.orderName != null and vo.orderName != ''
+                            and vo.orderValue != null and vo.orderValue != ''
+                            and (vo.orderField == null or vo.orderField == '')
+                            and (vo.orderType == null or vo.orderType == '')">
+                ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc
+            </when>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''
+                            and vo.orderName != null and vo.orderName != ''
+                            and vo.orderValue != null and vo.orderValue != ''">
+                ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc, ${vo.orderField} ${vo.orderType}
+            </when>
+            <otherwise>
+                ORDER BY currency
+            </otherwise>
+        </choose>
+    </sql>
+
+
+    <select id="reportGameVenueTypePageListSum"
+            resultType="com.cloud.baowang.report.api.vo.game.ReportGameQueryVenueTypeVO">
+        <include refid="reportGameVenueTypePageListSQL"/>
+    </select>
+
+
+    <select id="reportGameVenueTypePageListAll"
+            resultType="com.cloud.baowang.report.api.vo.game.ReportGameQueryVenueTypeVO">
+        <include refid="reportGameVenueTypePageListSQL"/>
+    </select>
+
+    <select id="reportGameVenueTypePageList"
+            resultType="com.cloud.baowang.report.api.vo.game.ReportGameQueryVenueTypeVO">
+        SELECT
+        venue_code AS venueCode,
+        currency AS currency,
+        IFNULL(SUM(bet_count), 0) AS betNum,
+        IFNULL(count(DISTINCT user_id),0) as bettorNum,
+        IFNULL(SUM(bet_amount), 0) AS betAmount,
+        IFNULL(-SUM(win_loss_amount), 0) AS winloseAmount,
+        IFNULL(-SUM(user_win_loss_amount), 0) AS betWinlose,
+        IFNULL(SUM(valid_amount), 0) AS validBetAmount,
+        IFNULL(SUM(tips_amount), 0) AS tipsAmount
+        FROM
+        report_user_venue_win_lose
+        <where>
+            1 = 1
+            <if test="vo.startTime != null">
+                AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+            <if test="vo.currency != null and vo.currency !='' ">
+                AND currency = #{vo.currency}
+            </if>
+            <if test="vo.siteCode != null and vo.siteCode !='' ">
+                AND site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.venueType != null">
+                AND venue_type = #{vo.venueType}
+            </if>
+            <if test="vo.venueCode != null and vo.venueCode !='' ">
+                AND venue_code = #{vo.venueCode}
+            </if>
+        </where>
+        group by venue_code,currency
+        <choose>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''
+                            and (vo.orderName == null or vo.orderName == '')
+                            and (vo.orderValue == null or vo.orderValue == '')">
+                ORDER BY ${vo.orderField} ${vo.orderType}
+            </when>
+            <when test="vo.orderName != null and vo.orderName != ''
+                            and vo.orderValue != null and vo.orderValue != ''
+                            and (vo.orderField == null or vo.orderField == '')
+                            and (vo.orderType == null or vo.orderType == '')">
+                ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc
+            </when>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''
+                            and vo.orderName != null and vo.orderName != ''
+                            and vo.orderValue != null and vo.orderValue != ''">
+                ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc, ${vo.orderField} ${vo.orderType}
+            </when>
+            <otherwise>
+                ORDER BY venue_code,currency
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <sql id="reportGameVenuePageListSQL">
+
+
+        SELECT
+        currency AS currency,
+        venue_code as venueCode,
+        IFNULL(SUM(bet_count), 0) AS betNum,
+        IFNULL(count(DISTINCT user_id),0) as bettorNum,
+        IFNULL(SUM(bet_amount), 0) AS betAmount,
+        IFNULL(-SUM(win_loss_amount), 0) AS winloseAmount,
+        IFNULL(-SUM(user_win_loss_amount), 0) AS betWinlose,
+        IFNULL(SUM(valid_amount), 0) AS validBetAmount,
+        IFNULL(SUM(tips_amount),0) as tipsAmount
+        FROM
+        report_user_venue_win_lose
+        <where>
+            1 = 1
+            <if test="vo.startTime != null">
+                AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+            <if test="vo.currency != null and vo.currency !='' ">
+                AND currency = #{vo.currency}
+            </if>
+            <if test="vo.siteCode != null and vo.siteCode !='' ">
+                AND site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.venueType != null">
+                AND venue_type = #{vo.venueType}
+            </if>
+            <if test="vo.venueCode != null and vo.venueCode !='' ">
+                AND venue_code = #{vo.venueCode}
+            </if>
+            <if test="vo.thirdGameCodes != null and vo.thirdGameCodes.size() > 0">
+                AND venue_game_type in
+                <foreach item="value" collection="vo.thirdGameCodes" open="(" separator="," close=")">
+                    #{value}
+                </foreach>
+            </if>
+        </where>
+        group by currency
+        <choose>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''
+                            and (vo.orderName == null or vo.orderName == '')
+                            and (vo.orderValue == null or vo.orderValue == '')">
+                ORDER BY ${vo.orderField} ${vo.orderType}
+            </when>
+            <when test="vo.orderName != null and vo.orderName != ''
+                            and vo.orderValue != null and vo.orderValue != ''
+                            and (vo.orderField == null or vo.orderField == '')
+                            and (vo.orderType == null or vo.orderType == '')">
+                ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc
+            </when>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''
+                            and vo.orderName != null and vo.orderName != ''
+                            and vo.orderValue != null and vo.orderValue != ''">
+                ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc, ${vo.orderField} ${vo.orderType}
+            </when>
+            <otherwise>
+                ORDER BY currency
+            </otherwise>
+        </choose>
+
+
+    </sql>
+
+
+    <select id="reportGameVenuePageListPageSum"
+            resultType="com.cloud.baowang.report.api.vo.game.ReportGameQueryVenueVO">
+        <include refid="reportGameVenuePageListSQL"/>
+    </select>
+
+    <select id="reportGameVenuePageListAll"
+            resultType="com.cloud.baowang.report.api.vo.game.ReportGameQueryVenueVO">
+        <include refid="reportGameVenuePageListSQL"/>
+    </select>
+
+    <select id="reportGameVenuePageList"
+            resultType="com.cloud.baowang.report.api.vo.game.ReportGameQueryVenueVO">
+        SELECT
+        venue_game_type AS thirdGameType,
+        currency AS currency,
+        venue_code as venueCode,
+        IFNULL(SUM(bet_count), 0) AS betNum,
+        IFNULL(count(DISTINCT user_id),0) as bettorNum,
+        IFNULL(SUM(bet_amount), 0) AS betAmount,
+        IFNULL(-SUM(win_loss_amount), 0) AS winloseAmount,
+        IFNULL(-SUM(user_win_loss_amount), 0) AS betWinlose,
+        IFNULL(SUM(valid_amount), 0) AS validBetAmount,
+        IFNULL(SUM(tips_amount),0) as tipsAmount
+        FROM
+        report_user_venue_win_lose
+        <where>
+            1 = 1
+            <if test="vo.startTime != null">
+                AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+            <if test="vo.currency != null and vo.currency !='' ">
+                AND currency = #{vo.currency}
+            </if>
+            <if test="vo.siteCode != null and vo.siteCode !='' ">
+                AND site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.venueType != null">
+                AND venue_type = #{vo.venueType}
+            </if>
+            <if test="vo.venueCode != null and vo.venueCode !='' ">
+                AND venue_code = #{vo.venueCode}
+            </if>
+            <if test="vo.thirdGameCodes != null and vo.thirdGameCodes.size() > 0">
+                AND venue_game_type in
+                <foreach item="value" collection="vo.thirdGameCodes" open="(" separator="," close=")">
+                    #{value}
+                </foreach>
+            </if>
+        </where>
+        group by venue_game_type,currency
+        <choose>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''
+                            and (vo.orderName == null or vo.orderName == '')
+                            and (vo.orderValue == null or vo.orderValue == '')">
+                ORDER BY ${vo.orderField} ${vo.orderType}
+            </when>
+            <when test="vo.orderName != null and vo.orderName != ''
+                            and vo.orderValue != null and vo.orderValue != ''
+                            and (vo.orderField == null or vo.orderField == '')
+                            and (vo.orderType == null or vo.orderType == '')">
+                ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc
+            </when>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''
+                            and vo.orderName != null and vo.orderName != ''
+                            and vo.orderValue != null and vo.orderValue != ''">
+                ORDER BY ${vo.orderName} != ${vo.orderValue}, ${vo.orderName} asc, ${vo.orderField} ${vo.orderType}
+            </when>
+            <otherwise>
+                ORDER BY venue_game_type,currency
+            </otherwise>
+        </choose>
+    </select>
+    <select id="reportGameCenterCount" resultType="java.lang.Long">
+        select count(1) as count from (
+        SELECT
+        site_code AS siteCode,
+        currency AS currency
+        FROM
+        report_user_venue_win_lose
+        <where>
+            1 = 1
+            <if test="vo.startTime != null">
+                AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+            <if test="vo.siteCodeList != null and vo.siteCodeList.size() > 0">
+                AND site_code in
+                <foreach item="value" collection="vo.siteCodeList" open="(" separator="," close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.currency != null and vo.currency != ''">
+                AND currency = #{vo.currency}
+            </if>
+        </where>
+        group by site_code,currency) t
+    </select>
+    <select id="sitePageListCount" resultType="java.lang.Long">
+        select count(1) from (
+        SELECT
+        venue_type AS venueType,
+        currency AS currency
+        FROM
+        report_user_venue_win_lose
+        <where>
+            1 = 1
+            <if test="vo.startTime != null">
+                AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+            <if test="vo.siteCode != null and vo.siteCode !='' ">
+                AND site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.venueType != null">
+                AND venue_type = #{vo.venueType}
+            </if>
+
+            <if test="vo.currency != null and vo.currency != ''">
+                AND currency = #{vo.currency}
+            </if>
+        </where>
+        group by venue_type,currency) t
+    </select>
+    <select id="venueTypePageListCount" resultType="java.lang.Long">
+        select count(1) from (
+        SELECT
+        venue_code AS venueCode
+        FROM
+        report_user_venue_win_lose
+        <where>
+            1 = 1
+            <if test="vo.startTime != null">
+                AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+            <if test="vo.currency != null and vo.currency !='' ">
+                AND currency = #{vo.currency}
+            </if>
+            <if test="vo.siteCode != null and vo.siteCode !='' ">
+                AND site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.venueType != null">
+                AND venue_type = #{vo.venueType}
+            </if>
+            <if test="vo.venueCode != null and vo.venueCode !='' ">
+                AND venue_code = #{vo.venueCode}
+            </if>
+        </where>
+        group by venue_code) t
+    </select>
+    <select id="venuePageListCount" resultType="java.lang.Long">
+        select count(1) from (
+        SELECT
+        venue_code AS venueCode,
+        venue_game_type AS thirdGameType
+        FROM
+        report_user_venue_win_lose
+        <where>
+            1 = 1
+            <if test="vo.startTime != null">
+                AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null">
+                AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+            </if>
+            <if test="vo.currency != null and vo.currency !='' ">
+                AND currency = #{vo.currency}
+            </if>
+            <if test="vo.siteCode != null and vo.siteCode !='' ">
+                AND site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.venueType != null">
+                AND venue_type = #{vo.venueType}
+            </if>
+            <if test="vo.venueCode != null and vo.venueCode !='' ">
+                AND venue_code = #{vo.venueCode}
+            </if>
+            <if test="vo.thirdGameCodes != null and vo.thirdGameCodes.size() > 0">
+                AND venue_game_type in
+                <foreach item="value" collection="vo.thirdGameCodes" open="(" separator="," close=")">
+                    #{value}
+                </foreach>
+            </if>
+        </where>
+        group by venue_game_type) t
+    </select>
+
+    <select id="getUserVenueAmountByAgentIds" resultType="com.cloud.baowang.report.api.vo.agent.ReportAgentVenueStaticsVO">
+        SELECT
+        venue_type as venueType,
+        currency as currency ,
+        sum(bet_amount) as betAmount,
+        sum(valid_amount) as validBetAmount,
+        sum(win_loss_amount) as winLossAmount
+        FROM
+        `report_user_venue_win_lose`
+        WHERE
+         agent_id IN
+        <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+            #{value}
+        </foreach>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        GROUP BY venue_type, currency
+    </select>
+
+    <select id="getUserVenueAmountGroupByAgent" resultType="com.cloud.baowang.report.api.vo.agent.ReportAgentVenueStaticsVO">
+        SELECT
+        agent_id as agentId,
+        venue_type as venueType,
+        currency as currency ,
+        sum(bet_amount) as betAmount,
+        sum(valid_amount) as validBetAmount,
+        sum(win_loss_amount) as winLossAmount
+        FROM
+        `report_user_venue_win_lose`
+        WHERE agent_id IS NOT NULL
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND day_hour_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND day_hour_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        GROUP BY venue_type, currency, agentId
+    </select>
+
+
+    <select id="queryVenueAmountByDay" resultType="com.cloud.baowang.report.api.vo.agent.ReportAgentVenueStaticsVO">
+        SELECT a.day_millis,
+        a.venue_code as venueCode,
+        sum(a.valid_amount) validBetAmount,
+        sum(a.valid_amount/b.final_rate) validBetPlatAmount
+        from report_user_venue_win_lose a join site_currency_info b  on a.currency=b.currency_code and a.site_code=b.site_code
+        where  1=1
+        and a.site_code=#{vo.siteCode}
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND a.day_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND a.day_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        GROUP BY a.day_millis,a.venue_code
+
+    </select>
+
+    <select id="getAgentUserVenueList" resultType="com.cloud.baowang.report.api.vo.user.ReportUserVenueTopVO">
+        select
+        venue_code as venueCode,
+        currency,
+        SUM(bet_amount) AS betAmount,
+        SUM(win_loss_amount) AS winLossAmount,
+        SUM(valid_amount) AS validAmount
+        from report_user_venue_win_lose a
+        where  1=1
+        and a.site_code=#{vo.siteCode}
+        <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+            and agent_id IN
+            <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND a.day_millis <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND a.day_millis <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        group by venue_code,currency
+        order by betAmount desc
+    </select>
+    <select id="getTotalCount" resultType="java.lang.Long">
+        select count(1) from (
+        select
+        venue_code,
+        currency
+        from report_user_venue_win_lose
+        <include refid="pageListParam"/>
+        group by venue_code,currency )
+        t
+    </select>
+
+    <select id="getDailyDistinctUserCount" resultType="com.cloud.baowang.report.api.vo.site.SiteReportUserVenueStaticsVO">
+         SELECT day_millis as dayMillis,
+            COUNT(DISTINCT user_id) AS userCount,
+            IFNULL(sum(bet_count),0) as betCount,
+            DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(day_millis / 1000), @@session.time_zone, #{timezone}), '%Y-%m-%d') AS myDay
+         FROM report_user_venue_win_lose
+         WHERE
+            site_code = #{siteCode}
+            AND day_millis BETWEEN #{startMillis} AND #{endMillis}
+         GROUP BY day_millis
+
+    </select>
+
+    <select id="getDailyCurrencyAmount" resultType="com.cloud.baowang.report.api.vo.site.SiteReportUserVenueStaticsVO">
+
+        SELECT
+            currency currencyCode,
+            IFNULL( sum( valid_amount ), 0 ) AS validAmount,
+            IFNULL( sum( win_loss_amount ), 0 ) AS winLoseAmount,
+            myDay
+        FROM
+        (
+            SELECT
+                currency,
+                IFNULL(valid_amount , 0 ) AS valid_amount,
+                IFNULL(win_loss_amount , 0 ) AS win_loss_amount,
+                DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(day_hour_millis / 1000), @@session.time_zone, #{timezone}), '%Y-%m-%d') AS myDay
+             FROM report_user_venue_win_lose
+             WHERE
+                site_code = #{siteCode}
+                AND day_hour_millis BETWEEN #{startMillis} AND #{endMillis}
+
+                <if test="currencyCode != null and currencyCode !='' ">
+                    AND currency = #{currencyCode}
+                </if>
+
+        ) mm
+        GROUP BY myDay,currency
+
+    </select>
+
+
+    <select id="statAgentValidBetAmount"
+            resultType="com.cloud.baowang.report.api.vo.ReportUserAgentVenueStaticsVO">
+
+        SELECT
+        t.site_code as siteCode,
+        t.agent_id       AS agentId,
+        t.agent_account  AS agentAccount,
+        t.venue_type as venueType,
+        t.currency as currency,
+        t.day_millis as dayMillis,
+        SUM(t.valid_amount) AS validAmount
+        FROM report_user_venue_win_lose t
+        WHERE t.day_hour_millis <![CDATA[>=]]> #{startTime}
+        AND t.day_hour_millis <![CDATA[<]]>  #{endTime}
+        AND t.agent_id IS NOT NULL
+        AND t.agent_id <![CDATA[<>]]> ''
+
+        <if test="venueType != null">
+            AND t.venue_type = #{venueType}
+        </if>
+        <if test="siteCode != null and siteCode != ''">
+            AND t.site_code = #{siteCode}
+        </if>
+        <if test="currency != null and currency != ''">
+            AND t.currency = #{currency}
+        </if>
+
+        GROUP BY
+        t.site_code,
+        t.agent_id,
+        t.agent_account,
+        t.venue_type,
+        t.currency,
+        t.day_millis
+        ORDER BY validAmount DESC
+
+    </select>
+
+
+</mapper>

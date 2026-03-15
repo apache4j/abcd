@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.user.repositories.SiteVIPGradeRepository">
+
+    <select id="queryVIPGradePage" resultType="com.cloud.baowang.user.api.vo.vip.SiteVIPGradeVO">
+        SELECT
+        svg.vip_rank_code AS vipRankCode,
+        vr.vip_rank_name_i18n_code AS vipRankName,
+        svg.vip_grade_code AS vipGradeCode,
+        svg.vip_grade_name AS vipGradeName,
+        svg.upgrade_xp AS upgradeXp,
+        svg.upgrade_bonus AS upgradeBonus,
+        svg.pic_icon AS picIcon
+        FROM
+        site_vip_grade svg
+        LEFT JOIN
+        site_vip_rank vr ON
+        vr.vip_rank_code = svg.vip_rank_code and svg.site_code = vr.site_code
+        WHERE
+        svg.site_code = #{siteCode}
+        order by svg.vip_grade_code asc
+    </select>
+
+</mapper>

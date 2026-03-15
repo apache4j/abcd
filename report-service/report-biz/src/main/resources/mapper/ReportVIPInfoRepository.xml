@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.report.repositories.ReportVIPInfoRepository">
+
+    <select id="getUserVIPData" resultType="com.cloud.baowang.report.api.vo.vip.UserVIPVO">
+        SELECT
+        t.site_code as siteCode,
+        #{startTime} as dateShow,
+        t.vip_grade_code as vipGradeCode,
+        count( t.vip_grade_code ) as currentGradeNum
+        FROM
+        user_info t
+        WHERE 1 = 1
+        and account_type = 2
+        <if test="siteCode != null and siteCode != ''">
+            AND site_code = #{siteCode}
+        </if>
+        <if test="endTime != null">
+            AND created_time <![CDATA[ < ]]> #{endTime}
+        </if>
+        GROUP BY
+        t.site_code,
+        t.vip_grade_code
+        order by t.vip_grade_code asc
+    </select>
+
+    <select id="getUserBonus" resultType="com.cloud.baowang.report.api.vo.vip.VIPAwardVO">
+        select a.siteCode, a.vipGradeCode, sum(a.receiveBonus / IF(a.finalRate IS NULL,1,a.finalRate)) as receiveBonus from (
+        SELECT
+        t.currency as currency,
+        (select final_rate from site_currency_info where site_code = #{siteCode} and t.currency = currency_code) as finalRate,
+        t.site_code as siteCode,
+        t.vip_grade_code as vipGradeCode,
+        sum( t.award_amount ) as receiveBonus
+        FROM
+        site_vip_award_record t
+        WHERE 1 = 1
+        and account_type = 2
+        <if test="siteCode != null and siteCode != ''">
+            AND t.site_code = #{siteCode}
+        </if>
+        <if test="startTime != null">
+            AND t.receive_time <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND t.receive_time <![CDATA[ < ]]> #{endTime}
+        </if>
+        AND t.receive_status = 1
+        group by t.currency, t.site_code, t.vip_grade_code ) a  group by a.siteCode, a.vipGradeCode
+    </select>
+
+    <select id="getVIPAchieve" resultType="com.cloud.baowang.report.api.vo.vip.VIPAchieveVO">
+        SELECT
+        t.site_code as siteCode,
+        t.after_change as vipGradeCode,
+        count( t.after_change ) as achieveNum
+        FROM
+        site_vip_change_record t, user_info t1
+        WHERE 1=  1
+        and t.user_id = t1.user_id
+        and t1.account_type = 2
+        <if test="siteCode != null and siteCode != ''">
+            AND t.site_code = #{siteCode}
+        </if>
+        <if test="startTime != null">
+            AND t.change_time <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND t.change_time <![CDATA[ < ]]> #{endTime}
+        </if>
+        AND t.change_type = 0
+        GROUP BY
+        t.site_code,
+        t.after_change
+    </select>
+
+    <select id="selectBonusTotal" resultType="BigDecimal">
+        SELECT SUM(receive_bonus) As receiveBonus
+        FROM report_vip_info
+        where site_code = #{vo.siteCode}
+        <if test="vo.startTime != null">
+            AND date_show = #{vo.startTime}
+        </if>
+        <if test="vo.vipRankCode != null and vo.vipRankCode != ''">
+            AND vip_rank_code = #{vo.vipRankCode}
+        </if>
+        <if test="vo.vipGradeCode != null and vo.vipGradeCode != ''">
+            AND vip_grade_code = #{vo.vipGradeCode}
+        </if>
+    </select>
+
+
+    <select id="getCnUserBonus" resultType="com.cloud.baowang.report.api.vo.vip.VIPAwardVO">
+        select a.siteCode, a.vipGradeCode, sum(a.receiveBonus / IF(a.finalRate IS NULL,1,a.finalRate)) as receiveBonus from (
+        SELECT
+        t.currency as currency,
+        (select final_rate from site_currency_info where site_code = #{siteCode} and t.currency = currency_code) as finalRate,
+        t.site_code as siteCode,
+        t.vip_grade_code as vipGradeCode,
+        sum( t.award_amount ) as receiveBonus
+        FROM
+        site_vip_award_record_v2 t
+        WHERE 1 = 1
+        and account_type = 2
+        <if test="siteCode != null and siteCode != ''">
+            AND t.site_code = #{siteCode}
+        </if>
+        <if test="startTime != null">
+            AND t.receive_time <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND t.receive_time <![CDATA[ < ]]> #{endTime}
+        </if>
+        AND t.receive_status = 1
+        group by t.currency, t.site_code, t.vip_grade_code ) a  group by a.siteCode, a.vipGradeCode
+    </select>
+
+    <select id="getCnVIPAchieve" resultType="com.cloud.baowang.report.api.vo.vip.VIPAchieveVO">
+        SELECT
+        t.site_code as siteCode,
+        t.vip_now as vipGradeCode,
+        count( t.vip_now ) as achieveNum
+        FROM
+        site_vip_change_record_cn t, user_info t1
+        WHERE 1=  1
+        and t.user_id = t1.user_id
+        and t1.account_type = 2
+        <if test="siteCode != null and siteCode != ''">
+            AND t.site_code = #{siteCode}
+        </if>
+        <if test="startTime != null">
+            AND t.created_time <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND t.created_time <![CDATA[ < ]]> #{endTime}
+        </if>
+        AND t.change_type = 0
+        GROUP BY
+        t.site_code,
+        t.vip_now
+    </select>
+
+
+
+</mapper>

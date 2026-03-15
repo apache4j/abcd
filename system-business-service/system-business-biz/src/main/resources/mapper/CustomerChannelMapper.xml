@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.system.repositories.operations.CustomerChannelRepository">
+
+    <select id="queryCustomerChannelPage" resultType="com.cloud.baowang.system.api.vo.operations.CustomerChannelVO">
+        SELECT
+        c.id as id,
+        c.channel_code as channelCode,
+        c.channel_name as channelName,
+        c.customer_type as customerType,
+        c.channel_addr as channelAddr,
+        IFNULL(s.site_code, '') AS siteCode,
+        si.site_name as siteName,
+        c.status as status,
+        c.updated_time as updatedTime,
+        c.updater_name as updaterName
+        FROM customer_channel c left join site_customer s on c.channel_code = s.channel_code
+        left join site_info si on s.site_code = si.site_code
+        WHERE 1 = 1
+        <if test="requestVO.channelCode != null and requestVO.channelCode != ''">
+            and c.channel_code like concat ('%', #{requestVO.channelCode},'%')
+        </if>
+        <if test="requestVO.channelName != null and requestVO.channelName != ''">
+            and c.channel_name like concat ('%', #{requestVO.channelName},'%')
+        </if>
+        <if test="requestVO.status != null and requestVO.status != ''">
+            and c.status = #{requestVO.status}
+        </if>
+        ORDER BY c.created_time desc
+    </select>
+
+
+    <select id="queryCustomerChannel" resultType="com.cloud.baowang.system.api.vo.operations.SiteCustomerChannelPageVO">
+        <if test="vo.siteCode ==null or vo.siteCode == ''">
+            select
+            id,
+            channelCode,
+            channelName,
+            customerType,
+            channelAddr,
+            remark,
+            status,
+            updatedTime,
+            updaterName,
+            chooseFlag,
+            channelTotal
+            from
+            (
+            SELECT
+            t.id AS id,
+            t.channel_code AS channelCode,
+            t.channel_name AS channelName,
+            t.customer_type AS customerType,
+            t.channel_addr AS channelAddr,
+            t.remark AS remark,
+            t.status AS status,
+            t.updated_time AS updatedTime,
+            t.creator_name AS updaterName,
+            0 AS chooseFlag,
+            (
+            SELECT
+            COUNT(1)
+            FROM
+            site_customer cc
+            WHERE
+            cc.channel_code = t.channel_code) AS channelTotal
+            FROM
+            customer_channel t)
+            a
+            WHERE
+            a.channelTotal = 0
+            <if test="vo.channelName != null and vo.channelName != ''">
+                AND t.channel_name = #{vo.channelName}
+            </if>
+            <if test="vo.channelCode != null and vo.channelCode != ''">
+                AND t.channel_code = #{vo.channelCode}
+            </if>
+            ORDER BY
+            channelTotal DESC,
+            status DESC,
+            updatedTime DESC
+        </if>
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            select
+            id,
+            channelCode,
+            channelName,
+            customerType,
+            channelAddr,
+            remark,
+            status,
+            updatedTime,
+            updaterName,
+            chooseFlag,
+            channelTotal
+            from
+            (
+            SELECT
+            t.id AS id,
+            t.channel_code AS channelCode,
+            t.channel_name AS channelName,
+            t.customer_type AS customerType,
+            t.channel_addr AS channelAddr,
+            t.remark AS remark,
+            t.status AS status,
+            t.updated_time AS updatedTime,
+            t.creator_name AS updaterName,
+            0 AS chooseFlag,
+            (
+            SELECT
+            COUNT(1)
+            FROM
+            site_customer cc
+            WHERE
+            cc.channel_code = t.channel_code) AS channelTotal
+            FROM
+            customer_channel t)
+            a
+            WHERE
+            a.channelTotal = 0
+            <if test="vo.channelName != null and vo.channelName != ''">
+                AND a.channel_name = #{vo.channelName}
+            </if>
+            <if test="vo.channelCode != null and vo.channelCode != ''">
+                AND a.channel_code = #{vo.channelCode}
+            </if>
+
+            union all
+            SELECT
+            cc.id id,
+            cc.channel_code as channelCode,
+            cc.channel_name as channelName,
+            cc.customer_type as customerType,
+            cc.channel_addr as channelAddr,
+            cc.remark,
+            cc.status,
+            sc.created_time as updatedTime,
+            sc.creator as updaterName,
+            1 as chooseFlag,
+            1 as channelTotal
+            from site_customer sc left join customer_channel cc on sc.channel_code = cc.channel_code
+            where sc.site_code = #{vo.siteCode}
+
+            <if test="vo.channelName != null and vo.channelName != ''">
+                AND cc.channel_name = #{vo.channelName}
+            </if>
+            <if test="vo.channelCode != null and vo.channelCode != ''">
+                AND cc.channel_code = #{vo.channelCode}
+            </if>
+            order by chooseFlag desc
+        </if>
+
+    </select>
+
+    <select id="getSiteCustomerChannelPage" resultType="com.cloud.baowang.system.api.vo.operations.SiteCustomerChannelVO">
+        SELECT
+            a.id,
+            a.channelCode as channelCode,
+            a.channelName as channelName,
+            a.customerType as customerType,
+            a.channelAddr as channelAddr,
+            a.`status` as status,
+            a.operator as updaterName,
+            a.operatorTime as updatedTime
+        FROM
+            (
+                SELECT
+                    t2.id AS id,
+                    t1.channel_code AS channelCode,
+                    t1.channel_name AS channelName,
+                    t1.customer_type AS customerType,
+                    t1.channel_addr AS channelAddr,
+                    t2.enable_status AS status,
+                    CASE
+                        WHEN t2.updated_time IS NOT NULL THEN
+                            t2.updated_time
+                        ELSE
+                            t2.created_time
+                        END AS operatorTime,
+                    CASE
+                        WHEN t2.updater IS NOT NULL THEN
+                            t2.updater
+                        ELSE
+                            t2.creator
+                        END AS operator
+                FROM
+                    customer_channel t1,
+                    site_customer t2
+                WHERE t2.site_code = #{vo.siteCode}
+                  and t1.channel_code = t2.channel_code
+                <if test="vo.status != null and vo.status != ''">
+                    AND t2.enable_status = #{vo.status}
+                </if>
+                <if test="vo.channelName != null and vo.channelName != ''">
+                    AND t1.channel_name = #{vo.channelName}
+                </if>
+                <if test="vo.channelCode != null and vo.channelCode != ''">
+                    AND t1.channel_code = #{vo.channelCode}
+                </if>
+
+            ) a
+        ORDER BY
+            a.status DESC,
+            a.operatorTime DESC
+    </select>
+
+    <select id="getSiteCustomerChannel" resultType="com.cloud.baowang.system.api.vo.operations.ClientCustomerChannelVO">
+        SELECT
+        a.platformCode,
+        a.channelCode,
+        a.channelName,
+        a.customerType,
+        a.channelAddr
+        FROM
+        (
+        SELECT
+        t1.platform_code as platformCode,
+        t1.channel_code AS channelCode,
+        t1.channel_name AS channelName,
+        t1.customer_type AS customerType,
+        t1.channel_addr AS channelAddr,
+        CASE
+        WHEN t2.updated_time IS NOT NULL THEN
+        t2.updated_time
+        ELSE
+        t2.created_time
+        END AS operatorTime,
+        CASE
+        WHEN t2.updater IS NOT NULL THEN
+        t2.updater
+        ELSE
+        t2.creator
+        END AS operator
+        FROM
+        customer_channel t1,
+        site_customer t2
+        WHERE t2.site_code = #{vo.siteCode}
+        and t1.channel_code = t2.channel_code
+        <if test="vo.status != null and vo.status != ''">
+            AND t2.enable_status = #{vo.status}
+        </if>
+        ) a
+        ORDER BY
+        a.operatorTime DESC
+        limit 1
+    </select>
+
+    <select id="getCustomerChannelByCode" resultType="com.cloud.baowang.system.api.vo.operations.MeiQiaChannelVO">
+        SELECT
+        a.platformCode,
+        a.channelCode,
+        a.channelName,
+        a.customerType,
+        a.channelAddr,
+        a.entId,
+        a.groupToken,
+        a.appKey,
+        a.secretKey,
+        a.extJson,
+        a.status
+        FROM
+        (
+        SELECT
+        t1.platform_code as platformCode,
+        t1.channel_code AS channelCode,
+        t1.channel_name AS channelName,
+        t1.customer_type AS customerType,
+        t1.channel_addr AS channelAddr,
+        t1.mer_id as entId,
+        t1.group_token as groupToken,
+        t1.app_key as appKey,
+        t1.secret_key as secretKey,
+        t1.ext_json as extJson,
+        t2.enable_status as status,
+        CASE
+        WHEN t2.updated_time IS NOT NULL THEN
+        t2.updated_time
+        ELSE
+        t2.created_time
+        END AS operatorTime,
+        CASE
+        WHEN t2.updater IS NOT NULL THEN
+        t2.updater
+        ELSE
+        t2.creator
+        END AS operator
+        FROM
+        customer_channel t1,
+        site_customer t2
+        WHERE t2.site_code = #{vo.siteCode}
+        and t1.channel_code = t2.channel_code
+        <if test="vo.status != null and vo.status != ''">
+            AND t2.enable_status = #{vo.status}
+        </if>
+        <if test="vo.platformCode != null and vo.platformCode != ''">
+            AND t1.platform_code = #{vo.platformCode}
+        </if>
+        ) a
+        ORDER BY a.operatorTime DESC
+    </select>
+    <select id="getCustomerChannel" resultType="com.cloud.baowang.system.api.vo.operations.CustomerChannelVO">
+        select t1.site_code as siteCode, t2.channel_addr AS channelAddr , t2.channel_code AS channelCode , t2.channel_name AS channelName, t2.customer_type as customerType , t2.platform_code AS channelCode, t2.remark
+        from site_customer t1 inner join customer_channel t2 on t1.channel_code = t2.channel_code
+        where t1.site_code = #{siteCode} and t1.enable_status = 0
+        order by t1.updated_time desc limit 1
+    </select>
+</mapper>

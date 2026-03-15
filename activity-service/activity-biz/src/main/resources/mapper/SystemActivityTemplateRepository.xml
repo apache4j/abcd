@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.activity.repositories.SystemActivityTemplateRepository">
+
+    <select id="querySiteActivityTemplate" resultType="com.cloud.baowang.activity.api.vo.SiteActivityTemplateVO">
+        select * from (
+        select
+        t.activity_template as activityTemplate,
+        t.activity_name as activityName,
+        <if test="siteCode != null and siteCode !=''">
+             IFNULL(s.bind_status,0) as bindStatus,
+             IFNULL(b.activityNum, 0) + IFNULL(c.activityNum, 0) AS activityNum
+        </if>
+        <if test="siteCode == null or siteCode.trim() ==''">
+             0 as bindStatus,
+             0 as activityNum
+        </if>
+        from system_activity_template t
+        <if test="siteCode != null and siteCode !=''">
+            left join site_activity_template s on t.activity_template =s.activity_template and site_code =#{siteCode}
+            left join (select activity_template,count(activity_template) as activityNum from site_activity_base
+            where site_code= #{siteCode} and  status =1 group by activity_template) b on t.activity_template=b.activity_template
+            left join (select activity_template,count(activity_template) as activityNum from site_activity_base_v2
+            where site_code= #{siteCode} and  status =1 group by activity_template) c on t.activity_template=c.activity_template
+        </if>
+        ) as b
+    </select>
+
+    <select id="getPage" resultType="com.cloud.baowang.activity.api.vo.SystemActivityTemplateVO">
+        SELECT
+        t.id AS id,
+        t.activity_name AS activityName,
+        t.activity_template as activityTemplate,
+        t.updater AS updater,
+        t.updated_time AS updatedTime,
+        IFNULL(c.activityBindNum,0) as activityBindNum,
+        count( base.id )+count( basev2.id ) AS activityNum
+        FROM
+        system_activity_template t
+        left join (
+        select * from  ( select activity_template,count(activity_template) as  activityBindNum from
+        site_activity_template where bind_status=1
+        group by activity_template ) b
+        ) c on 	t.activity_template = c.activity_template
+        LEFT JOIN site_activity_base base ON t.activity_template = base.activity_template  AND base.`status` = 1
+        LEFT JOIN site_activity_base_v2 basev2 ON t.activity_template = basev2.activity_template AND basev2.`status` = 1
+
+        GROUP BY
+        t.id,
+        t.activity_name,
+        t.activity_template,
+        t.updater,
+        t.updated_time,
+        c.activityBindNum
+        <if test="vo.activityTemplate != null and vo.activityTemplate !=''">
+            HAVING
+            t.activity_template = #{vo.activityTemplate}
+        </if>
+        order by t.id asc
+    </select>
+
+    <select id="getInfo" resultType="com.cloud.baowang.activity.api.vo.SystemActivityTemplateInfoVO">
+        select * from (
+            SELECT
+            *
+            FROM
+            (
+                SELECT
+                    t.site_code AS siteCode,
+                    s.site_name AS siteName,
+                    IFNULL( temp.bind_status, 0 ) AS bindStatus,
+                    count( t.activity_template ) AS activityNum
+                    FROM
+                site_activity_base t
+                 LEFT JOIN site_activity_template temp ON t.activity_template = temp.activity_template AND t.site_code = temp.site_code
+                 LEFT JOIN site_info s ON s.site_code = t.site_code WHERE t.activity_template = #{vo.activityTemplate} AND t.STATUS = 1
+            GROUP BY t.site_code,t.activity_template,temp.bind_status,s.site_name
+        ) b WHERE b.bindStatus = 0
+        UNION ALL
+        SELECT  *  FROM (
+            SELECT
+            t.site_code AS siteCode,
+            s.site_name AS siteName,
+            IFNULL( temp.bind_status, 0 ) AS bindStatus,
+            count( t.activity_template ) AS activityNum
+            FROM
+            site_activity_base_v2 t
+            LEFT JOIN site_activity_template temp ON t.activity_template = temp.activity_template AND t.site_code = temp.site_code
+            LEFT JOIN site_info s ON s.site_code = t.site_code WHERE t.activity_template = #{vo.activityTemplate}  AND t.STATUS = 1
+            GROUP BY t.site_code,t.activity_template,temp.bind_status,s.site_name
+        ) b WHERE b.bindStatus = 0
+        UNION ALL
+            SELECT
+                temp.site_code AS siteCode,
+                s.site_name AS siteName,
+                IFNULL( temp.bind_status, 0 ) AS bindStatus,
+                count( t.activity_template ) + count( st.activity_template ) AS activityNum
+            FROM
+            site_activity_template temp
+            LEFT JOIN site_info s ON s.site_code = temp.site_code
+            LEFT JOIN site_activity_base t ON t.site_code = temp.site_code AND temp.activity_template = t.activity_template AND t.STATUS = 1
+            LEFT JOIN site_activity_base_v2 st ON st.site_code = temp.site_code AND temp.activity_template = st.activity_template AND st.STATUS = 1
+        WHERE temp.bind_status = 1 AND temp.activity_template = #{vo.activityTemplate}
+        GROUP BY
+            temp.site_code,
+            temp.activity_template,
+            temp.bind_status,
+            s.site_name
+            ) c
+        order by c.activityNum desc, bindStatus desc
+    </select>
+
+</mapper>

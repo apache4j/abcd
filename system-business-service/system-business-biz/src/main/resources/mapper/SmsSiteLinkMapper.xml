@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.system.repositories.verify.SmsSiteLinkRepository">
+
+
+    <select id="querySmsLinkCountChannel" resultType="com.cloud.baowang.system.api.vo.verify.SiteLinkCountVO">
+        select channel_code as channelCode, count(1) as count from sms_site_link group by channel_code
+    </select>
+
+    <select id="querySiteLinkVOBySiteCode" resultType="com.cloud.baowang.system.api.vo.verify.SiteLinkVO">
+        select
+        t.channel_code as channelCode,
+        c.channel_id as  channelId
+        from sms_site_link t
+        left join sms_channel_config c on t.channel_code =c.channel_code
+        where t.site_code = #{siteCode}
+    </select>
+
+</mapper>

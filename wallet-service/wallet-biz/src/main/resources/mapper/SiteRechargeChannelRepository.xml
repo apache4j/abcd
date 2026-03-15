@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.wallet.repositories.SiteRechargeChannelRepository">
+
+    <select id="queryPlatformAuthorize" resultType="com.cloud.baowang.wallet.api.vo.recharge.RechargeChannelResVO">
+        SELECT
+        t.id,
+        t.channel_type AS channelType,
+        t.recharge_way_id AS rechargeWayId,
+        (SELECT recharge_way_i18 FROM system_recharge_way WHERE id = t.recharge_way_id) AS rechargeWayI18,
+        t.channel_name AS channelName,
+        t.channel_code AS channelCode,
+        t.recharge_min AS rechargeMin,
+        t.recharge_max AS rechargeMax,
+        t.use_scope AS useScope,
+        t.weight AS weight,
+        t.memo AS memo,
+        t.status AS status,
+        CASE
+        WHEN t1.site_code IS NOT NULL AND t1.site_code != '' THEN t1.created_time
+        ELSE t.updated_time
+        END AS updatedTime,
+
+        CASE
+        WHEN t1.site_code IS NOT NULL AND t1.site_code != '' THEN t1.creator
+        ELSE t.creator
+        END AS updater,
+
+        CASE
+        WHEN t.id = t1.channel_id THEN 1
+        ELSE 0
+        END AS chooseFlag
+
+        FROM
+        system_recharge_channel t
+        LEFT JOIN
+        site_recharge_channel t1
+        ON
+        t.id = t1.channel_id AND t1.site_code = #{vo.siteCode}
+        WHERE
+        t.recharge_way_id = #{vo.rechargeWayId}
+        <if test="vo.channelName != '' and vo.channelName != null">
+            AND t.channel_name = #{vo.channelName}
+        </if>
+        <if test="vo.channelCode != '' and vo.channelCode != null">
+            AND t.channel_code = #{vo.channelCode}
+        </if>
+        <if test="vo.status != null and vo.status != ''">
+            AND t.status = #{vo.status}
+        </if>
+        ORDER BY
+        chooseFlag desc,
+        t.status DESC,
+        t.sort_order DESC
+    </select>
+    <select id="selectSiteSystemChannelList" resultType="com.cloud.baowang.wallet.api.vo.SiteRechargeChannelVO">
+        select
+        src.channel_id as channelId,
+        src.site_code as siteCode,
+        src.status,
+        ssrc.recharge_way_id as wayId from site_recharge_channel src join system_recharge_channel ssrc on src.channel_id = ssrc.id
+        where src.site_code = #{siteCode} and ssrc.recharge_way_id in
+        <foreach collection="rechargeWayIds" item="wayId" separator="," open="(" close=")">
+            #{wayId}
+        </foreach>
+    </select>
+    <select id="selectRechargePage"
+            resultType="com.cloud.baowang.wallet.api.vo.recharge.SiteRechargeChannelRespVO">
+            SELECT
+            a.id AS id,
+            b.currency_code AS currencyCode,
+            b.recharge_channel_no AS rechargeChannelNo,
+            a.channel_id AS channelId,
+            b.channel_code AS channelCode,
+            b.channel_type AS channelType,
+            b.channel_name AS channelName,
+            c.id AS rechargeWayId,
+            c.recharge_way_i18 AS rechargeWayI18,
+            b.recharge_type_code as rechargeTypeCode,
+            c.network_type AS networkType,
+            a.status AS status,
+            a.sort_order AS sortOrder,
+            a.recv_user_name AS recvUserName,
+            a.recv_bank_code AS recvBankCode,
+            a.recv_bank_name AS recvBankName,
+            a.recv_bank_branch AS recvBankBranch,
+            a.recv_bank_card AS recvBankCard,
+            a.recv_bank_account AS recvBankAccount,
+            a.recv_qr_code AS recvQrCode,
+            a.creator AS creator,
+            a.created_time AS createdTime,
+            a.updater AS updater,
+            a.updated_time AS updatedTime,
+            a.vip_grade_use_scope AS vipGradeUseScope
+            FROM
+            site_recharge_channel a
+            LEFT JOIN system_recharge_channel b ON b.id = a.channel_id
+            LEFT JOIN system_recharge_way c ON c.id = b.recharge_way_id
+            WHERE
+            a.site_code = #{vo.siteCode}
+            <if test="vo.channelType != null and vo.channelType != ''">
+                AND b.channel_type = #{vo.channelType}
+            </if>
+            <if test="vo.currencyCode != null and vo.currencyCode != ''">
+                AND b.currency_code = #{vo.currencyCode}
+            </if>
+            <if test="vo.channelName != null and vo.channelName != ''">
+                AND b.channel_name LIKE CONCAT('%', #{vo.channelName}, '%')
+            </if>
+            <if test="vo.status != null ">
+                AND a.status = #{vo.status}
+            </if>
+            <if test="vo.rechargeWayId != null and vo.rechargeWayId != ''">
+                AND b.recharge_way_id = #{vo.rechargeWayId}
+            </if>
+            ORDER BY a.updated_time DESC
+
+    </select>
+    <select id="selectBySort" resultType="com.cloud.baowang.wallet.api.vo.recharge.SiteRechargeChannelRespVO">
+        SELECT
+        a.id AS id,
+        b.currency_code AS currencyCode,
+        b.recharge_channel_no AS rechargeChannelNo,
+        a.channel_id AS channelId,
+        b.channel_code AS channelCode,
+        b.channel_type AS channelType,
+        b.channel_name AS channelName,
+        c.id AS rechargeWayId,
+        c.recharge_way_i18 AS rechargeWayI18,
+        a.status AS status,
+        a.sort_order AS sortOrder,
+        a.creator AS creator,
+        a.created_time AS createdTime,
+        a.updater AS updater,
+        a.updated_time AS updatedTime,
+        a.recv_user_name recvUserName,
+        a.recv_bank_code recvBankCode,
+        a.recv_bank_name recvBankName,
+        a.recv_bank_branch recvBankBranch,
+        a.recv_bank_card recvBankCard,
+        a.recv_bank_account recvBankAccount,
+        a.recv_qr_code recvQrCode,
+        a.vip_grade_use_scope AS vipGradeUseScope
+        FROM
+        site_recharge_channel a
+        LEFT JOIN system_recharge_channel b ON b.id = a.channel_id
+        LEFT JOIN system_recharge_way c ON c.id = b.recharge_way_id
+        WHERE
+        a.site_code = #{vo.siteCode}
+        <if test="vo.channelType != null and vo.channelType != ''">
+            AND b.channel_type = #{vo.channelType}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode != ''">
+            AND b.currency_code = #{vo.currencyCode}
+        </if>
+        <if test="vo.channelName != null and vo.channelName != ''">
+            AND b.channel_name LIKE CONCAT('%', #{vo.channelName}, '%')
+        </if>
+        <if test="vo.status != null ">
+            AND a.status = #{vo.status}
+        </if>
+        <if test="vo.rechargeWayId != null and vo.rechargeWayId != ''">
+            AND b.recharge_way_id = #{vo.rechargeWayId}
+        </if>
+        ORDER BY a.sort_order ASC
+    </select>
+    <select id="selectSiteRechargeChannelChangeVO" resultType="com.cloud.baowang.wallet.api.vo.recharge.SiteRechargeChannelChangeVO">
+        select
+        c.channel_id channelId,
+        s.recharge_way_id rechargeWayId,
+        s.channel_code channelCode
+        from site_recharge_channel c
+        left join system_recharge_channel s on s.id = c.channel_id
+        where c.site_code = #{siteCode}
+    </select>
+
+
+    <select id="selectSiteRechargeChannelList" resultType="com.cloud.baowang.wallet.api.vo.recharge.SiteSystemRechargeChannelRespVO">
+        SELECT
+        a.status AS status,
+        a.sort_order AS sortOrder,
+        a.recv_user_name AS recvUserName,
+        a.recv_bank_code AS recvBankCode,
+        a.recv_bank_name AS recvBankName,
+        a.recv_bank_branch AS recvBankBranch,
+        a.recv_bank_card AS recvBankCard,
+        a.recv_bank_account AS recvBankAccount,
+        a.recv_qr_code AS recvQrCode,
+        a.creator AS creator,
+        a.created_time AS createdTime,
+        a.updater AS updater,
+        a.updated_time AS updatedTime,
+        b.recharge_channel_no AS rechargeChannelNo,
+        b.id AS id,
+        b.currency_code AS currencyCode,
+        b.channel_code AS channelCode,
+        b.channel_type AS channelType,
+        b.recharge_type_id AS rechargeTypeId,
+        b.recharge_way_id AS rechargeWayId,
+        b.channel_name AS channelName,
+        b.currency_code AS currencyCode,
+        b.mer_no AS merNo,
+        b.private_key AS privateKey,
+        b.pub_key AS pubKey,
+        b.secret_key AS secretKey,
+        b.sort_order AS sortOrder,
+        b.recharge_min AS rechargeMin,
+        b.recharge_max AS rechargeMax,
+        b.fee AS fee,
+        b.use_scope AS useScope,
+        b.weight AS weight,
+        b.auth_num AS authNum,
+        b.status AS status,
+        b.api_url AS apiUrl,
+        b.callback_url AS callbackUrl,
+        b.use_scope AS vipRankUseScope,
+        a.vip_grade_use_scope AS vipGradeUseScope
+
+        FROM
+        site_recharge_channel a
+        LEFT JOIN system_recharge_channel b ON b.id = a.channel_id
+        where
+            a.site_code = #{siteCode}
+            AND a.status = 1
+            AND b.status = 1
+        ORDER BY a.sort_order ASC
+    </select>
+    <select id="getChannelInfoByCurrencyAneWayId"
+            resultType="com.cloud.baowang.wallet.api.vo.recharge.SystemRechargeChannelBaseVO">
+        SELECT
+            b.recharge_channel_no AS rechargeChannelNo,
+            b.id AS id,
+            b.currency_code AS currencyCode,
+            b.channel_code AS channelCode,
+            b.channel_type AS channelType,
+            b.recharge_type_id AS rechargeTypeId,
+            b.recharge_way_id AS rechargeWayId,
+            b.channel_name AS channelName,
+            b.currency_code AS currencyCode,
+            b.mer_no AS merNo,
+            b.private_key AS privateKey,
+            b.pub_key AS pubKey,
+            b.secret_key AS secretKey,
+            b.sort_order AS sortOrder,
+            b.recharge_min AS rechargeMin,
+            b.recharge_max AS rechargeMax,
+            b.fee AS fee,
+            b.use_scope AS useScope,
+            b.weight AS weight,
+            b.auth_num AS authNum,
+            b.status AS status,
+            b.api_url AS apiUrl,
+            b.callback_url AS callbackUrl,
+            a.recv_user_name AS recvUserName,
+            a.recv_bank_code AS recvBankCode,
+            a.recv_bank_name AS recvBankName,
+            a.recv_bank_branch AS recvBankBranch,
+            a.recv_bank_card AS recvBankCard,
+            a.recv_bank_account AS recvBankAccount,
+            a.recv_qr_code AS recvQrCode
+        FROM
+        site_recharge_channel a
+        LEFT JOIN system_recharge_channel b ON b.id = a.channel_id
+        where
+        a.site_code = #{siteCode}
+        AND a.status = 1
+        AND b.status = 1
+          AND b.currency_code = #{currencyCode}
+          AND b.recharge_way_id = #{rechargeWayId}
+          AND b.channel_type != 'SITE_CUSTOM'
+        <if test="channelId != null and channelId != ''">
+            AND b.id = #{channelId}
+        </if>
+        LIMIT 1
+
+    </select>
+    <select id="getChannelInfoByChannelId"
+            resultType="com.cloud.baowang.wallet.api.vo.recharge.SystemRechargeChannelBaseVO">
+        SELECT
+        b.recharge_channel_no AS rechargeChannelNo,
+        b.id AS id,
+        b.currency_code AS currencyCode,
+        b.channel_code AS channelCode,
+        b.channel_type AS channelType,
+        b.recharge_type_id AS rechargeTypeId,
+        b.recharge_way_id AS rechargeWayId,
+        b.channel_name AS channelName,
+        b.currency_code AS currencyCode,
+        b.mer_no AS merNo,
+        b.private_key AS privateKey,
+        b.pub_key AS pubKey,
+        b.secret_key AS secretKey,
+        b.sort_order AS sortOrder,
+        b.recharge_min AS rechargeMin,
+        b.recharge_max AS rechargeMax,
+        b.fee AS fee,
+        b.use_scope AS useScope,
+        b.weight AS weight,
+        b.auth_num AS authNum,
+        b.status AS status,
+        b.api_url AS apiUrl,
+        b.callback_url AS callbackUrl,
+        a.recv_user_name AS recvUserName,
+        a.recv_bank_code AS recvBankCode,
+        a.recv_bank_name AS recvBankName,
+        a.recv_bank_branch AS recvBankBranch,
+        a.recv_bank_card AS recvBankCard,
+        a.recv_bank_account AS recvBankAccount,
+        a.recv_qr_code AS recvQrCode
+        FROM
+        site_recharge_channel a
+        LEFT JOIN system_recharge_channel b ON b.id = a.channel_id
+        where
+        a.site_code = #{siteCode}
+        AND a.status = 1
+        AND b.status = 1
+        AND b.currency_code = #{currencyCode}
+        AND b.recharge_way_id = #{rechargeWayId}
+        AND b.id = #{channelId}
+    </select>
+
+</mapper>

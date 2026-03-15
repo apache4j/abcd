@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.play.repositories.SiteVenueRepository">
+
+    <select id="queryVenueAuthorize" resultType="com.cloud.baowang.play.api.vo.venue.SiteVenueResponsePageVO">
+        SELECT DISTINCT
+        ta.venueId,
+        ta.venueName,
+        ta.venueType,
+        ta.venueCode,
+        ta.venueJoinType,
+        ta.STATUS,
+        ta.handlingFee,
+        ta.validProportion,
+        ta.operatorTime,
+        ta.operator,
+        ta.chooseFlag,
+        ta.gameNum
+        FROM
+        (
+        SELECT
+        vi.id AS venueId,
+        vi.venue_name AS venueName,
+        vi.venue_type AS venueType,
+        vi.venue_code AS venueCode,
+        vi.venue_join_type AS venueJoinType,
+        vi.STATUS,
+        IFNULL(svi.handling_fee, vi.venue_proportion) AS handlingFee,
+        IFNULL(svi.valid_proportion, vi.valid_proportion) AS validProportion,
+        IFNULL(svi.created_time, vi.updated_time) AS operatorTime,
+        IFNULL(svi.creator, vi.creator) AS operator,
+        IF(vi.venue_code = svi.venue_code, 1, 0) AS chooseFlag,
+        vi.gameNum
+        FROM
+        (
+        SELECT
+        sv.id,
+        sv.venue_code,
+        sv.venue_name,
+        sv.venue_type,
+        sv.venue_join_type,
+        sv.venue_proportion,
+        sv.valid_proportion,
+        sv.updated_time,
+        sv.STATUS,
+        sv.creator,
+        (SELECT COUNT(1) FROM game_info gi WHERE gi.venue_code = sv.venue_code) AS gameNum,
+        ROW_NUMBER() OVER (PARTITION BY sv.venue_code ORDER BY sv.id DESC) AS rn
+        FROM
+        venue_info sv
+        ) vi
+        LEFT JOIN site_venue svi
+        ON vi.venue_code = svi.venue_code
+        AND svi.site_code = #{vo.siteCode}
+        WHERE
+        vi.rn = 1
+        ) AS ta
+        <where>
+            <if test="vo.venueName != null and vo.venueName != ''">
+                AND ta.venueName = #{vo.venueName}
+            </if>
+            <if test="vo.venueCode != null and vo.venueCode != ''">
+                AND ta.venueCode = #{vo.venueCode}
+            </if>
+            <if test="vo.venueType != null and vo.venueType != ''">
+                AND ta.venueType = #{vo.venueType}
+            </if>
+            <if test="vo.status != null and vo.status != ''">
+                AND ta.status = #{vo.status}
+            </if>
+        </where>
+        ORDER BY
+        ta.chooseFlag DESC,
+        ta.status ASC,
+        ta.operatorTime DESC
+    </select>
+    <select id="querySiteVenueBySiteCode"
+            resultType="com.cloud.baowang.play.api.vo.venue.siteDetail.SiteVenueQueryVO">
+        select
+        sv.id,
+        vi.venue_name as venueName,
+        vi.venue_code as venueCode,
+        vi.venue_type as venueType,
+        vi.status
+        from
+        site_venue sv left join venue_info vi on sv.venue_code = vi.venue_code
+        where sv.site_code = #{siteCode}
+    </select>
+
+    <select id="querySiteVenueJoinConfigBySiteCode" resultType="com.cloud.baowang.play.api.vo.venue.SiteVenueConfigVO">
+
+        SELECT * FROM site_venue sv
+        LEFT JOIN site_venue_config config ON config.venue_code = sv.venue_code and config.site_code = #{siteCode}
+        where sv.site_code = #{siteCode}
+
+    </select>
+</mapper>

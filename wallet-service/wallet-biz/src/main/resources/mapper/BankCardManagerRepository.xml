@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.wallet.repositories.bank.BankCardManagerRepository">
+
+    <update id="updateChannelBankRelationStatus" >
+            update system_channel_bank_relation_base
+            set bank_channel_status=2
+            where currency_code=#{currency}
+
+    </update>
+</mapper>

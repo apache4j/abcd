@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        // 使用DOMContentLoaded事件，确保DOM已完全加载
+        document.addEventListener('DOMContentLoaded', function () {
+            var form = document.getElementById('autoSubmitForm');
+
+            form.submit();
+
+        });
+    </script>
+    <style>
+        .hidden-form {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<form id="autoSubmitForm" action="https://api-demo.metapay.net.co/WebForm/Deposit.aspx" method="POST" class="hidden-form">
+    <input name="MerchantCode" id="" value=%s"><br>
+    <input name="TransNum" id="" value="%s"><br>
+    <input name="Currency" id="" value="%s"><br>
+    <input name="Amount" id="" value="%s"><br>
+    <input name="FirstName" id="" value="%s"><br>
+    <input name="LastName" id="" value=""><br>
+    <input name="EmailAddress" id="" value="test@gmail.com"><br>
+    <input name="MerchantRemark" id="" value=""><br>
+    <input name="State" id="" value=""><br>
+    <input name="City" id="" value=""><br>
+    <input name="Postcode" id="" value=""><br>
+    <input name="Country" id="" value="%s"><br>
+    <input name="Signature" id="" value="%s"><br>
+</form>
+</body>
+</html>

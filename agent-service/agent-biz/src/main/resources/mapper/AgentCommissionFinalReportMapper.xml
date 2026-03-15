@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentCommissionFinalReportRepository">
+
+    <select id="getLatestReport" resultType="com.cloud.baowang.agent.po.commission.AgentCommissionFinalReportPO">
+        select * from agent_commission_final_report
+        where agent_id = #{agentId}
+        order by created_time desc limit 1
+    </select>
+
+    <select id="getLatestReportByTime" resultType="com.cloud.baowang.agent.po.commission.AgentCommissionFinalReportPO">
+        select t1.*
+        FROM
+        `agent_commission_final_report` t1
+        where
+         t1.agent_id = #{vo.agentId}
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND  t1.start_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND t1.end_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        <if test="vo.statusList != null and vo.statusList.size() > 0">
+            and t1.status IN
+            <foreach collection="vo.statusList" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        order by end_time desc limit 1
+    </select>
+
+    <select id="getFinalReportListGroupAgentId" resultType="com.cloud.baowang.agent.api.vo.commission.front.CommissionDetailVO">
+        SELECT
+            t1.agent_account agentAccount,
+            sum(t1.active_number) activeValidNumber,
+            sum(t1.new_valid_number) newActiveNumber,
+            sum(t1.user_win_loss_total) userWinLossTotal,
+            sum(t1.venue_fee) venueFee,
+            sum(t1.transfer_amount) discountUsed,
+            sum(t1.access_fee) accessFee,
+            sum(t1.discount_amount) discountAmount,
+            sum(t1.vip_amount) vipAmount,
+            sum(t1.valid_bet_amount) validBetAmount,
+            sum(t1.active_number) activeValidNumber,
+            sum(t1.new_valid_number) newActiveNumber,
+            sum(t1.net_win_loss) netWinLoss,
+            sum(t1.last_month_remain) lastMonthRemain,
+            sum(t1.commission_amount) commissionAmount,
+            sum(t1.adjust_amount) adjustAmount,
+            sum(t1.review_adjust_amount) reviewAdjustAmount,
+            sum(t1.bet_win_loss) betWinLoss,
+            sum(t1.tips_amount) tipsAmount
+        FROM
+            `agent_commission_final_report` t1
+        where t1.site_code = #{vo.siteCode}
+        <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+            and t1.agent_id IN
+            <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.statusList != null and vo.statusList.size() > 0">
+            and t1.status IN
+            <foreach collection="vo.statusList" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.agentAccount != null and vo.agentAccount != ''">
+            AND t1.agent_account = #{vo.agentAccount}
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND t1.start_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND t1.end_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        group by t1.agent_account
+    </select>
+
+    <select id="getStatisticsByAgentId" resultType="com.cloud.baowang.agent.api.vo.commission.front.CommissionDetailVO">
+        SELECT
+        t1.agent_account agentAccount,
+        sum(t1.active_number) activeValidNumber,
+        sum(t1.new_valid_number) newActiveNumber,
+        sum(t1.user_win_loss_total) userWinLossTotal,
+        sum(t1.venue_fee) venueFee,
+        sum(t1.transfer_amount) discountUsed,
+        sum(t1.access_fee) accessFee,
+        sum(t1.discount_amount) discountAmount,
+        sum(t1.vip_amount) vipAmount,
+        sum(t1.valid_bet_amount) validBetAmount,
+        sum(t1.active_number) activeValidNumber,
+        sum(t1.new_valid_number) newActiveNumber,
+        sum(t1.net_win_loss) netWinLoss,
+        sum(t1.last_month_remain) lastMonthRemain,
+        sum(t1.commission_amount) commissionAmount,
+        sum(t1.adjust_amount) adjustAmount,
+        sum(t1.review_adjust_amount) reviewAdjustAmount,
+        sum(t1.bet_win_loss) betWinLoss,
+        sum(t1.tips_amount) tipsAmount
+        FROM
+        `agent_commission_final_report` t1
+        where t1.site_code = #{vo.siteCode}
+        <if test="vo.agentIds != null and vo.agentIds.size() > 0">
+            and t1.agent_id IN
+            <foreach collection="vo.agentIds" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.agentAccount != null and vo.agentAccount != ''">
+            AND t1.agent_account = #{vo.agentAccount}
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND t1.end_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND t1.start_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        group by t1.agent_account
+    </select>
+
+    <select id="getCommissionFinalList" resultType="com.cloud.baowang.agent.po.commission.AgentCommissionFinalReportPO">
+        SELECT * FROM
+        `agent_commission_final_report`
+        WHERE agent_id = #{vo.agentId}
+        AND (
+        (
+        start_time <![CDATA[ <= ]]> #{vo.startTime}
+        AND end_time <![CDATA[ >= ]]> #{vo.startTime}
+        )
+        OR (
+        start_time <![CDATA[ <= ]]> #{vo.endTime}
+        AND end_time <![CDATA[ >= ]]> #{vo.endTime}
+        )
+        )
+    </select>
+</mapper>

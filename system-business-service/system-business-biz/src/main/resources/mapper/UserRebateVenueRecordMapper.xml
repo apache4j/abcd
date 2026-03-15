@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.system.repositories.site.rebate.UserRebateVenueRecordRepository">
+
+    <select id="siteRebateListPage" resultType="com.cloud.baowang.system.api.vo.site.rebate.ReportUserRebateInfoVO">
+
+       select
+        venueType,
+        venueTypeText,
+        currencyCode,
+        count(DISTINCT(userId)) as issueNums,
+        sum(issueAmount)  as issueAmount,
+        COUNT(DISTINCT CASE WHEN status = 2 THEN userId END) AS receiveNums,
+        SUM(CASE WHEN status = 2 THEN rebateAmount END) AS rebateAmount
+        from (
+               <include refid="rebateQuerySql" />
+        ) as t
+        group by   venueType,venueTypeText,currencyCode
+        ORDER BY venueType ASC, currencyCode ASC
+    </select>
+
+    <sql id="rebateQuerySql" >
+
+        SELECT
+        venue_type as venueType,
+        '' as venueTypeText,
+        currency_code as currencyCode,
+        user_id as userId,
+        IFNULL(act_rebate_amount,0)  as issueAmount,
+        0 as rebateAmount,
+        0 as status
+        from user_rebate_venue_record
+        where 1=1
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            AND site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode != ''">
+            AND currency_code = #{vo.currencyCode}
+        </if>
+        <if test="vo.startTime != null">
+            AND `day_millis` <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND `day_millis` <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        union all
+        SELECT
+        venue_type as venueType,
+        '' as venueTypeText,
+        currency_code as currencyCode,
+        user_id as userId,
+        0 as issueAmount,
+        IFNULL(act_rebate_amount,0)  as rebateAmount,
+        2 as status
+        from user_rebate_venue_record
+        where 1=1
+        and status = 2
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            AND site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode != ''">
+            AND currency_code = #{vo.currencyCode}
+        </if>
+        <if test="vo.startTime != null">
+            AND `day_millis` <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND `day_millis` <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        union all
+        SELECT
+        '-1' as venueType,
+        '人工加减额' as venueTypeText,
+        currency_code as currencyCode,
+        user_id as userId,
+        case adjust_way when 1 then  IFNULL(adjust_amount,0) else  (0-IFNULL(adjust_amount,0)) end as issueAmount,
+        0  AS rebateAmount,
+        0 as status
+        FROM user_manual_up_down_record
+        where 1=1
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            AND site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode != ''">
+            AND currency_code = #{vo.currencyCode}
+        </if>
+        <if test="vo.startTime != null">
+            AND `audit_datetime` <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND `audit_datetime` <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        and  adjust_type=10
+        and  audit_status = 3
+        union all
+        SELECT
+        '-1' as venueType,
+        '人工加减额' as venueTypeText,
+        currency_code as currencyCode,
+        user_id as userId,
+        0  as issueAmount,
+        case adjust_way when 1 then  IFNULL(adjust_amount,0) else  (0-IFNULL(adjust_amount,0)) end   AS rebateAmount,
+        2 as status
+        FROM user_manual_up_down_record
+        where 1=1
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            AND site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode != ''">
+            AND currency_code = #{vo.currencyCode}
+        </if>
+        <if test="vo.startTime != null">
+            AND `audit_datetime` <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND `audit_datetime` <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        and  adjust_type=10
+        and  audit_status = 3
+        and  balance_change_status =1
+    </sql>
+
+
+    <select id="siteTotalRebateInfo" resultType="com.cloud.baowang.system.api.vo.site.rebate.ReportUserRebateInfoVO">
+        select
+        count(DISTINCT(userId)) as issueNums,
+        sum(issueAmount)  as issueAmount,
+        COUNT(DISTINCT CASE WHEN status = 2 THEN userId END) AS receiveNums,
+        SUM(CASE WHEN status = 2 THEN rebateAmount END) AS rebateAmount
+        from (
+        <include refid="rebateQuerySql" />
+        ) as t
+    </select>
+
+<!--
+    <select id="siteRebateInfoPage" resultType="com.cloud.baowang.system.api.vo.site.rebate.ReportUserRebateInfoVO">
+        SELECT venue_type as venueType,
+               currency_code as currencyCode,
+               count(DISTINCT(user_id)) as issueNums,
+                IFNULL(sum(rebate_amount),0)  as issueAmount,
+                COUNT(DISTINCT CASE WHEN status = 2 THEN user_id END) AS receiveNums,
+                SUM(CASE WHEN status = 2 THEN rebate_amount END) AS rebateAmount
+        from user_rebate_venue_record
+        where 1=1
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            AND site_code = #{vo.siteCode}
+        </if>
+
+        <if test="vo.startTime != null">
+            AND `issue_time` <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND `issue_time` <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+
+        GROUP BY venueType,currencyCode order by venueType asc,currencyCode asc
+    </select>-->
+
+
+    <select id="siteReceiveRebatePage" resultType="com.cloud.baowang.system.api.vo.site.rebate.ReportUserRebateInfoVO">
+        SELECT
+        venue_type AS venueType,
+        currency_code AS currencyCode,
+        COUNT(DISTINCT user_id) AS receiveNums,
+        IFNULL(sum(rebate_amount),0) AS rebateAmount
+        FROM user_rebate_venue_record
+        WHERE status = 2
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            AND site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.startTime != null">
+            AND receive_time <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND receive_time <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        GROUP BY venueType, currencyCode
+        ORDER BY venueType ASC, currencyCode ASC
+
+    </select>
+
+
+
+
+    <!--<select id="manualRebateInfo" resultType="com.cloud.baowang.system.api.vo.site.rebate.ReportUserRebateInfoVO">
+        SELECT  COUNT(DISTINCT user_id) AS receiveNums,
+        IFNULL(sum(adjust_amount),0)  AS rebateAmount,
+        currency_code as currencyCode
+        FROM user_manual_up_down_record
+        where 1=1
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            AND site_code = #{vo.siteCode}
+        </if>
+
+        <if test="vo.startTime != null">
+            AND `audit_datetime` <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND `audit_datetime` <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        and adjust_type=10
+        and  audit_status = 3
+        and  balance_change_status =1
+        group by currency_code
+    </select>-->
+
+
+
+    <select id="siteBackAdjustRebatePage" resultType="com.cloud.baowang.system.api.vo.site.rebate.ReportUserRebateInfoVO">
+        SELECT
+            DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(audit_datetime/1000),@@session.time_zone,#{vo.timeZoneDb}),'%Y-%m-%d') as issueTime,
+        currency_code as currencyCode,
+        COUNT(DISTINCT user_id) AS issueNums,
+        case adjust_way when 1 then  SUM(IFNULL(adjust_amount,0)) else  sum((0-IFNULL(adjust_amount,0))) end AS issueAmount,
+        COUNT(DISTINCT user_id) AS receiveNums,
+        case adjust_way when 1 then  SUM(IFNULL(adjust_amount,0)) else  sum((0-IFNULL(adjust_amount,0))) end AS rebateAmount
+        FROM user_manual_up_down_record
+        where 1=1
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            AND site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode != '' ">
+            AND `currency_code` = #{vo.currencyCode}
+        </if>
+        <if test="vo.startTime != null">
+            AND `audit_datetime` <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND `audit_datetime` <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        and adjust_type=10
+        and  audit_status = 3
+        and  balance_change_status =1
+        GROUP BY audit_datetime,currencyCode,adjust_way
+        ORDER BY audit_datetime DESC
+    </select>
+
+
+
+    <select id="venueRebatePage" resultType="com.cloud.baowang.system.api.vo.site.rebate.ReportUserRebateInfoVO">
+        SELECT
+        DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(day_millis/1000),
+        @@session.time_zone,#{vo.timeZoneDb}),'%Y-%m-%d') as issueTime,
+        currency_code as currencyCode,
+        count(DISTINCT(user_id)) as issueNums,
+        IFNULL(sum(act_rebate_amount),0) as issueAmount,
+        COUNT(DISTINCT CASE WHEN status = 2 THEN user_id END) AS receiveNums,
+        SUM(CASE WHEN status = 2 THEN act_rebate_amount END) AS rebateAmount
+        from user_rebate_venue_record
+        where 1=1
+        <if test="vo.siteCode != null and vo.siteCode != ''">
+            AND site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode != '' ">
+            AND `currency_code` = #{vo.currencyCode}
+        </if>
+        <if test="vo.venueType != null and vo.venueType != '' ">
+            AND `venue_type` = #{vo.venueType}
+        </if>
+        <if test="vo.startTime != null">
+            AND `day_millis` <![CDATA[ >= ]]> #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null">
+            AND `day_millis` <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        GROUP BY  day_millis, currencyCode
+        ORDER BY  day_millis ASC, currencyCode ASC
+
+    </select>
+
+
+
+
+
+
+</mapper>

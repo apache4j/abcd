@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.wallet.repositories.SiteSecurityChangeLogRepository">
+
+    <select id="selectTotal" resultType="com.cloud.baowang.wallet.api.vo.siteSecurity.SiteSecurityChangeLogRespVO">
+        SELECT
+        currency,
+       sum( `before_amount` ) AS before_amount,
+       sum( `change_amount` ) AS change_amount,
+       sum( `after_amount` ) AS after_amount
+       from
+       (
+            select  *
+            FROM
+            site_security_change_log
+            ${ew.customSqlSegment}
+        ) as t
+         group by currency
+    </select>
+
+</mapper>

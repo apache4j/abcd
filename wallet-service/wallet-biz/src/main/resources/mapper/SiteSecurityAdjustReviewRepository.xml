@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.wallet.repositories.SiteSecurityAdjustReviewRepository">
+
+    <select id="getReviewPage" resultType="com.cloud.baowang.wallet.api.vo.siteSecurity.SiteSecurityAdjustReviewVO">
+        SELECT
+        a.id as id ,
+        a.site_code as siteCode,
+        a.apply_time as applyTime,
+        a.first_review_time as firstReviewTime ,
+        a.review_order_number as reviewOrderNumber,
+        a.review_status as reviewOperation,
+        a.review_status as reviewStatus,
+        a.apply_user as applyUser,
+        a.first_reviewer as firstReviewer,
+        a.lock_status as lockStatus,
+        a.adjust_type as adjustType,
+        a.adjust_amount as adjustAmount,
+        a.locker as locker,
+        a.review_remark as reviewRemark,
+        a.created_time as createdTime,
+        a.updated_time as updatedTime,
+        a.creator as creator,
+        a.updater as updater,
+        a.currency as currency,
+        a.remark as remark,
+        b.account_status as accountStatus,
+        a.site_name as siteName
+        FROM site_security_adjust_review a
+        LEFT JOIN site_security_balance b ON a.site_code = b.site_code
+        <where>
+             a.review_status in (1,2)
+            <if test="vo.applyTimeStart != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+
+            <if test="vo.firstReviewTimeStart != null">
+                AND a.first_review_time <![CDATA[ >= ]]> #{vo.firstReviewTimeStart}
+            </if>
+
+            <if test="vo.firstReviewTimeEnd != null">
+                AND a.first_review_time <![CDATA[ <= ]]> #{vo.firstReviewTimeEnd}
+            </if>
+
+            <if test="vo.reviewOrderNumber != null and vo.reviewOrderNumber != ''">
+                AND a.review_order_number = #{vo.reviewOrderNumber}
+            </if>
+            <if test="vo.lockStatus != null">
+                AND a.lock_status = #{vo.lockStatus}
+            </if>
+
+            <if test="vo.siteName != '' and vo.siteName != null">
+                AND a.site_name = #{vo.siteName}
+            </if>
+
+            <if test="vo.adjustType != null">
+                AND a.adjust_type = #{vo.adjustType}
+            </if>
+            <if test="vo.firstReviewer != '' and vo.firstReviewer != null">
+                AND a.first_reviewer = #{vo.firstReviewer}
+            </if>
+
+        </where>
+          ORDER BY  lock_status desc,a.review_operation ASC, a.review_status ASC, a.apply_time desc
+    </select>
+
+
+
+    <select id="detail" resultType="com.cloud.baowang.wallet.api.vo.siteSecurity.SiteSecurityAdjustReviewDetailVO">
+        SELECT
+        a.id as id,
+        a.review_order_number as reviewOrderNumber,
+        a.apply_user  as applyUser,
+        a.apply_time  as applyTime,
+        a.adjust_type  as adjustType,
+        a.currency  as currency,
+        a.adjust_amount  as adjustAmount,
+        a.remark  as remark,
+        first_review_time  as firstReviewTime,
+        first_reviewer  as firstReviewer,
+        review_remark  as reviewRemark,
+        s.site_name  as siteName,
+        s.site_code  as siteCode,
+        s.company  as company,
+        s.site_type  as siteType,
+        s.`status`  as status,
+        s.site_admin_account  as siteAdminAccount,
+        s.remark as siteRemark
+        FROM
+        site_security_adjust_review a
+        LEFT JOIN site_info s ON a.site_code = s.site_code
+        where a.id =#{id}
+    </select>
+
+    <select id="logsPageList" resultType="com.cloud.baowang.wallet.api.vo.siteSecurity.SiteSecurityAdjustReviewLogVO">
+        SELECT
+        a.id as id,
+        a.site_code as siteCode,
+        a.site_name as siteName,
+        a.review_order_number as reviewOrderNumber,
+        a.review_status as reviewStatus,
+        a.adjust_type as adjustType,
+        a.currency as currency ,
+        a.apply_user as applyUser,
+        a.remark as remark,
+        a.adjust_amount as adjustAmount,
+        a.apply_time as applyTime,
+        a.first_reviewer as firstReviewer,
+        a.first_review_time as firstReviewTime,
+        ( a.first_review_time - a.lock_time )/ 1000 AS reviewTotalTime,
+        b.account_status as accountStatus,
+        b.security_status as securityStatus,
+        a.review_remark as reviewRemark
+        FROM
+        site_security_adjust_review a
+        LEFT JOIN site_security_balance b ON a.site_code = b.site_code
+        <where>
+            a.review_status in (3,4)
+            <if test="vo.applyTimeStart != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.firstReviewTimeStart != null">
+                AND a.first_review_time <![CDATA[ >= ]]> #{vo.firstReviewTimeStart}
+            </if>
+
+            <if test="vo.firstReviewTimeEnd != null">
+                AND a.first_review_time <![CDATA[ <= ]]> #{vo.firstReviewTimeEnd}
+            </if>
+
+            <if test="vo.reviewOrderNumber != null and vo.reviewOrderNumber != ''">
+                AND a.review_order_number = #{vo.reviewOrderNumber}
+            </if>
+
+            <if test="vo.siteName != '' and vo.siteName != null">
+                AND a.site_name = #{vo.siteName}
+            </if>
+
+
+            <if test="vo.adjustType != null">
+                AND a.adjust_type = #{vo.adjustType}
+            </if>
+            <if test="vo.firstReviewer != '' and vo.firstReviewer != null">
+                AND a.first_reviewer = #{vo.firstReviewer}
+            </if>
+
+            <if test="vo.reviewStatus != null">
+                AND a.review_status = #{vo.reviewStatus}
+            </if>
+        </where>
+        ORDER BY  a.updated_time desc
+    </select>
+
+
+    <select id="logsPageListTotalCount" resultType="java.lang.Long">
+        SELECT
+         count(*)
+        FROM
+        site_security_adjust_review a
+        LEFT JOIN site_security_balance b ON a.site_code = b.site_code
+        <where>
+            a.review_status in (3,4)
+            <if test="vo.applyTimeStart != null">
+                AND a.apply_time <![CDATA[ >= ]]> #{vo.applyTimeStart}
+            </if>
+            <if test="vo.applyTimeEnd != null">
+                AND a.apply_time <![CDATA[ <= ]]> #{vo.applyTimeEnd}
+            </if>
+            <if test="vo.firstReviewTimeStart != null">
+                AND a.first_review_time <![CDATA[ >= ]]> #{vo.firstReviewTimeStart}
+            </if>
+
+            <if test="vo.firstReviewTimeEnd != null">
+                AND a.first_review_time <![CDATA[ <= ]]> #{vo.firstReviewTimeEnd}
+            </if>
+            <if test="vo.reviewOrderNumber != null and vo.reviewOrderNumber != ''">
+                AND a.review_order_number = #{vo.reviewOrderNumber}
+            </if>
+            <if test="vo.siteName != '' and vo.siteName != null">
+                AND a.site_name = #{vo.siteName}
+            </if>
+            <if test="vo.adjustType != null">
+                AND a.adjust_type = #{vo.adjustType}
+            </if>
+            <if test="vo.firstReviewer != '' and vo.firstReviewer != null">
+                AND a.first_reviewer = #{vo.firstReviewer}
+            </if>
+            <if test="vo.reviewStatus != null">
+                AND a.review_status = #{vo.reviewStatus}
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

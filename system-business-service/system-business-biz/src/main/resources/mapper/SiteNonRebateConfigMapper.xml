@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.system.repositories.site.rebate.SiteNonRebateConfigRepository">
+
+
+    <select id="listPage" resultType="com.cloud.baowang.system.po.site.rebate.SiteNonRebateConfigPO">
+        SELECT * FROM site_non_rebate_config
+        WHERE site_code = #{vo.siteCode}
+        <if test="vo.venueType != null and vo.venueType != ''">
+            AND venue_type = #{vo.venueType}
+        </if>
+
+        <if test="vo.venueCode != null and vo.venueCode != ''">
+            AND venue_code = #{vo.venueCode}
+        </if>
+
+        <if test="vo.updater != null and vo.updater != ''">
+            AND updater = #{vo.updater}
+        </if>
+
+        <if test="vo.gameName != null and vo.gameName != ''">
+            and JSON_CONTAINS(game_info, JSON_OBJECT('gameName', #{vo.gameName}), '$')
+        </if>
+
+        order by updated_time desc
+
+    </select>
+
+
+</mapper>

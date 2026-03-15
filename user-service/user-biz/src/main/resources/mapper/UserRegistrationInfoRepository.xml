@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.user.repositories.UserRegistrationInfoRepository">
+
+    <select id="getTotalCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        from user_registration_info a
+        <where>
+            <if test="vo.startRegistrationTime != null">
+                AND a.registration_time <![CDATA[ >= ]]> #{vo.startRegistrationTime}
+            </if>
+            <if test="vo.endRegistrationTime != null">
+                AND a.registration_time <![CDATA[ <= ]]> #{vo.endRegistrationTime}
+            </if>
+            <if test="vo.memberType != null and vo.memberType.size() > 0">
+                AND a.member_type IN
+                <foreach collection="vo.memberType" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.registerTerminal != null and vo.registerTerminal.size() > 0">
+                AND a.register_terminal IN
+                <foreach collection="vo.registerTerminal" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.memberId != null and vo.memberId != ''">
+                AND a.member_id = #{vo.memberId}
+            </if>
+            <if test="vo.superiorAgent != null and vo.superiorAgent != '' ">
+                AND a.superior_agent = #{vo.superiorAgent}
+            </if>
+            <if test="vo.registerIp != null and vo.registerIp != '' ">
+                AND a.register_ip = #{vo.registerIp}
+            </if>
+            <if test="vo.ipAttribution != null and vo.ipAttribution != '' ">
+                AND a.ip_attribution = #{vo.ipAttribution}
+            </if>
+            <if test="vo.memberAccount != null and vo.memberAccount != '' ">
+                AND a.member_account = #{vo.memberAccount}
+            </if>
+            <if test="vo.siteCode != null and vo.siteCode != '' ">
+                AND a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.email != null and vo.email != '' ">
+                AND a.email = #{vo.email}
+            </if>
+            <if test="vo.phone != null and vo.phone != '' ">
+                AND a.phone = #{vo.phone}
+            </if>
+        </where>
+    </select>
+
+    <select id="getByPage" resultType="com.cloud.baowang.user.api.vo.user.UserRegistrationInfoResVO">
+        SELECT
+            a.registration_time as registrationTime,
+            a.member_id as memberId,
+            a.member_type as memberType,
+            a.main_currency as mainCurrency,
+            a.superior_agent as superiorAgent,
+            a.member_account as memberAccount,
+            a.register_ip as registerIp,
+            a.ip_attribution as ipAttribution,
+            a.register_terminal as registerTerminal,
+            a.terminal_device_number as terminalDeviceNumber,
+            b.phone as phone,
+            b.area_code as areaCode,
+            b.area_code as areaCode_$_phone,
+            b.email as email,
+            a.site_code as siteCode,
+           a.agent_id as agentId
+        FROM user_registration_info a
+        left join user_info b on a.member_id = b.user_id
+        <where>
+            <if test="vo.startRegistrationTime != null">
+                AND a.registration_time <![CDATA[ >= ]]> #{vo.startRegistrationTime}
+            </if>
+            <if test="vo.endRegistrationTime != null">
+                AND a.registration_time <![CDATA[ <= ]]> #{vo.endRegistrationTime}
+            </if>
+            <if test="vo.ownerAgent ==1 ">
+                AND a.superior_agent is not null
+            </if>
+            <if test="vo.ownerAgent ==0 ">
+                AND a.superior_agent  null
+            </if>
+            <if test="vo.memberType != null and vo.memberType.size() > 0">
+                AND a.member_type IN
+                <foreach collection="vo.memberType" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.registerTerminal != null and vo.registerTerminal.size() > 0">
+                AND a.register_terminal IN
+                <foreach collection="vo.registerTerminal" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.accountType != null ">
+                AND a.member_type = #{vo.accountType}
+            </if>
+            <if test="vo.memberId != null and vo.memberId != ''">
+                AND a.member_id =  #{vo.memberId}
+            </if>
+            <if test="vo.superiorAgent != null and vo.superiorAgent != '' ">
+                AND a.superior_agent = #{vo.superiorAgent}
+            </if>
+            <if test="vo.registerIp != null and vo.registerIp != '' ">
+                AND a.register_ip =  #{vo.registerIp}
+            </if>
+            <if test="vo.ipAttribution != null and vo.ipAttribution != '' ">
+                AND a.ip_attribution =  #{vo.ipAttribution}
+            </if>
+            <if test="vo.memberAccount != null and vo.memberAccount != '' ">
+                AND a.member_account =  #{vo.memberAccount}
+            </if>
+            <if test="vo.siteCode != null and vo.siteCode != '' ">
+                AND a.site_code =  #{vo.siteCode}
+            </if>
+            <if test="vo.email != null and vo.email != '' ">
+                AND b.email =  #{vo.email}
+            </if>
+            <if test="vo.phone != null and vo.phone != '' ">
+                AND b.phone LIKE CONCAT('%', #{vo.phone},'%')
+            </if>
+        </where>
+        <choose>
+            <when test="vo.orderField != null and vo.orderField != ''
+                            and vo.orderType != null and vo.orderType != ''">
+                ORDER BY ${vo.orderField} ${vo.orderType}
+            </when>
+            <otherwise>
+                ORDER BY a.registration_time DESC
+            </otherwise>
+        </choose>
+    </select>
+</mapper>

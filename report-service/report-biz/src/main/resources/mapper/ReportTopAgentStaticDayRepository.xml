@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.report.repositories.ReportTopAgentStaticDayRepository">
+
+
+    <select id="selectTotal" resultType="com.cloud.baowang.report.po.ReportTopAgentStaticDayPO">
+        SELECT
+        currency_code,
+        sum( `user_num` ) AS user_num,
+        sum( `register_user_num` ) AS register_user_num,
+        sum( `first_deposit_num` ) AS first_deposit_num,
+        sum( `bet_user_count` ) AS bet_user_count,
+        sum( `bet_amount` ) AS bet_amount,
+        sum( `valid_amount` ) AS valid_amount,
+        sum( `rebate_amount` ) AS rebate_amount,
+        sum( `win_loss_amount_user` ) AS win_loss_amount_user,
+        sum( `win_loss_amount_plat` ) AS win_loss_amount_plat,
+        sum( `adjust_amount` ) AS adjust_amount,
+        sum( `activity_amount` ) AS activity_amount,
+        sum( `vip_amount` ) AS vip_amount,
+        sum( `already_use_amount` ) AS already_use_amount,
+        sum( `deposit_amount` ) AS deposit_amount,
+        sum( `withdraw_amount` ) AS withdraw_amount,
+        sum( `deposit_withdraw_fee_amount` ) AS deposit_withdraw_fee_amount
+        from
+        (
+            select  *
+            FROM
+            report_top_agent_static_day
+             ${ew.customSqlSegment}
+        ) as t
+        group by currency_code
+    </select>
+
+    <select id="selectGroupPage"  resultType="com.cloud.baowang.report.po.ReportTopAgentStaticDayPO">
+        SELECT
+        agent_id,
+        agent_account,
+        currency_code,
+        register_time,
+        sum( `team_agent_num` ) AS team_agent_num,
+        sum( `direct_report_num` ) AS direct_report_num,
+        sum( `user_num` ) AS user_num,
+        sum( `register_user_num` ) AS register_user_num,
+        sum( `first_deposit_num` ) AS first_deposit_num,
+        sum( `bet_user_count` ) AS bet_user_count,
+        sum( `bet_amount` ) AS bet_amount,
+        sum( `valid_amount` ) AS valid_amount,
+        sum( `rebate_amount` ) AS rebateAmount,
+        sum( `win_loss_amount_user` ) AS win_loss_amount_user,
+        sum( `win_loss_amount_plat` ) AS win_loss_amount_plat,
+        sum( `adjust_amount` ) AS adjust_amount,
+        sum( `activity_amount` ) AS activity_amount,
+        sum( `vip_amount` ) AS vip_amount,
+        sum( `already_use_amount` ) AS already_use_amount,
+        sum( `deposit_amount` ) AS deposit_amount,
+        sum( `withdraw_amount` ) AS withdraw_amount,
+        sum( `deposit_withdraw_fee_amount` ) AS deposit_withdraw_fee_amount
+        from
+        (
+            select  *
+            FROM
+            report_top_agent_static_day
+            ${ew.customSqlSegment}
+        ) as t
+        group by agent_id,agent_account,currency_code,register_time
+        order by  register_time desc
+    </select>
+
+    <select id="selectTeamNumGroupPage"  resultType="com.cloud.baowang.report.po.ReportTopAgentStaticDayPO">
+        SELECT
+        agent_id,
+        agent_account,
+        sum( `team_agent_num` ) AS team_agent_num,
+        sum( `direct_report_num` ) AS direct_report_num
+        from
+        (
+            select
+            agent_id,agent_account,report_date,
+            max( `team_agent_num` ) AS team_agent_num,
+            max( `direct_report_num` ) AS direct_report_num
+            FROM
+                (
+                    select * from
+                    report_top_agent_static_day
+                    ${ew.customSqlSegment}
+                 ) as w
+            group by agent_id,agent_account,report_date
+        ) as t
+        group by agent_id,agent_account
+    </select>
+
+    <select id="selectTeamNumTotal"  resultType="com.cloud.baowang.report.po.ReportTopAgentStaticDayPO">
+        SELECT
+        sum( `team_agent_num` ) AS team_agent_num,
+        sum( `direct_report_num` ) AS direct_report_num
+        from
+        (
+            select
+               agent_id,agent_account,report_date,
+                max( `team_agent_num` ) AS team_agent_num,
+                max( `direct_report_num` ) AS direct_report_num
+                FROM
+                 (
+                    select * from
+                      report_top_agent_static_day
+                        ${ew.customSqlSegment}
+                ) as w
+                group by agent_id,agent_account,report_date
+        ) as t
+    </select>
+</mapper>

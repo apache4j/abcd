@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.user.repositories.VIPChangeRepository">
+    <select id="selectVIPChangePage" resultType="com.cloud.baowang.user.api.vo.vip.VIPChangeVO">
+        select
+        change_type as changeType,
+        change_time as changeTime,
+        change_before as changeBefore,
+        change_after as changeAfter,
+        user_account as userAccount,
+        account_type as accountType,
+        user_label as userLabel,
+        control_rank as controlRank,
+        account_status as accountStatus,
+        operator as operator
+        from vip_change_info
+        where 1 = 1
+        <if test="vo.changeType != null">
+            AND change_type = #{vo.changeType}
+        </if>
+        <if test="vo.userAccount != null and vo.userAccount != ''">
+            AND user_account = #{vo.userAccount}
+        </if>
+        <if test="vo.operator != null and vo.operator != ''">
+            AND operator = #{vo.operator}
+        </if>
+        <if test="vo.changeTimeStart != null and vo.changeTimeStart != ''">
+            AND change_time <![CDATA[ >= ]]> #{vo.changeTimeStart}
+        </if>
+        <if test="vo.changeTimeEnd != null and vo.changeTimeEnd != ''">
+            AND change_time <![CDATA[ <= ]]> #{vo.changeTimeEnd}
+        </if>
+        <if test="vo.orderField != null and vo.orderField != ''">
+            order by ${vo.orderField} ${vo.orderType}
+        </if>
+        <if test="vo.orderField == null || vo.orderField == ''">
+            order by change_time desc
+        </if>
+    </select>
+</mapper>

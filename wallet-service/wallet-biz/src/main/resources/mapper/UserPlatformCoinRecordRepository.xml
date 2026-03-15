@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.wallet.repositories.UserPlatformCoinRecordRepository">
+
+    <select id="sumUserPlatformCoinRecord" resultType="com.cloud.baowang.wallet.api.vo.userCoinRecord.UserPlatformCoinRecordVO">
+        SELECT
+            "总计" AS orderNo,
+            IFNULL(SUM(a.coin_from),0) AS coinFrom,
+            IFNULL(SUM(a.coin_value),0) AS coinValue,
+            IFNULL(SUM(a.coin_to),0) AS coinTo
+        FROM
+            user_platform_coin_record a
+        WHERE
+            a.site_code = #{vo.siteCode}
+        <if test="vo.coinRecordStartTime != null">
+            AND a.created_time &gt;= #{vo.coinRecordStartTime}
+        </if>
+        <if test="vo.coinRecordEndTime != null">
+            AND a.created_time &lt;= #{vo.coinRecordEndTime}
+        </if>
+        <if test="vo.orderNo != null and vo.orderNo !=''">
+            AND a.order_no = #{vo.orderNo}
+        </if>
+        <if test="vo.currencyCode != null and vo.currencyCode !=''">
+            AND a.currency = #{vo.currencyCode}
+        </if>
+        <if test="vo.userAccount != null and vo.userAccount !=''">
+            AND a.user_account = #{vo.userAccount}
+        </if>
+        <if test="vo.accountStatus != null and vo.accountStatus !=''">
+            AND a.account_status = #{vo.accountStatus}
+        </if>
+        <if test="vo.riskLevelId != null and vo.riskLevelId !=''">
+            AND a.risk_control_level_id = #{vo.riskLevelId}
+        </if>
+        <if test="vo.minVipRank != null and vo.minVipRank !=''">
+            AND a.vip_rank &gt;= #{vo.minVipRank}
+        </if>
+        <if test="vo.maxVipRank != null and vo.maxVipRank !=''">
+            AND a.vip_rank &lt;= #{vo.maxVipRank}
+        </if>
+        <if test="vo.minVipGradeCode != null and vo.minVipGradeCode !=''">
+            AND a.vip_grade_code &gt;= #{vo.minVipGradeCode}
+        </if>
+        <if test="vo.maxVipGradeCode != null and vo.maxVipGradeCode !=''">
+            AND a.vip_grade_code &lt;= #{vo.maxVipGradeCode}
+        </if>
+        <if test="vo.businessCoinType != null and vo.businessCoinType !=''">
+            AND a.business_coin_type = #{vo.businessCoinType}
+        </if>
+        <if test="vo.coinType != null and vo.coinType !='' ">
+            AND a.coin_type = #{vo.coinType}
+        </if>
+        <if test="vo.balanceType != null and vo.balanceType !=''">
+            AND a.balance_type = #{vo.balanceType}
+        </if>
+        <if test="vo.businessCoinTypeList != null and vo.businessCoinTypeList.size > 0">
+            AND a.business_coin_type IN
+            <foreach collection="vo.businessCoinTypeList" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        <if test="vo.coinTypeList != null  and vo.coinTypeList.size > 0">
+            AND a.coin_type IN
+            <foreach collection="vo.coinTypeList" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+
+        <if test="vo.minCoinValue != null ">
+            AND a.coin_value &gt;= #{vo.minCoinValue}
+        </if>
+        <if test="vo.maxCoinValue != null ">
+            AND a.coin_value &lt;= #{vo.maxCoinValue}
+        </if>
+
+    </select>
+    <!--<select id="listUserCoinDetail" resultType="com.cloud.baowang.wallet.api.vo.userCoinRecord.UserCoinRecordDetailVO">
+        SELECT
+        coinRecordDetail.orderNo,
+        coinRecordDetail.customerCoinType,
+        coinRecordDetail.coinRealAmount,
+        coinRecordDetail.orderAmount,
+        coinRecordDetail.coinTime,
+        coinRecordDetail.remark,
+        coinRecordDetail.exchangeRate AS exchangeRate,
+        coinRecordDetail.paymentMethod AS paymentMethod,
+        coinRecordDetail.handleStatus AS handleStatus
+        FROM
+        (
+            SELECT
+                udw.order_no AS orderNo,
+                IF(udw.type = '1','1','3') AS customerCoinType,
+                udw.arrive_amount AS coinRealAmount,
+                udw.apply_amount AS orderAmount,
+                udw.updated_time AS coinTime,
+                IF(udw.STATUS = '101','1',IF(udw.STATUS IN ('3','6','9','96','97','98','100'),'3','2')) AS handleStatus,
+                udw.remark AS remark,
+                IFNULL( udw.exchange_rate, '1' ) AS exchangeRate,
+                IF(udw.type = '1',udw.payment_method,udw.wallet_type) AS paymentMethod
+            FROM
+                user_deposit_withdrawal udw
+            WHERE
+                udw.user_account = #{vo.userAccount}
+                AND udw.updated_time &gt;= #{startTime}
+                AND udw.updated_time &lt;= #{endTime} UNION
+            SELECT
+            uci.order_no AS orderNo,
+            uci.customer_coin_type AS customerCoinType,
+            uci.coin_value AS coinRealAmount,
+            IFNULL(uci.order_amount,uci.coin_value) AS orderAmount,
+            uci.created_time AS coinTime,
+            '1' AS handleStatus,
+            uci.remark AS remark,
+            IFNULL(uci.exchange_rate,'1') AS exchangeRate,
+            uci.payment_method AS paymentMethod
+            FROM
+            user_coin_record uci
+            WHERE
+            uci.user_account = #{vo.userAccount}
+            AND (uci.customer_coin_type is null or uci.customer_coin_type != '5')
+            AND uci.coin_type not in ('1','7','21','22','25','26','27')
+            AND uci.balance_type not in ('3','4')
+            AND uci.created_time &gt;= #{startTime}
+            AND uci.created_time &lt;= #{endTime} UNION
+            SELECT
+            tr.order_id AS orderNo,
+            '5' AS customerCoinType,
+            tr.amount AS coinRealAmount,
+            tr.amount AS orderAmount,
+            tr.created_time AS coinTime,
+            ( CASE tr.order_status WHEN '0' THEN '1' WHEN '1' THEN '3' WHEN '2' THEN '2' ELSE '3' END ) AS handleStatus,
+            tr.remark AS remark,
+            '1' AS exchangeRate,
+            '' AS paymentMethod
+            FROM
+            transfer_record tr
+            WHERE
+            tr.user_account = #{vo.userAccount}
+            AND tr.created_time &gt;= #{startTime}
+            AND tr.created_time &lt;= #{endTime}
+            ) coinRecordDetail
+        WHERE
+            1=1
+            <if test="vo.coinRecordStatus != null and vo.coinRecordStatus !=''">
+              AND  coinRecordDetail.handleStatus = #{vo.coinRecordStatus}
+            </if>
+            <if test="vo.customerCoinType != null and vo.customerCoinType !=''">
+                AND  coinRecordDetail.customerCoinType = #{vo.customerCoinType}
+            </if>
+        ORDER BY coinRecordDetail.coinTime DESC
+
+    </select>-->
+    <select id="userDividendPage" resultType="com.cloud.baowang.wallet.api.vo.userDividend.UserDividendPageVO">
+        select a.userAccount,a.dividendType, a.receiveType, a.dividendAmount, a.applyTime, a.receiveTime from (
+<!--        SELECT-->
+<!--        user_account AS userAccount,-->
+<!--        0 AS dividendType,-->
+<!--        receive_amount AS dividendAmount,-->
+<!--        agent_account as agentAccount,-->
+<!--        case when receive_status = 1 then 3 when receive_status = 3 then 4-->
+<!--        when receive_status = 2 then 0  else null end AS receiveType,-->
+<!--        created_time AS applyTime,-->
+<!--        receive_time as receiveTime-->
+<!--        FROM-->
+<!--        activity_user_record-->
+<!--        where receive_status in (1,2,3) UNION-->
+<!--        (-->
+        SELECT
+        user_account AS userAccount,
+        adjust_type as adjustType,
+        <!--case when adjust_type = 1 then 0 when adjust_type = 2 then 3 when adjust_type = 5 then 1
+        when adjust_type = 6 then 2 end AS dividendType,-->
+        adjust_amount AS dividendAmount,
+        agent_account as agentAccount,
+        case when audit_status in (2,5) then 1 when audit_status = 6 then 0 else 2 end AS receiveType,
+        created_time AS applyTime,
+        <!--case when audit_status = 3 then updated_time  else null end  AS receiveTime-->
+        updated_time as receiveTime
+        FROM
+        user_manual_up_down_record
+        WHERE
+        site_code = #{vo.site_code}
+        and adjust_way = 1
+        <if test="vo.manualAdjustType != null and vo.manualAdjustType.size() > 0">
+            AND adjust_type IN
+            <foreach item="type" collection="vo.manualAdjustType" open="(" separator="," close=")">
+                #{type}
+            </foreach>
+        </if>
+
+        )a
+<!--        UNION-->
+<!--        ( SELECT user_account AS userAccount, 3 AS dividendType, rebate_amount AS dividendAmount,-->
+<!--        agent_account as agentAccount, 0 AS receiveType, created_time AS applyTime, created_time as receiveTime  FROM user_rebate_record ) -->
+<!--        UNION-->
+<!--        ( SELECT user_account AS userAccount, 1 AS dividendType, award_amount AS dividendAmount,-->
+<!--        agent_account as agentAccount,-->
+<!--        CASE-->
+<!--        WHEN receive_status = 0 THEN-->
+<!--        3-->
+<!--        WHEN receive_status = 1 THEN-->
+<!--        0-->
+<!--        WHEN receive_status = 2 THEN-->
+<!--        4 ELSE NULL-->
+<!--        END AS receiveType,-->
+<!--        created_time AS applyTime,-->
+<!--        receive_time as receiveTime-->
+<!--        FROM-->
+<!--        vip_award_record-->
+<!--        )-->
+<!--        ) a-->
+        where 1 = 1
+        <if test="vo.beginTime != null">
+            AND a.applyTime <![CDATA[ >= ]]> #{vo.beginTime}
+        </if>
+        <if test="vo.endTime != null">
+            and a.applyTime <![CDATA[ <= ]]> #{vo.endTime}
+        </if>
+        <if test="vo.dividendType != null and vo.dividendType !=''">
+            AND a.dividendType = #{vo.dividendType}
+        </if>
+        <if test="vo.receiveType != null and vo.receiveType !=''">
+            and a.receiveType = #{vo.receiveType}
+        </if>
+        <if test="vo.userAccount != null and vo.userAccount !=''">
+            AND a.userAccount = #{vo.userAccount}
+        </if>
+        <if test="vo.agentAcct != null and vo.agentAcct.size() > 0">
+            AND a.agentAccount IN
+            <foreach collection="vo.agentAcct" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+        order by a.applyTime desc
+    </select>
+
+    <select id="winLoseRecalculateMainPage"
+            resultType="com.cloud.baowang.wallet.api.vo.report.WinLoseRecalculateWalletVO">
+        select
+        a.site_code as siteCode,
+        a.user_id as userId,
+        a.user_account as userAccount,
+        a.agent_id as agentId,
+        a.agent_name as superAgentAccount,
+        b.main_currency as mainCurrency,
+        SUM(case when(a.business_coin_type) in ('2','3') then a.coin_to-a.coin_from    end) as activityAmount,
+        sum(case when(a.business_coin_type) in( '1') then a.coin_to-a.coin_from    end) as vipAmount,
+        /*sum(case when(a.business_coin_type) in( '5') then a.coin_to-a.coin_from    end) as rebateAmount,*/
+        sum(case when(a.business_coin_type) in( '6') then a.coin_to-a.coin_from    end) as platAdjustAmount,
+        ANY_VALUE(b.account_type) AS accountType
+        from user_platform_coin_record a left join user_info b
+        on a.user_id = b.user_id
+        where a.created_time <![CDATA[ >= ]]> #{vo.startTime}
+        and a.created_time <![CDATA[ <= ]]> #{vo.endTime}
+        <if test="vo.siteCode != null and vo.siteCode !=''">
+            and a.site_code = #{vo.siteCode}
+        </if>
+        <if test="vo.businessType != null and !vo.businessType.isEmpty()">
+            AND a.business_coin_type IN
+            <foreach collection="vo.businessType" item="value" separator="," open="(" close=")">
+                #{value}
+            </foreach>
+        </if>
+
+        group by
+        a.site_code,a.user_id,a.user_account,b.main_currency,a.agent_id,a.agent_name
+        order by
+        a.site_code,a.user_id,a.user_account,b.main_currency,a.agent_id,a.agent_name
+    </select>
+
+</mapper>

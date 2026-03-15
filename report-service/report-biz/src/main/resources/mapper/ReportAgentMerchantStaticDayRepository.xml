@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.report.repositories.ReportAgentMerchantStaticDayRepository">
+
+
+    <select id="selectTotal" resultType="com.cloud.baowang.report.po.ReportAgentMerchantStaticDayPO">
+       <!-- SELECT
+        currency_code,
+        sum( `team_agent_num` ) AS team_agent_num,
+        sum( `direct_agent_num` ) AS direct_agent_num,
+        sum( `register_user_num` ) AS register_user_num,
+        sum( `first_deposit_num` ) AS first_deposit_num,
+        sum( `deposit_amount` ) AS deposit_amount,
+        sum( `withdraw_amount` ) AS withdraw_amount,
+        sum( `deposit_withdraw_fee` ) AS deposit_withdraw_fee,
+        sum( `bet_user_num` ) AS bet_user_num,
+        sum( `bet_amount` ) AS bet_amount,
+        sum( `valid_amount` ) AS valid_amount,
+        sum( `win_loss_amount_user` ) AS win_loss_amount_user,
+        sum( `win_loss_amount_plat` ) AS win_loss_amount_plat,
+        sum( `already_use_amount` ) AS already_use_amount
+        from
+        (-->
+            select  *
+            FROM
+            report_agent_merchant_static_day
+            ${ew.customSqlSegment}
+       <!-- ) as t
+        group by currency_code-->
+    </select>
+</mapper>

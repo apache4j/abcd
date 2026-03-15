@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.system.repositories.verify.MailChannelConfigRepository">
+
+
+    <select id="queryEmailChannel" resultType="com.cloud.baowang.system.api.vo.verify.SiteEmailChannelPageVO">
+        select
+        a.id AS id,
+        a.channelId,
+        a.channelName,
+        a.channelCode,
+        a.host,
+        a.status,
+        a.channelTotal,
+        a.operatorTime,
+        a.operator,
+        a.chooseFlag
+
+        from (
+        SELECT
+        t.id AS id,
+        t.channel_id AS channelId,
+        t.channel_name AS channelName,
+        t.channel_code AS channelCode,
+        t.host AS host,
+        t.status AS status,
+
+        CASE
+        WHEN t1.created_time IS NOT NULL THEN t1.created_time
+        ELSE t.updated_time
+        END AS operatorTime,
+
+        CASE
+        WHEN t1.creator IS NOT NULL THEN t1.updater
+        ELSE t.updater
+        END AS operator,
+
+        CASE
+        WHEN t.channel_code = t1.channel_code THEN 1
+        ELSE 0
+        END AS chooseFlag,
+
+        (SELECT COUNT(1) FROM mail_channel_config mcc WHERE mcc.channel_code = t1.channel_code) AS channelTotal
+        FROM
+        mail_channel_config t
+        LEFT JOIN mail_site_link t1
+        ON t.channel_code = t1.channel_code AND t1.site_code = #{vo.siteCode}
+
+        <where>
+            <if test="vo.status != null and vo.status != ''">
+                AND t.status = #{vo.status}
+            </if>
+            <if test="vo.channelName != null and vo.channelName != ''">
+                AND t.channel_name = #{vo.channelName}
+            </if>
+            <if test="vo.channelCode != null and vo.channelCode != ''">
+                AND t.channel_code = #{vo.channelCode}
+            </if>
+        </where>
+        ) a
+
+        ORDER BY a.channelTotal desc ,a.status DESC, a.operatorTime DESC
+    </select>
+</mapper>

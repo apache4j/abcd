@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.user.repositories.UserVipFlowRecordCnRepository">
+
+
+    <select id="lastSiteVipChangeRecordCnPOs" resultType="com.cloud.baowang.user.po.UserVipFlowRecordCnPO">
+        SELECT *
+        FROM (
+            SELECT
+            id,
+            user_id as userId,
+            site_code as siteCode,
+            user_account as userAccount ,
+            vip_grade_code as vipGradeCode,
+            next_vip_grade_code as nextVipGradeCode,
+            bet_amount_exe as betAmountExe,
+            finish_bet_amount as finishBetAmount,
+            upgrade_bet_amount as upgradeBetAmount,
+            finish_relegation_amount as finishRelegationAmount,
+            grade_relegation_amount as gradeRelegationAmount,
+            relegation_days as relegationDays,
+            up_vip_time  as  upVipTime,
+            relegation_days_time as relegationDaysTime,
+            currency_code as currencyCode,
+            created_time as createdTime,
+            updated_time as updatedTime,
+            creator as creator,
+            updater as updater,
+            ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_time DESC) as rn
+        FROM user_vip_flow_record_cn
+        <where>
+            <if test="vo.userId != '' and vo.userId != null">
+                AND user_id = #{vo.userId}
+            </if>
+            <if test="vo.siteCode != '' and vo.siteCode != null">
+                AND site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.currencyCode != '' and vo.currencyCode != null  ">
+                AND currency_code = #{vo.currencyCode}
+            </if>
+        </where>
+        ) t
+        WHERE rn = 1
+        <if test="vo.relegationDaysTime != '' and vo.relegationDaysTime != null  ">
+            AND relegationDaysTime =  #{vo.relegationDaysTime}
+            AND gradeRelegationAmount > finishRelegationAmount
+            AND vipGradeCode != 1
+        </if>
+        <if test="vo.maxVipLevel != '' and vo.maxVipLevel != null  ">
+            AND finishBetAmount >= upgradeBetAmount
+            AND vipGradeCode != #{vo.maxVipLevel}
+        </if>
+        <if test="vo.nextVipGradeCode != '' and vo.nextVipGradeCode != null  ">
+            AND nextVipGradeCode = #{vo.nextVipGradeCode}
+        </if>
+        <if test="vo.vipGradeCode != '' and vo.vipGradeCode != null  ">
+            AND vipGradeCode = #{vo.vipGradeCode}
+        </if>
+        <if test="vo.vipMaxGradeCode != '' and vo.vipMaxGradeCode != null  ">
+            AND finishRelegationAmount >= gradeRelegationAmount
+            AND vipGradeCode = #{vo.vipMaxGradeCode}
+        </if>
+        <if test="vo.maxGradeRelegationDaysTime != '' and vo.maxGradeRelegationDaysTime != null  ">
+            AND relegationDaysTime =  #{vo.maxGradeRelegationDaysTime}
+            AND vipGradeCode != 1
+        </if>
+    </select>
+</mapper>

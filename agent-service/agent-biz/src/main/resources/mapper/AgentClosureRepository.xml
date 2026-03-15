@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.agent.repositories.AgentClosureRepository">
+
+
+    <insert id="insertSelfIfAbsent">
+        INSERT INTO agent_closure(parent_node_id, child_node_id, distance)
+        VALUES (#{nodeId}, #{nodeId}, 0)
+            ON DUPLICATE KEY UPDATE distance = distance
+    </insert>
+
+    <insert id="insertByParent">
+        INSERT INTO agent_closure(parent_node_id, child_node_id, distance)
+        SELECT parent_node_id, #{newUserId}, distance + 1
+        FROM agent_closure
+        WHERE child_node_id = #{parentUserId}
+            ON DUPLICATE KEY UPDATE distance = VALUES(distance)
+    </insert>
+
+
+
+</mapper>

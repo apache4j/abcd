@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.baowang.user.repositories.UserAccountUpdateReviewRepository">
+
+    <select id="getReviewPage"
+            resultType="com.cloud.baowang.user.api.vo.UserAccountUpdateReviewVO.UserAccountUpdateReviewResVO">
+        SELECT
+        a.id id,
+        a.application_time applicationTime,
+        a.first_review_time firstReviewTime,
+        a.review_order_number reviewOrderNumber,
+        a.review_operation reviewOperation,
+        a.review_status reviewStatus,
+        a.applicant applicant,
+        a.first_instance firstInstance,
+        a.lock_status lockStatus,
+        a.review_application_type reviewApplicationType,
+        a.member_account memberAccount,
+        a.account_type accountType,
+        IF(a.locker = #{adminName}, -1, 5) reviewOperation1,
+        a.application_information applicationInfo,
+        a.before_fixing beforeFixing,
+        a.after_modification afterModification,
+        a.locker locker,
+        a.review_remark reviewRemark
+        FROM user_account_update_review a
+        <where>
+            <if test="vo.siteCode != null  and vo.siteCode != ''">
+                AND a.site_code = #{vo.siteCode}
+            </if>
+            <if test="vo.startApplicationTime != null and vo.startApplicationTime != '' ">
+                AND a.application_time <![CDATA[ >= ]]> #{vo.startApplicationTime}
+            </if>
+            <if test="vo.endApplicationTime != null and vo.endApplicationTime != '' ">
+                AND a.application_time <![CDATA[ <= ]]> #{vo.endApplicationTime}
+            </if>
+            <if test="vo.startFirstReviewTime != null and vo.startFirstReviewTime != '' ">
+                AND a.first_review_time <![CDATA[ >= ]]> #{vo.startFirstReviewTime}
+            </if>
+            <if test="vo.endFirstReviewTime != null and vo.endFirstReviewTime != '' ">
+                AND a.first_review_time <![CDATA[ <= ]]> #{vo.endFirstReviewTime}
+            </if>
+            <if test="vo.memberAccount != null and vo.memberAccount != '' ">
+                AND a.member_account = #{vo.memberAccount}
+            </if>
+            <if test="vo.accountType != null and vo.accountType.length > 0">
+                AND a.account_type IN
+                <foreach collection="vo.accountType" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+
+            <if test="vo.reviewApplicationType != null and vo.reviewApplicationType.length > 0">
+                AND a.review_application_type IN
+                <foreach collection="vo.reviewApplicationType" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+
+            <if test="vo.reviewOperation != null and vo.reviewOperation != '' ">
+                AND a.review_operation = #{vo.reviewOperation}
+            </if>
+            <if test="vo.reviewStatus != null and vo.reviewStatus.length > 0">
+                AND a.review_status IN
+                <foreach collection="vo.reviewStatus" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </if>
+            <if test="vo.applicant != null and vo.applicant != '' ">
+                AND a.applicant = #{vo.applicant}
+            </if>
+            <if test="vo.firstInstance != null and vo.firstInstance != '' ">
+                AND a.first_instance = #{vo.firstInstance}
+            </if>
+            <if test="vo.lockStatus != null and vo.lockStatus != '' ">
+                AND a.lock_status = #{vo.lockStatus}
+            </if>
+            <if test="vo.reviewOrderNumber != null and vo.reviewOrderNumber != '' ">
+                AND a.review_order_number = #{vo.reviewOrderNumber}
+            </if>
+        </where>
+        <choose>
+            <when test="vo.orderField == 'applicationTime' and vo.orderType == 'asc'">
+                ORDER BY applicationTime asc
+            </when>
+            <when test="vo.orderField == 'applicationTime' and vo.orderType == 'desc'">
+                ORDER BY applicationTime desc
+            </when>
+
+            <when test="vo.orderField == 'firstReviewTime' and vo.orderType == 'asc'">
+                ORDER BY firstReviewTime asc
+            </when>
+            <when test="vo.orderField == 'firstReviewTime' and vo.orderType == 'desc'">
+                ORDER BY firstReviewTime desc
+            </when>
+            <otherwise>
+                ORDER BY reviewOperation1 asc,a.review_status ASC,a.review_operation ASC,a.review_application_type ASC, a.application_time ASC
+            </otherwise>
+        </choose>
+    </select>
+</mapper>

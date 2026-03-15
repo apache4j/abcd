@@ -1,0 +1,8 @@
+com.cloud.baowang.common.data.transfer.i18n.config.CustomMessageSourceAutoConfiguration
+com.cloud.baowang.common.data.transfer.i18n.config.I18nMessageSourceAutoConfiguration
+com.cloud.baowang.common.data.transfer.i18n.I18nResponseAdvice
+com.cloud.baowang.common.data.transfer.i18n.config.LocaleConfig
+com.cloud.baowang.common.data.transfer.i18n.I18nOptions
+com.cloud.baowang.common.data.transfer.i18n.cache.I18nMessageCache
+com.cloud.baowang.common.data.transfer.i18n.cache.LanguageInfoCache
+com.cloud.baowang.common.data.transfer.cache.SystemDictCache
